@@ -1,7 +1,7 @@
 PY := .venv/bin/python
 export PYTHONPATH := src
 
-.PHONY: help corpus check test lint evidence validate calibrate sweep prove crossval review clean
+.PHONY: help corpus check test lint evidence validate calibrate sweep prove crossval semantic review clean
 
 help:
 	@echo "  make corpus     fetch PriMock57 (CC BY 4.0, text only -- no audio needed)"
@@ -14,6 +14,7 @@ help:
 	@echo "  make sweep      trace the sensitivity/specificity trade"
 	@echo "  make prove      break it on purpose; see what is caught"
 	@echo "  make crossval   held-out evaluation; nothing scored in-sample"
+	@echo "  make semantic   measure the LLM grader (needs Ollama; not in make check)"
 	@echo "  make review     export a one-file review page you can click through"
 
 corpus:
@@ -44,6 +45,11 @@ prove:
 
 crossval:
 	@$(PY) -m witness.cli crossval
+
+# Not part of `make check`: it needs a model server and takes tens of
+# minutes on a local 7B. Cassettes make the second run free.
+semantic:
+	@$(PY) -m witness.cli semantic $(ARGS)
 
 review:
 	@$(PY) -m witness.cli review

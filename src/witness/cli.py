@@ -21,6 +21,7 @@ from witness.graders.lexical import LexicalGrader
 from witness.matching import MatchResult, match_note
 from witness.pipeline import Pipeline
 from witness.prove import format_report, run_proof
+from witness.providers import OllamaProvider, default_provider
 from witness.segment import segment
 from witness.viewer import export
 
@@ -173,6 +174,51 @@ def cmd_crossval(ns: argparse.Namespace) -> int:
     return 1
 
 
+def cmd_semantic(ns: argparse.Namespace) -> int:
+    from pathlib import Path as _Path
+
+    from witness import semantic_eval as se
+    from witness.graders.lexical import LexicalGrader
+    from witness.graders.semantic import SemanticGrader
+
+    c = _corpus()
+    provider = default_provider(prefer=ns.provider)
+    if provider is None:
+        # Say exactly what is missing. "No provider available" sends a reviewer
+        # looking for a bug in the harness when the answer is a missing model.
+        ollama = OllamaProvider()
+        installed = ollama.installed_models()
+        print("\n  No model provider is reachable.")
+        print("  " + "-" * 68)
+        if installed:
+            print(f"  Ollama is running at {ollama.host} and serves: {', '.join(installed)}")
+            print(f"  ...but the harness wants {ollama.model!r}. Either:")
+            print(f"      ollama pull {ollama.model}")
+            print(f"      OLLAMA_MODEL={installed[0]} make semantic")
+        else:
+            print(f"  Ollama is not answering at {ollama.host}.")
+            print(f"      ollama serve  &&  ollama pull {ollama.model}")
+        print("  Or export ANTHROPIC_API_KEY / OPENAI_API_KEY.")
+        return 2
+
+    print(f"\n  provider: {provider.name} / {provider.model}")
+    print(f"  {ns.consultations or 57} consultation(s), "
+          f"{ns.annotations} generated note(s) each")
+    print("  Responses are cached to cassettes/, so a second run is free and")
+    print("  an interrupted run resumes where it stopped.\n")
+
+    report = se.evaluate(
+        c,
+        graders={"lexical": LexicalGrader(), "semantic": SemanticGrader(provider)},
+        consultation_limit=ns.consultations,
+        annotations_per_consultation=ns.annotations,
+    )
+    print(report.render())
+    out = se.write_report(report, _Path("data/out/semantic_report.json"))
+    print(f"\n  wrote {out}")
+    return 0
+
+
 def cmd_prove(_: argparse.Namespace) -> int:
     c = _corpus()
     calib = cal.calibrate(c, 0.90)
@@ -224,6 +270,15 @@ def main(argv: list[str] | None = None) -> int:
     xv = sub.add_parser("crossval", help="held-out evaluation; no number scored in-sample")
     xv.add_argument("--k", type=int, default=5, help="number of folds (default 5)")
     xv.set_defaults(fn=cmd_crossval)
+
+    sm = sub.add_parser("semantic", help="measure the LLM grader against the offline ones")
+    sm.add_argument("--consultations", type=int, default=None,
+                    help="limit to the first N consultations (default: all 57)")
+    sm.add_argument("--annotations", type=int, default=1,
+                    help="generated notes per consultation (default 1)")
+    sm.add_argument("--provider", default=None, choices=["ollama", "anthropic", "openai"],
+                    help="preferred provider (default: local first)")
+    sm.set_defaults(fn=cmd_semantic)
     rv = sub.add_parser("review", help="export a one-file review page")
     rv.add_argument("--consultation", default="day1_consultation01")
     rv.set_defaults(fn=cmd_review)

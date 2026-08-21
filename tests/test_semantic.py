@@ -1,0 +1,275 @@
+"""The semantic grader, exercised against a scripted provider.
+
+This grader had never been run when these tests were written. It could not be:
+the machine it was built on had no model server, no API key and no route to
+pretrained weights. Shipping it unmeasured and describing it as the fix would
+have been the kind of claim this project exists to object to.
+
+A scripted provider does not measure accuracy and nothing here pretends to.
+What it does measure is every path where the grader must *refuse* a model's
+answer -- a cited utterance that does not exist, a SUPPORTED verdict with no
+citation, unparseable output, a dead provider. Those are the paths that decide
+whether a wrong answer from the model becomes a wrong answer from the harness,
+and they are exactly the paths a live run exercises least, because a working
+model mostly behaves.
+"""
+
+from __future__ import annotations
+
+import json
+
+import pytest
+
+from witness.corpus import Utterance
+from witness.graders.semantic import SemanticGrader
+from witness.grounding import Assertion, Slot, Verdict
+from witness.providers import Completion, ProviderError
+
+UTTERANCES = [
+    Utterance(speaker="doctor", text="What brings you in?", start_s=0.0, end_s=2.0),
+    Utterance(
+        speaker="patient",
+        text="Loose watery stool about six times a day for three days",
+        start_s=2.0,
+        end_s=8.0,
+    ),
+    Utterance(speaker="doctor", text="Any blood in it?", start_s=8.0, end_s=10.0),
+    Utterance(speaker="patient", text="No, no blood at all", start_s=10.0, end_s=12.0),
+]
+
+
+class ScriptedProvider:
+    """Returns whatever it is told to, and records what it was asked."""
+
+    name = "scripted"
+    model = "test"
+
+    def __init__(self, *responses: str):
+        self.responses = list(responses)
+        self.calls: list[str] = []
+
+    def available(self) -> bool:
+        return True
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
+        self.calls.append(user)
+        text = self.responses.pop(0) if self.responses else "{}"
+        if isinstance(text, Exception):  # pragma: no cover - defensive
+            raise text
+        return Completion(text, self.name, self.model)
+
+
+class FailingProvider:
+    name = "failing"
+    model = "test"
+
+    def available(self) -> bool:
+        return True
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
+        raise ProviderError("connection refused")
+
+
+def _verdicts(*items: dict) -> str:
+    return json.dumps({"verdicts": list(items)})
+
+
+def _assertion(i: int, text: str, negated: bool = False) -> Assertion:
+    return Assertion(index=i, text=text, slot=Slot.OTHER, negated=negated)
+
+
+def _ground(provider, assertions):
+    return SemanticGrader(provider).ground_note("c1", "m1", assertions, UTTERANCES)
+
+
+class TestHappyPath:
+    def test_a_cited_verdict_carries_its_span(self):
+        g = _ground(
+            ScriptedProvider(_verdicts({"i": 0, "v": "SUPPORTED", "u": 1, "why": "stated"})),
+            [_assertion(0, "diarrhoea for three days")],
+        )
+        a = g.assertions[0]
+        assert a.verdict is Verdict.SUPPORTED
+        assert [s.utterance_index for s in a.spans] == [1]
+        assert a.spans[0].text.startswith("Loose watery stool")
+
+    def test_inferred_is_preserved_rather_than_flattened(self):
+        # The whole reason this is not an entailment model. Collapsing INFERRED
+        # into SUPPORTED or UNSUPPORTED loses the distinction the grader exists
+        # to make.
+        g = _ground(
+            ScriptedProvider(
+                _verdicts({"i": 0, "v": "INFERRED", "u": 1, "why": "six loose stools -> diarrhoea"})
+            ),
+            [_assertion(0, "diarrhoea")],
+        )
+        assert g.assertions[0].verdict is Verdict.INFERRED
+        assert g.assertions[0].spans
+
+    def test_transcript_is_numbered_for_the_model(self):
+        p = ScriptedProvider(_verdicts({"i": 0, "v": "UNSUPPORTED", "u": None}))
+        _ground(p, [_assertion(0, "x")])
+        assert "[1] patient: Loose watery stool" in p.calls[0]
+
+
+class TestRefusals:
+    """Every path where the grader must not take the model's word for it."""
+
+    def test_a_fabricated_utterance_number_is_refused(self):
+        # Worse than no citation, because it looks like evidence.
+        g = _ground(
+            ScriptedProvider(_verdicts({"i": 0, "v": "SUPPORTED", "u": 99, "why": "said so"})),
+            [_assertion(0, "chest pain")],
+        )
+        a = g.assertions[0]
+        assert a.verdict is Verdict.UNSUPPORTED
+        assert "does not exist" in a.rationale
+        assert not a.spans
+
+    def test_negative_index_is_refused(self):
+        g = _ground(
+            ScriptedProvider(_verdicts({"i": 0, "v": "SUPPORTED", "u": -1})),
+            [_assertion(0, "chest pain")],
+        )
+        assert g.assertions[0].verdict is Verdict.UNSUPPORTED
+
+    def test_supported_without_a_citation_is_refused(self):
+        g = _ground(
+            ScriptedProvider(_verdicts({"i": 0, "v": "SUPPORTED", "u": None, "why": "obvious"})),
+            [_assertion(0, "chest pain")],
+        )
+        a = g.assertions[0]
+        assert a.verdict is Verdict.UNSUPPORTED
+        assert "without citing" in a.rationale
+
+    def test_unrecognised_verdict_is_refused(self):
+        g = _ground(
+            ScriptedProvider(_verdicts({"i": 0, "v": "PROBABLY_FINE", "u": 1})),
+            [_assertion(0, "chest pain")],
+        )
+        assert g.assertions[0].verdict is Verdict.UNSUPPORTED
+        assert "unrecognised" in g.assertions[0].rationale
+
+    def test_unparseable_output_does_not_become_a_clean_bill_of_health(self):
+        g = _ground(
+            ScriptedProvider("I'm sorry, I can't help with clinical documents."),
+            [_assertion(0, "chest pain"), _assertion(1, "nkda")],
+        )
+        assert all(a.verdict is Verdict.UNSUPPORTED for a in g.assertions)
+
+    def test_a_dead_provider_blocks_rather_than_passes(self):
+        # The dangerous failure: a grader that cannot reach its model returning
+        # nothing to report, and a gate reading that as a clean note.
+        g = _ground(FailingProvider(), [_assertion(0, "chest pain")])
+        a = g.assertions[0]
+        assert a.verdict is Verdict.UNSUPPORTED
+        assert "grader unavailable" in a.rationale
+        assert a.is_failure
+
+    def test_a_claim_the_model_skipped_is_not_silently_dropped(self):
+        # Two claims in, one verdict back. The missing one must appear in the
+        # output as unresolved, or the note gets graded on a subset of itself.
+        g = _ground(
+            ScriptedProvider(_verdicts({"i": 0, "v": "SUPPORTED", "u": 1})),
+            [_assertion(0, "diarrhoea"), _assertion(1, "no blood")],
+        )
+        assert len(g.assertions) == 2
+        assert g.assertions[1].verdict is Verdict.UNSUPPORTED
+        assert "no verdict" in g.assertions[1].rationale
+
+
+class TestBatching:
+    def test_every_claim_is_graded_across_batches(self):
+        claims = [_assertion(i, f"claim {i}") for i in range(30)]
+        responses = [
+            _verdicts(*[{"i": i, "v": "SUPPORTED", "u": 1} for i in range(s, min(s + 12, 30))])
+            for s in range(0, 30, 12)
+        ]
+        p = ScriptedProvider(*responses)
+        g = _ground(p, claims)
+        assert len(p.calls) == 3
+        assert len(g.assertions) == 30
+        assert [a.assertion.index for a in g.assertions] == list(range(30))
+        assert all(a.verdict is Verdict.SUPPORTED for a in g.assertions)
+
+    def test_one_failed_batch_does_not_discard_the_others(self):
+        claims = [_assertion(i, f"claim {i}") for i in range(24)]
+        p = ScriptedProvider(
+            _verdicts(*[{"i": i, "v": "SUPPORTED", "u": 1} for i in range(12)]),
+            "garbage",
+        )
+        g = _ground(p, claims)
+        assert len(g.assertions) == 24
+        assert all(a.verdict is Verdict.SUPPORTED for a in g.assertions[:12])
+        assert all(a.verdict is Verdict.UNSUPPORTED for a in g.assertions[12:])
+
+    def test_an_empty_note_makes_no_calls(self):
+        p = ScriptedProvider()
+        g = _ground(p, [])
+        assert p.calls == []
+        assert g.assertions == []
+
+
+class TestReplayIsDisclosed:
+    def test_a_replayed_verdict_says_so(self):
+        # A number produced from a cassette and a number produced from a live
+        # model are different claims, and the report must not conflate them.
+        class Replaying(ScriptedProvider):
+            def complete(self, system, user, max_tokens=1024):
+                self.calls.append(user)
+                return Completion(
+                    _verdicts({"i": 0, "v": "SUPPORTED", "u": 1, "why": "stated"}),
+                    self.name,
+                    self.model,
+                    replayed=True,
+                )
+
+        g = _ground(Replaying(), [_assertion(0, "diarrhoea")])
+        assert "(replayed)" in g.assertions[0].rationale
+
+
+class TestOllamaAvailability:
+    def test_a_missing_model_reports_unavailable(self, monkeypatch):
+        # Reporting "available" when the daemon is up but the model is absent
+        # produces a note full of UNSUPPORTED verdicts that looks like a
+        # measurement and is a missing download.
+        import witness.providers as pv
+
+        class FakeResponse:
+            status = 200
+
+            def read(self):
+                return json.dumps({"models": [{"name": "llama3.1:8b"}]}).encode()
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+        monkeypatch.setattr(pv.urllib.request, "urlopen", lambda *a, **k: FakeResponse())
+        assert not pv.OllamaProvider(model="qwen2.5:7b-instruct").available()
+        assert pv.OllamaProvider(model="llama3.1:8b").available()
+        # A bare family name matches the tag the daemon actually serves.
+        assert pv.OllamaProvider(model="llama3.1").available()
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        '{"verdicts": []}',
+        "{}",
+        "",
+        "null",
+        # This one crashed the grader the first time these tests were run:
+        # .get("verdicts", []) returns None when the key is present and null.
+        '{"verdicts": null}',
+        '{"verdicts": "SUPPORTED"}',
+        '{"verdicts": [null, 3, "x"]}',
+        'Sure! Here is the JSON: {"verdicts": [{"i": 0, "v": "SUPP',
+        '```json\n{"verdicts": []}\n```',
+    ],
+)
+def test_degenerate_payloads_do_not_raise(payload):
+    g = _ground(ScriptedProvider(payload), [_assertion(0, "chest pain")])
+    assert g.assertions[0].verdict is Verdict.UNSUPPORTED

@@ -140,13 +140,30 @@ class SemanticGrader:
 
     @staticmethod
     def _parse(text: str) -> list[dict]:
+        """Recover the verdict list from whatever the model actually emitted.
+
+        Every branch here returns ``[]`` rather than raising, and an empty list
+        becomes UNSUPPORTED for every claim in the batch. That asymmetry is the
+        point: a grader that cannot read its own model's output must block, not
+        pass. A 7B model asked for JSON will wrap it in prose, truncate it
+        mid-object, or answer ``{"verdicts": null}`` -- the last of which
+        crashed this method the first time it was run against a scripted
+        provider, because ``.get("verdicts", [])`` returns ``None`` when the
+        key is present and null.
+        """
         m = _JSON_RE.search(text)
         if not m:
             return []
         try:
-            return json.loads(m.group(0)).get("verdicts", [])
-        except (json.JSONDecodeError, AttributeError):
+            doc = json.loads(m.group(0))
+        except (json.JSONDecodeError, ValueError):
             return []
+        if not isinstance(doc, dict):
+            return []
+        verdicts = doc.get("verdicts")
+        if not isinstance(verdicts, list):
+            return []
+        return [v for v in verdicts if isinstance(v, dict)]
 
     def _to_verdict(
         self,

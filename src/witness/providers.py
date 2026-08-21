@@ -98,16 +98,41 @@ class OllamaProvider:
 
     name = "ollama"
 
-    def __init__(self, model: str = "llama3.1:8b", host: str | None = None):
-        self.model = model
+    #: Any instruct-tuned model Ollama can serve. Overridable with
+    #: ``OLLAMA_MODEL`` so a reviewer can point the harness at whatever they
+    #: already have pulled instead of downloading another several gigabytes.
+    DEFAULT_MODEL = "qwen2.5:7b-instruct"
+
+    def __init__(self, model: str | None = None, host: str | None = None):
+        self.model = model or os.environ.get("OLLAMA_MODEL") or self.DEFAULT_MODEL
         self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
 
     def available(self) -> bool:
+        """Reachable *and* serving the requested model.
+
+        Checking only that the daemon answers reports a provider that then
+        fails on every call, which the semantic grader turns into a note full
+        of UNSUPPORTED verdicts -- a plausible-looking result produced by a
+        missing model rather than by a bad note.
+        """
         try:
             with urllib.request.urlopen(f"{self.host}/api/tags", timeout=2) as r:
-                return r.status == 200
-        except (urllib.error.URLError, OSError, TimeoutError):
+                if r.status != 200:
+                    return False
+                tags = json.loads(r.read()).get("models", [])
+        except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError):
             return False
+        names = {m.get("name", "") for m in tags}
+        return any(n == self.model or n.split(":")[0] == self.model.split(":")[0]
+                   for n in names)
+
+    def installed_models(self) -> list[str]:
+        """What this daemon can actually serve. Printed when the match fails."""
+        try:
+            with urllib.request.urlopen(f"{self.host}/api/tags", timeout=2) as r:
+                return sorted(m.get("name", "") for m in json.loads(r.read()).get("models", []))
+        except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError):
+            return []
 
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
         payload = json.dumps(
