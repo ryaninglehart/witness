@@ -222,3 +222,34 @@ That is a property of the grader, not of the thresholds, and no amount of
 tuning fixes it. It is the measured argument for `graders/semantic.py`, and it
 is why the lexical grader is documented as a floor rather than shipped as an
 answer.
+
+---
+
+## WIT-009 — The fix for WIT-005 was not applied to the facts that mattered most
+
+**What happened.** WIT-005 narrowed a salient fact's identity to its clinical
+core, so coverage was no longer scored over filler. The safety branch was
+exempted from that narrowing and kept `core |= terms` — every token in the
+utterance.
+
+So for allergies, medications and red flags — the categories where a missed
+omission is dangerous rather than untidy — the original bug survived. A patient
+saying *"Um, I have been allergic to penicillin since I was a child"* produced a
+five-term fact including `um`, `since` and `child`. A note reading *"Allergic to
+penicillin"* covers two of those five, falls under the 65% threshold, and the
+correctly recorded allergy was reported as omitted.
+
+**Why it survived.** The aggregate numbers moved in the right direction when
+WIT-005 was fixed — omissions per note fell from 24 to 8.3 — so the fix looked
+complete. The exemption was one line inside the branch that the aggregate
+improvement was hiding.
+
+**What catches the class now.** The safety branch contributes only the terms its
+pattern actually matched, not the whole utterance.
+`test_a_carried_fact_is_not_reported_as_omitted` pins it, and that test is what
+found this.
+
+**The generalisation.** When a fix improves an aggregate, check whether it
+applied to every branch or only to the common one. The uncommon branch here was
+the safety-critical one, which is the usual way round: the rare path is both the
+one that matters most and the one least exercised by summary statistics.

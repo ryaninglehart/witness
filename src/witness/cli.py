@@ -15,10 +15,13 @@ from witness import calibration as cal
 from witness import evidence as ev
 from witness import validate as val
 from witness.corpus import PriMock57
+from witness.gate import Gate
 from witness.graders.lexical import LexicalGrader
 from witness.matching import MatchResult, match_note
+from witness.pipeline import Pipeline
 from witness.prove import format_report, run_proof
 from witness.segment import segment
+from witness.viewer import export
 
 CORPUS = Path(__file__).resolve().parents[2] / "primock57"
 
@@ -153,6 +156,25 @@ def cmd_prove(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_review(ns: argparse.Namespace) -> int:
+    c = _corpus()
+    calib = cal.calibrate(c, 0.90)
+    pipe = Pipeline(
+        gate=Gate(calib.thresholds), max_critical_omissions=calib.max_critical_omissions
+    )
+    cons = c.load_consultation(ns.consultation)
+    anns = [a for a in c.annotations() if a.consultation_id == ns.consultation]
+    note = anns[0].generated_note if anns else cons.clinician_note
+    model = anns[0].model_id if anns else "clinician"
+    run = pipe.run(cons, note, model, publish=False)
+    out = export(run, cons, Path("data/out") / f"{ns.consultation}.html")
+    print(f"\n  wrote {out}")
+    print(f"  {run.grounding.summary()}")
+    print(f"  gate: {'passed' if run.gate.published else 'refused'}")
+    print("  open it and click any claim to see the utterance that justifies it.")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="witness")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -171,6 +193,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("prove", help="break it on purpose; see what is caught").set_defaults(
         fn=cmd_prove
     )
+    rv = sub.add_parser("review", help="export a one-file review page")
+    rv.add_argument("--consultation", default="day1_consultation01")
+    rv.set_defaults(fn=cmd_review)
     ns = p.parse_args(argv)
     return ns.fn(ns)
 

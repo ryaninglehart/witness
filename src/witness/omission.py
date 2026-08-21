@@ -174,11 +174,18 @@ def extract_salient(
         # with the answer, so restricting facts to what was *reported* keeps
         # "any blood in the stool?" from becoming a fact in its own right.
         core = terms & (clinician_terms | highlight_terms)
-        safety_hit = next(
-            (label for label, pat in _SAFETY_PATTERNS if pat.search(text)), None
-        )
-        if safety_hit:
-            core |= terms
+        safety_hit = None
+        for label, pat in _SAFETY_PATTERNS:
+            m = pat.search(text)
+            if m:
+                safety_hit = label
+                # Only the terms the pattern actually matched. Taking the whole
+                # utterance here reintroduced WIT-005 for safety facts alone:
+                # "allergic to penicillin" became a five-term fact including
+                # "um" and "since", which no note reproduces, so a correctly
+                # recorded allergy was still reported as omitted.
+                core |= content_terms(m.group(0))
+                break
         if not core:
             continue
 
