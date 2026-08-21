@@ -1,0 +1,49 @@
+name: witness
+
+# The gate runs on every push and every pull request. A check that only runs
+# when someone remembers to run it is not a check.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # The README claims this runs on a laptop with no special setup, so it
+        # is tested across the versions a reviewer is plausibly holding rather
+        # than only the one it was written on.
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Fetch PriMock57
+        # Text only. The audio is git-lfs, roughly a gigabyte, and nothing in
+        # the harness reads it -- grounding is measured against the human
+        # transcripts the corpus ships.
+        env:
+          GIT_LFS_SKIP_SMUDGE: 1
+        run: git clone --depth 1 https://github.com/babylonhealth/primock57.git
+
+      - name: Install
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt
+
+      - name: Gate
+        # lint, tests, evidence, validation, calibration, sabotage, and the
+        # held-out cross-validation that checks the published figures still
+        # reproduce. Any one of them exiting non-zero fails the build.
+        run: make check

@@ -24,7 +24,7 @@ from pathlib import Path
 from witness.corpus import Consultation, PriMock57
 from witness.gate import Acknowledgement, Gate, GateResult
 from witness.graders.lexical import LexicalGrader
-from witness.grounding import NoteGrounding, Verdict
+from witness.grounding import Grader, NoteGrounding, Verdict
 from witness.omission import OmissionReport, Tier, find_omissions
 from witness.segment import segment
 
@@ -87,7 +87,7 @@ class RunResult:
 class Pipeline:
     def __init__(
         self,
-        grader: LexicalGrader | None = None,
+        grader: Grader | None = None,
         gate: Gate | None = None,
         out_dir: Path | None = None,
         max_critical_omissions: int = 0,

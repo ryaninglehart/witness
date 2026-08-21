@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 from witness import calibration as cal
+from witness import crossval as cx
 from witness import evidence as ev
 from witness import validate as val
 from witness.corpus import PriMock57
@@ -145,6 +146,33 @@ def cmd_sweep(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_crossval(ns: argparse.Namespace) -> int:
+    c = _corpus()
+    report = cx.run(c, k=ns.k)
+    print(report.render())
+
+    if ns.k != 5:
+        print(f"\n  (published figures are 5-fold; k={ns.k} not checked against them)")
+        return 0
+
+    drift = cx.check_published(report)
+    shape = cx.monotone_violations(report.radius)
+    if not drift and not shape:
+        print("\n  every figure the README publishes reproduces within tolerance.")
+        return 0
+
+    # Exit non-zero. A README whose numbers have quietly stopped being true is
+    # the exact defect this project was built to find in other people's
+    # systems, and printing a warning would make this one an instance of it.
+    print("\n  PUBLISHED FIGURES HAVE DRIFTED")
+    print("  " + "-" * 68)
+    for line in drift + shape:
+        print(f"    {line}")
+    print("\n  Update README.md and witness.crossval.PUBLISHED together, or fix")
+    print("  the regression. Do not widen the tolerance to make this pass.")
+    return 1
+
+
 def cmd_prove(_: argparse.Namespace) -> int:
     c = _corpus()
     calib = cal.calibrate(c, 0.90)
@@ -193,6 +221,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("prove", help="break it on purpose; see what is caught").set_defaults(
         fn=cmd_prove
     )
+    xv = sub.add_parser("crossval", help="held-out evaluation; no number scored in-sample")
+    xv.add_argument("--k", type=int, default=5, help="number of folds (default 5)")
+    xv.set_defaults(fn=cmd_crossval)
     rv = sub.add_parser("review", help="export a one-file review page")
     rv.add_argument("--consultation", default="day1_consultation01")
     rv.set_defaults(fn=cmd_review)

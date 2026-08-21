@@ -1,7 +1,7 @@
 PY := .venv/bin/python
 export PYTHONPATH := src
 
-.PHONY: help corpus check test lint evidence validate calibrate sweep prove review clean
+.PHONY: help corpus check test lint evidence validate calibrate sweep prove crossval review clean
 
 help:
 	@echo "  make corpus     fetch PriMock57 (CC BY 4.0, text only -- no audio needed)"
@@ -13,6 +13,7 @@ help:
 	@echo "  make calibrate  derive thresholds from clinician-written notes"
 	@echo "  make sweep      trace the sensitivity/specificity trade"
 	@echo "  make prove      break it on purpose; see what is caught"
+	@echo "  make crossval   held-out evaluation; nothing scored in-sample"
 	@echo "  make review     export a one-file review page you can click through"
 
 corpus:
@@ -41,10 +42,13 @@ sweep:
 prove:
 	@$(PY) -m witness.cli prove
 
+crossval:
+	@$(PY) -m witness.cli crossval
+
 review:
 	@$(PY) -m witness.cli review
 
-check: lint test evidence validate calibrate prove
+check: lint test evidence validate calibrate prove crossval
 	@echo "  all checks passed"
 
 clean:

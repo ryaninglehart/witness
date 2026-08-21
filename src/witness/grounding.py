@@ -37,6 +37,11 @@ before it was designed here.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from witness.corpus import Utterance
+
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -175,3 +180,24 @@ class NoteGrounding:
             "safety_failures": len(self.safety_failures),
             "unsupported_rate": round(self.unsupported_rate, 4),
         }
+
+
+class Grader(Protocol):
+    """What every grader must provide.
+
+    Stated as a protocol rather than a base class so a grader can be written
+    without importing this module's machinery, and so the pipeline, the
+    calibrator and the sabotage harness all name the same contract instead of
+    each hard-coding the lexical implementation -- which is how the first
+    version of this project ended up unable to measure a second grader at all.
+    """
+
+    name: str
+
+    def ground_note(
+        self,
+        consultation_id: str,
+        model_id: str,
+        assertions: list[Assertion],
+        utterances: list[Utterance],
+    ) -> NoteGrounding: ...

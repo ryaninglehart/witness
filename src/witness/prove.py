@@ -23,6 +23,7 @@ from dataclasses import dataclass
 
 from witness.corpus import Consultation
 from witness.gate import Gate, Thresholds
+from witness.grounding import Grader
 from witness.pipeline import Pipeline
 
 Injection = Callable[[str], str]
@@ -167,7 +168,7 @@ class ProofResult:
         return self.blocked == self.sabotage.should_block
 
 
-def clean_baseline(consultation: Consultation) -> str:
+def clean_baseline(consultation: Consultation, grader: Grader | None = None) -> str:
     """A note the harness passes, built only from claims it can ground.
 
     The first version of this harness injected defects into the treating
@@ -183,7 +184,7 @@ def clean_baseline(consultation: Consultation) -> str:
     from witness.grounding import Verdict
     from witness.segment import segment
 
-    grounding = LexicalGrader().ground_note(
+    grounding = (grader or LexicalGrader()).ground_note(
         consultation.consultation_id, "baseline",
         segment(consultation.clinician_note), consultation.utterances,
     )
@@ -200,6 +201,7 @@ def run_proof(
     clean_note: str,
     thresholds: Thresholds | None = None,
     max_critical_omissions: int = 0,
+    grader: Grader | None = None,
 ) -> list[ProofResult]:
     """Inject each defect and check the *named* mechanism fires.
 
@@ -208,7 +210,7 @@ def run_proof(
     """
     results: list[ProofResult] = []
     gate = Gate(thresholds) if thresholds else Gate()
-    pipeline = Pipeline(gate=gate, max_critical_omissions=max_critical_omissions)
+    pipeline = Pipeline(gate=gate, max_critical_omissions=max_critical_omissions, grader=grader)
     for s in SABOTAGES:
         if s.key == "weakened_threshold":
             results.append(_prove_threshold(consultation, clean_note, s, thresholds))

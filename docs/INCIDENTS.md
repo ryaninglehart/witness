@@ -253,3 +253,92 @@ found this.
 applied to every branch or only to the common one. The uncommon branch here was
 the safety-critical one, which is the usual way round: the rare path is both the
 one that matters most and the one least exercised by summary statistics.
+
+---
+
+## WIT-010 — A learned lexicon whose nearest neighbour for `hx` was `yeah`
+
+**What happened.** The first association model built one document per
+consultation — the union of every utterance plus the clinician's note — took
+PPMI over the term co-occurrence matrix, and reduced it with a truncated SVD.
+On inspection it had learned real clinical structure: `inhaler` → `salbutamol`
+at 0.91, `abdo` → `bowels` at 0.85.
+
+It had also learned that `hx` means `yeah` (0.87), `you're` (0.87) and `uh`
+(0.86).
+
+**Why.** Two causes, both structural rather than accidental.
+
+With 57 documents, a term appearing in most consultations co-occurs with
+everything, because in a document that size it genuinely does. Filler is the
+most frequent thing in a transcript, so filler ended up adjacent to every term
+in the space. There was no document-frequency ceiling.
+
+And raw PMI is biased toward rare terms: a term seen twice earns an enormous
+score with whatever it happened to sit beside. `hx` appears in a handful of
+notes, so its row was almost entirely noise, and the SVD faithfully preserved
+the noise.
+
+**Why it nearly shipped.** The terms anyone checks first are the interesting
+ones. `inhaler` → `salbutamol` is a striking result and it is genuine, and
+having seen it there is very little pull toward typing in a boring term to see
+whether the answer is garbage. The failure was not in the method, it was in the
+inspection: the sample was chosen by what would look good.
+
+**What changed.** A document-frequency ceiling (a term in more than half the
+consultations is dropped rather than learned), context distribution smoothing
+at 0.75 on the context marginal — the standard correction for the rare-term
+bias — and two co-occurrence views rather than one: cross-view counts pairing
+note terms with transcript terms, which is the parallel-corpus signal, plus
+local counts over a sliding window of utterances, which supplies the
+observations 57 documents cannot.
+
+`test_frequent_terms_are_excluded_from_the_lexicon` pins the ceiling.
+`AssociationModel.nearest` exists so the lexicon can be read; a learned mapping
+nobody inspects is a hand-written one with worse provenance.
+
+**The generalisation.** When inspecting something learned, pick the sample
+before looking at the output. Terms chosen after the fact select for the
+result you hoped for.
+
+---
+
+## WIT-011 — Every published number was scored in-sample
+
+**What happened.** Nothing broke. The README said, in the limitations section:
+*"Thresholds are calibrated on the same 57 consultations they are evaluated on.
+There is no held-out split."* That was true, disclosed, and still wrong to
+report numbers from.
+
+It became untenable rather than merely untidy when the statistical grader was
+added, because that grader *learns* from the corpus. Fitted on all 57 and
+scored on the same 57, it would have reported grounding far above what it can
+actually do, and the figure would have been indistinguishable from a real one.
+
+**What changed.** `witness/crossval.py`, and `make crossval` in the default
+gate. Five folds by stride over sorted consultation ids — deterministic, no
+seed, and striding rather than blocking so a recording day is not confined to
+one fold. For each fold the association model is fitted on the training
+consultations only, and thresholds are calibrated from the training
+consultations' out-of-fold groundings. Every consultation is evaluated exactly
+once, by a model and a threshold set derived only from the others.
+
+The lexical grader is run over the same partition despite having nothing to
+leak, because comparing a held-out number to an in-sample one is the error this
+module exists to prevent. Its held-out recall came out at 48.3% — identical to
+the previously published in-sample figure, which is the expected result for a
+grader that learns nothing and is the check that the harness itself is sound.
+
+**What it found.** The statistical grader grounds 66.7% of a median
+clinician-written note against the lexical grader's 40.0%, held out. It also
+drops recall against clinician-identified critical errors from 48.3% to 31.6%.
+Sweeping the association floor traces a monotone trade between the two, and at
+the tight end the learned grader converges exactly onto the lexical baseline.
+
+Widening the match radius cannot separate paraphrase from fabrication, because
+to a term matcher they are the same event: a claim whose words are not in the
+transcript. That is now measured rather than argued.
+
+**The generalisation.** A disclosed limitation is still a limitation. Writing
+it down converts a hidden error into an honest one; it does not convert it into
+a result.
