@@ -12,7 +12,7 @@ refused.
 ```bash
 git clone https://github.com/<user>/witness.git
 cd witness
-python3 -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate   # needs Python 3.11+
 pip install -r requirements.txt
 make corpus      # PriMock57, text only — audio is git-lfs and optional
 make check       # lint, 77 tests, and every number below
