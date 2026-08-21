@@ -1,7 +1,7 @@
 PY := .venv/bin/python
 export PYTHONPATH := src
 
-.PHONY: help corpus check test lint evidence validate clean
+.PHONY: help corpus check test lint evidence validate calibrate sweep prove clean
 
 help:
 	@echo "  make corpus     fetch PriMock57 (CC BY 4.0, text only -- no audio needed)"
@@ -10,6 +10,9 @@ help:
 	@echo "  make lint       ruff"
 	@echo "  make evidence   do existing metrics predict clinical safety?"
 	@echo "  make validate   does Witness flag what clinicians flagged?"
+	@echo "  make calibrate  derive thresholds from clinician-written notes"
+	@echo "  make sweep      trace the sensitivity/specificity trade"
+	@echo "  make prove      break it on purpose; see what is caught"
 
 corpus:
 	@test -d primock57 || GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 \
@@ -28,7 +31,16 @@ evidence:
 validate:
 	@$(PY) -m witness.cli validate
 
-check: lint test evidence validate
+calibrate:
+	@$(PY) -m witness.cli calibrate
+
+sweep:
+	@$(PY) -m witness.cli sweep
+
+prove:
+	@$(PY) -m witness.cli prove
+
+check: lint test evidence validate calibrate prove
 	@echo "  all checks passed"
 
 clean:

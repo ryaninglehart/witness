@@ -52,6 +52,24 @@ class Thresholds:
     warn_inferred_rate: float = 0.30
     #: A note with almost nothing in it passes every ratio test trivially.
     min_assertions: int = 3
+    #: Per-slot ceilings on ungrounded claims, as ``"ALLERGY:0,DOSE:0"``.
+    #:
+    #: One global safety ceiling is the wrong shape. Calibrated against real
+    #: clinician notes it lands around five, because notes are dense with
+    #: groundable diagnoses and medications -- and at five, a single fabricated
+    #: allergy passes. Allergy claims are rare and high-stakes, so their bar can
+    #: be zero while the overall bar stays loose enough to accept human notes.
+    #: Stored as a string so the dataclass stays frozen and hashable. See WIT-008.
+    slot_ceilings: str = "ALLERGY:0,DOSE:0"
+
+    def ceiling_for(self, slot_name: str) -> int | None:
+        for pair in self.slot_ceilings.split(","):
+            if not pair.strip():
+                continue
+            name, _, value = pair.partition(":")
+            if name.strip().upper() == slot_name.upper():
+                return int(value)
+        return None
 
     def fingerprint(self) -> str:
         payload = json.dumps(asdict(self), sort_keys=True, separators=(",", ":"))
@@ -145,6 +163,23 @@ class Gate:
                     contradicted,
                 )
             )
+
+        # Per-slot ceilings first. A fabricated allergy must block even in a
+        # noisy note whose overall safety count is within tolerance.
+        by_slot: dict[str, int] = {}
+        for a in grounding.safety_failures:
+            by_slot[a.assertion.slot.value] = by_slot.get(a.assertion.slot.value, 0) + 1
+        for slot_name, count in sorted(by_slot.items()):
+            ceiling = t.ceiling_for(slot_name)
+            if ceiling is not None and count > ceiling:
+                findings.append(
+                    Finding(
+                        "slot_ceiling_exceeded",
+                        Severity.BLOCK,
+                        f"{count} ungrounded {slot_name} claim(s), ceiling {ceiling}",
+                        count,
+                    )
+                )
 
         safety = grounding.safety_failures
         if len(safety) > t.max_safety_unsupported:

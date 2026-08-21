@@ -76,6 +76,29 @@ class TestBlockingRules:
         assert not r.published
         assert any(f.rule == "unsupported_safety_claims" for f in r.blocking)
 
+    def test_one_fabricated_allergy_blocks_in_an_otherwise_noisy_note(self) -> None:
+        """Why per-slot ceilings exist.
+
+        Calibrated against real clinician notes the aggregate safety ceiling
+        lands around five, and at five a single fabricated allergy publishes.
+        Allergy claims are rare, so their own bar can be zero while the
+        aggregate stays loose enough to accept human writing. See WIT-008.
+        """
+        loose = Thresholds(
+            max_safety_unsupported=5, max_unsupported_rate=0.9,
+            slot_ceilings="ALLERGY:0",
+        )
+        note = _note(*[_ok(i) for i in range(19)],
+                     _bad(19, Verdict.UNSUPPORTED, Slot.ALLERGY))
+        r = Gate(loose).evaluate(note)
+        assert not r.published
+        assert any(f.rule == "slot_ceiling_exceeded" for f in r.blocking)
+
+    def test_slot_ceilings_are_inside_the_fingerprint(self) -> None:
+        a = Thresholds(slot_ceilings="ALLERGY:0")
+        b = Thresholds(slot_ceilings="ALLERGY:9")
+        assert a.fingerprint() != b.fingerprint()
+
     def test_ungrounded_social_detail_does_not_block_on_the_safety_rule(self) -> None:
         """Asymmetry is the point.
 
@@ -139,7 +162,13 @@ class TestAcknowledgement:
             note, [Acknowledgement("contradicted_claims", "reviewed", "r.inglehart")]
         )
         assert not r.published
-        assert {f.rule for f in r.unacknowledged_blocking} == {"unsupported_safety_claims"}
+        # The dose failure legitimately trips two rules: the per-slot ceiling
+        # for DOSE and the aggregate safety count. Both must survive an
+        # acknowledgement aimed at a third rule.
+        assert {f.rule for f in r.unacknowledged_blocking} == {
+            "unsupported_safety_claims",
+            "slot_ceiling_exceeded",
+        }
 
 
 class TestRulesetFingerprint:

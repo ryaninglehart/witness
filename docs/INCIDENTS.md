@@ -113,3 +113,112 @@ every other number should be read.
 
 **The generalisation.** Before treating disagreement with ground truth as model
 error, measure how much the ground truth disagrees with itself.
+
+---
+
+## WIT-005 — Coverage was computed over filler, so nothing was ever covered
+
+**What happened.** A salient fact's identity was every content token in the
+utterance it came from. A patient saying *"Oh hey, um, I've just had some
+diarrhoea for the last three days"* produced a fact with eleven terms, and
+coverage asked whether the note reproduced 60% of them.
+
+No note does. **Coverage came out at 0.0 on every consultation** and the module
+reported 24 omissions per note, against a clinician-labelled ground truth of
+roughly five.
+
+**Why it survived.** The number was not obviously absurd — omission detectors
+are expected to be noisy — and 0.0 coverage reads like a strict tool rather than
+a broken one.
+
+**What catches the class now.** A fact's identity is its *clinical core*: the
+terms the treating clinician also recorded, plus anything a safety pattern
+matched. Filler cannot enter the comparison.
+
+**The generalisation.** When a rate comes out at exactly 0.0 or exactly 1.0
+across an entire corpus, the measurement is broken. Saturation is a bug report.
+
+---
+
+## WIT-006 — The sabotage harness gave itself credit for mechanisms that never fired
+
+**What happened.** Seven defects were injected and the harness reported all
+seven "STOPPED", against named mechanisms: polarity comparison, the safety-slot
+rule, salience extraction.
+
+Six of them were actually stopped by the generic unsupported-rate rule. The
+report named a mechanism; the evidence line beside it named a different one, and
+the two were never compared.
+
+**Why it survived.** Every case was blocked, so the summary said `7 stopped, 0
+missed`. The harness was asked "did something block?" when the question it
+claimed to answer was "did *this* block?".
+
+**What catches the class now.** Each sabotage declares `expect_rule`, and a case
+counts as caught only when that specific rule fires. Everything else is reported
+as *"blocked, but by X rather than the expected Y"*.
+
+**The generalisation.** This is the project's own thesis turned on itself: a
+check verifies the value it names, not the value the reader sees. A test suite
+that asserts "an error occurred" rather than "this error occurred" passes for
+the wrong reasons and keeps passing after the mechanism it describes has stopped
+working.
+
+Related: the harness had also been injecting defects into the treating
+clinician's own note, which the grader already fails. Every case blocked before
+any injection, so the false-positive control could not have passed. A sabotage
+baseline must be clean *by the harness's own standard*.
+
+---
+
+## WIT-007 — Tiering made every clinician-written note fail
+
+**What happened.** Any utterance sharing a term with the treating clinician's
+highlights was tiered `CRITICAL`. Highlights are broad (`3/7 hx of diarrhea`),
+so most of a consultation qualified, and `critical_omission` fired on all 57
+notes — including the ones clinicians wrote themselves.
+
+**What catches the class now.** `CRITICAL` is reserved for categories whose
+omission is dangerous: allergies, medications and doses, red flags, pregnancy.
+Clinician highlights are strong evidence of salience and are tiered `MAJOR`.
+
+**The generalisation.** A severity scale where most things are the top severity
+is not a scale.
+
+---
+
+## WIT-008 — Thresholds chosen by judgement rejected 57 of 57 clinician notes
+
+**What happened.** The gate's opening thresholds — no contradictions, no
+ungrounded safety claims, under 15% ungrounded — were picked because they
+sounded defensible. Measured against notes written by the consulting clinicians,
+**they rejected every single one.**
+
+**Why it matters more than the other four.** A gate that fails everything gets
+switched off in week two, and a switched-off gate is worse than no gate: it
+still appears in the architecture diagram and the compliance narrative while
+doing nothing.
+
+**What catches the class now.** `witness.calibration` derives every threshold
+from a percentile of the human-written distribution and publishes the resulting
+operating point — the fraction of clinician notes the gate would flag. A
+threshold with no reference population is a guess with a decimal point.
+
+**A second finding, from the same fix.** One aggregate safety ceiling is the
+wrong shape. Calibrated against real notes it lands at five, and at five a
+single fabricated allergy publishes. Allergy claims are rare, so their own
+ceiling can be zero while the aggregate stays loose enough to accept human
+writing. Ceilings are now derived per slot, and they are inside the ruleset
+fingerprint.
+
+**And the finding that outranks all of it.** Sweeping the calibration percentile
+from 0.50 to 0.99 shows there is **no operating point** at which the lexical
+grader both accepts clinician-written notes and catches a single injected
+defect. Its best balance is 44% of human notes accepted at 29% detection. The
+cause is in the calibration table: it cannot ground 60% of a median human note,
+because clinicians write in abbreviation and inference.
+
+That is a property of the grader, not of the thresholds, and no amount of
+tuning fixes it. It is the measured argument for `graders/semantic.py`, and it
+is why the lexical grader is documented as a floor rather than shipped as an
+answer.

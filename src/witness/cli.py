@@ -11,11 +11,13 @@ import argparse
 import sys
 from pathlib import Path
 
+from witness import calibration as cal
 from witness import evidence as ev
 from witness import validate as val
 from witness.corpus import PriMock57
 from witness.graders.lexical import LexicalGrader
 from witness.matching import MatchResult, match_note
+from witness.prove import format_report, run_proof
 from witness.segment import segment
 
 CORPUS = Path(__file__).resolve().parents[2] / "primock57"
@@ -114,6 +116,43 @@ def cmd_validate(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_calibrate(_: argparse.Namespace) -> int:
+    c = _corpus()
+    print()
+    print(cal.calibrate(c, 0.90).report())
+    return 0
+
+
+def cmd_sweep(_: argparse.Namespace) -> int:
+    c = _corpus()
+    print("\n  Calibration sweep -- is there any threshold that works?")
+    print("  " + "-" * 66)
+    print(f"  {'percentile':>11}{'human notes pass':>19}{'defects caught':>17}")
+    points = cal.sweep(c)
+    for op in points:
+        print(f"  {op.percentile:>11.2f}{op.human_pass_rate:>18.0%}{op.sabotage_detection:>17.0%}")
+    best = max(points, key=lambda o: min(o.human_pass_rate, o.sabotage_detection))
+    print()
+    print(
+        f"  Best balance: {best.human_pass_rate:.0%} of clinician notes accepted at "
+        f"{best.sabotage_detection:.0%} detection."
+    )
+    print("  Lexical grounding has no usable operating point. That is a property")
+    print("  of the grader, not of the thresholds -- see graders/semantic.py.")
+    return 0
+
+
+def cmd_prove(_: argparse.Namespace) -> int:
+    c = _corpus()
+    calib = cal.calibrate(c, 0.90)
+    cons = c.load_consultation("day1_consultation01")
+    results = run_proof(
+        cons, cons.clinician_note, calib.thresholds, calib.max_critical_omissions
+    )
+    print(format_report(results))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="witness")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -122,6 +161,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub.add_parser("validate", help="does Witness flag what clinicians flagged?").set_defaults(
         fn=cmd_validate
+    )
+    sub.add_parser("calibrate", help="derive thresholds from clinician-written notes").set_defaults(
+        fn=cmd_calibrate
+    )
+    sub.add_parser("sweep", help="trace the sensitivity/specificity trade").set_defaults(
+        fn=cmd_sweep
+    )
+    sub.add_parser("prove", help="break it on purpose; see what is caught").set_defaults(
+        fn=cmd_prove
     )
     ns = p.parse_args(argv)
     return ns.fn(ns)

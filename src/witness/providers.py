@@ -1,0 +1,257 @@
+"""Model access, with the offline path as the default rather than the fallback.
+
+Three providers, one interface: Anthropic, OpenAI, and a local model over
+Ollama. Plus a cassette layer that replays recorded responses, which is what
+makes the test suite hermetic and the CI run free.
+
+The ordering matters and is a design position, not a convenience. **Ollama is
+tried first.** For a clinical tool the local path is the one with the strongest
+privacy story -- encounter text never leaves the machine, so no business
+associate agreement is needed with anyone -- and a harness whose default
+requires shipping patient conversations to a third party has chosen the wrong
+default no matter how good the BAA is.
+
+DeepScribe's own published architecture reasons the same way: they hold BAAs
+with OpenAI and Anthropic *and* fine-tune 7B models in-house for the hot path
+(SpecialtyScribe, ACL 2025). A legal control and an architectural control are
+not substitutes.
+
+Nothing here requires an API key to run. If no provider is reachable the
+harness says so and continues with the lexical grader rather than failing --
+the same reasoning that keeps the corpus loader working without audio.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import urllib.error
+import urllib.request
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Protocol
+
+CASSETTE_DIR = Path(__file__).resolve().parents[2] / "cassettes"
+
+
+class ProviderError(RuntimeError):
+    pass
+
+
+@dataclass
+class Completion:
+    text: str
+    provider: str
+    model: str
+    #: True when this came from a recorded cassette rather than a live call.
+    #: Surfaced all the way into the report, because a number produced from a
+    #: replay and a number produced from a live model are different claims.
+    replayed: bool = False
+
+
+class Provider(Protocol):
+    name: str
+    model: str
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion: ...
+
+    def available(self) -> bool: ...
+
+
+def _cassette_key(provider: str, model: str, system: str, user: str) -> str:
+    h = hashlib.sha256(f"{provider}\x00{model}\x00{system}\x00{user}".encode()).hexdigest()
+    return h[:32]
+
+
+class Cassette:
+    """Record and replay model responses.
+
+    An evaluation harness that cannot reproduce its own numbers without a
+    network and a credit card is not much of a harness. Recording every call
+    means the published results can be re-derived exactly by anyone who clones
+    the repository, and it makes the test suite deterministic.
+    """
+
+    def __init__(self, directory: Path | None = None, record: bool = True):
+        self.dir = Path(directory or CASSETTE_DIR)
+        self.record = record
+
+    def get(self, key: str) -> Completion | None:
+        path = self.dir / f"{key}.json"
+        if not path.exists():
+            return None
+        d = json.loads(path.read_text())
+        return Completion(d["text"], d["provider"], d["model"], replayed=True)
+
+    def put(self, key: str, c: Completion) -> None:
+        if not self.record:
+            return
+        self.dir.mkdir(parents=True, exist_ok=True)
+        (self.dir / f"{key}.json").write_text(
+            json.dumps({"text": c.text, "provider": c.provider, "model": c.model}, indent=2)
+        )
+
+
+class OllamaProvider:
+    """A local model. No key, no network egress, no BAA."""
+
+    name = "ollama"
+
+    def __init__(self, model: str = "llama3.1:8b", host: str | None = None):
+        self.model = model
+        self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
+
+    def available(self) -> bool:
+        try:
+            with urllib.request.urlopen(f"{self.host}/api/tags", timeout=2) as r:
+                return r.status == 200
+        except (urllib.error.URLError, OSError, TimeoutError):
+            return False
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
+        payload = json.dumps(
+            {
+                "model": self.model,
+                "system": system,
+                "prompt": user,
+                "stream": False,
+                # Grading is a classification task. Sampling temperature above
+                # zero makes the same note score differently on reruns, which
+                # would make a release gate non-deterministic.
+                "options": {"temperature": 0.0, "num_predict": max_tokens},
+            }
+        ).encode()
+        req = urllib.request.Request(
+            f"{self.host}/api/generate", data=payload, headers={"Content-Type": "application/json"}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                return Completion(json.loads(r.read())["response"], self.name, self.model)
+        except (urllib.error.URLError, OSError, TimeoutError, KeyError) as exc:
+            raise ProviderError(f"ollama: {exc}") from exc
+
+
+class AnthropicProvider:
+    name = "anthropic"
+
+    def __init__(self, model: str = "claude-sonnet-4-5", api_key: str | None = None):
+        self.model = model
+        self.api_key = api_key or os.environ.get("ANTHROPIC_API_KEY", "")
+
+    def available(self) -> bool:
+        return bool(self.api_key)
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
+        if not self.api_key:
+            raise ProviderError("anthropic: ANTHROPIC_API_KEY is not set")
+        body = json.dumps(
+            {
+                "model": self.model,
+                "max_tokens": max_tokens,
+                "temperature": 0,
+                "system": system,
+                "messages": [{"role": "user", "content": user}],
+            }
+        ).encode()
+        req = urllib.request.Request(
+            "https://api.anthropic.com/v1/messages",
+            data=body,
+            headers={
+                "content-type": "application/json",
+                "x-api-key": self.api_key,
+                "anthropic-version": "2023-06-01",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                d = json.loads(r.read())
+            return Completion(d["content"][0]["text"], self.name, self.model)
+        except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+            raise ProviderError(f"anthropic: {exc}") from exc
+
+
+class OpenAIProvider:
+    name = "openai"
+
+    def __init__(self, model: str = "gpt-4o-mini", api_key: str | None = None):
+        self.model = model
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
+
+    def available(self) -> bool:
+        return bool(self.api_key)
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
+        if not self.api_key:
+            raise ProviderError("openai: OPENAI_API_KEY is not set")
+        body = json.dumps(
+            {
+                "model": self.model,
+                "max_completion_tokens": max_tokens,
+                "temperature": 0,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": user},
+                ],
+            }
+        ).encode()
+        req = urllib.request.Request(
+            "https://api.openai.com/v1/chat/completions",
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.api_key}",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                d = json.loads(r.read())
+            return Completion(d["choices"][0]["message"]["content"], self.name, self.model)
+        except (urllib.error.URLError, OSError, TimeoutError, KeyError, IndexError) as exc:
+            raise ProviderError(f"openai: {exc}") from exc
+
+
+class CachedProvider:
+    """Wraps a provider with cassette replay."""
+
+    def __init__(self, inner: Provider, cassette: Cassette | None = None):
+        self.inner = inner
+        self.cassette = cassette or Cassette()
+        self.name = inner.name
+        self.model = inner.model
+
+    def available(self) -> bool:
+        return True  # replay works with no live provider at all
+
+    def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
+        key = _cassette_key(self.inner.name, self.inner.model, system, user)
+        hit = self.cassette.get(key)
+        if hit is not None:
+            return hit
+        if not self.inner.available():
+            raise ProviderError(
+                f"{self.inner.name} is unavailable and no cassette exists for this "
+                "prompt. Run once with the provider reachable to record it."
+            )
+        out = self.inner.complete(system, user, max_tokens)
+        self.cassette.put(key, out)
+        return out
+
+
+def default_provider(prefer: str | None = None) -> Provider | None:
+    """Pick a provider, local first.
+
+    Returns ``None`` rather than raising when nothing is reachable, so callers
+    can fall back to the lexical grader and say so, instead of the whole run
+    dying because a laptop is offline.
+    """
+    candidates: list[Provider] = [OllamaProvider(), AnthropicProvider(), OpenAIProvider()]
+    if prefer:
+        candidates.sort(key=lambda p: p.name != prefer)
+    for p in candidates:
+        if p.available():
+            return CachedProvider(p)
+    # Replay-only: if cassettes exist the harness still reproduces its numbers.
+    if CASSETTE_DIR.exists() and any(CASSETTE_DIR.glob("*.json")):
+        return CachedProvider(OllamaProvider())
+    return None
