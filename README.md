@@ -4,10 +4,21 @@
 claim in a generated note must name the utterance that witnessed it, or be
 refused.
 
-> All data here is public and synthetic. Witness is built and validated
-> entirely on [PriMock57](https://github.com/babylonhealth/primock57) (CC BY
-> 4.0) — 57 mock consultations recorded with actors, and 1,140 notes graded by
-> five clinicians. **No real patient information was used and none is present.**
+> Built and validated entirely on [PriMock57](https://github.com/babylonhealth/primock57)
+> (CC BY 4.0) — 57 mock consultations recorded with actors, and 1,140 notes
+> graded by five clinicians. **No real patient information was used and none is
+> present.**
+
+```bash
+git clone https://github.com/<user>/witness.git
+cd witness
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+make corpus      # PriMock57, text only — audio is git-lfs and optional
+make check       # lint, 63 tests, and every number below
+```
+
+About ninety seconds. No API key, no network egress, no GPU.
 
 ---
 
@@ -19,11 +30,11 @@ That measures whether the clinician bothered to fix the note. It does not
 measure whether the note is true. A note can be edit-free and still omit a
 penicillin allergy.
 
-This is testable, because PriMock57 ships both halves: 24 automatic metrics
-computed by the corpus authors, and every note graded by clinicians for
-incorrect statements and omissions, each marked critical or not.
+PriMock57 lets this be tested rather than asserted: it ships 24 automatic
+metrics computed by the corpus authors *and* every note graded by clinicians
+for incorrect statements and omissions, each marked critical or not.
 
-Run `make evidence` to reproduce the following on your own machine.
+`make evidence`:
 
 | Signal | Rank correlation with critical errors | Error reduction in its best decile |
 |---|---|---|
@@ -33,16 +44,14 @@ Run `make evidence` to reproduce the following on your own machine.
 | WER | **+0.085** (wrong sign) | −1.6% |
 | Post-edit effort | −0.713 | 64.9% — but only knowable *after* review |
 
-Selecting the notes the best text-similarity metric likes most reduces the
-critical-error burden by under a quarter. Editing effort does much better and
+Selecting the notes the best text-similarity metric likes most cuts the
+critical-error burden by under a quarter. Editing effort does far better and
 cannot gate anything, because you only learn it once a clinician has already
 read and fixed the note.
 
-**And 62.5% of the critical errors clinicians found were omissions** — things
-the encounter contained and the note dropped. No similarity metric detects
-those at all, and most published work does not measure them.
-
----
+**62.5% of the critical errors clinicians found were omissions** — things the
+encounter contained and the note dropped. No similarity metric detects those,
+and most published work does not measure them.
 
 ## What Witness does
 
@@ -55,72 +64,120 @@ Four verdicts per clinical claim, each carrying the utterance that justifies it:
 - `UNSUPPORTED` — nothing supports it
 - `CONTRADICTED` — the encounter says otherwise
 
-`INFERRED` is the reason this is not a wrapper around an entailment model. A
-naive checker calls correct clinical reasoning a hallucination.
+`INFERRED` is why this is not a wrapper around an entailment model: a naive
+checker calls correct clinical reasoning a hallucination.
 
-Verdicts feed a release gate with BLOCK / WARN / INFO severities. Overrides
-require a written reason and a named approver, and the ruleset fingerprint
-covers **the threshold values themselves** — so a gate that has been quietly
-weakened cannot produce artifacts claiming the same ruleset.
+Verdicts and omissions feed a release gate with BLOCK / WARN / INFO severities.
+Overrides need a written reason and a named approver. The ruleset fingerprint
+covers **the threshold values themselves**, so a gate that has been quietly
+weakened cannot produce artifacts claiming an unchanged ruleset.
 
-## Results
+`make review` writes a one-file page: click a claim, and the utterance that
+justifies it highlights with its timestamp.
+
+## The main result is negative
+
+`make sweep` calibrates the gate against notes written by the consulting
+clinicians, at every percentile from 0.50 to 0.99:
+
+| Calibration percentile | Clinician notes accepted | Injected defects caught |
+|---|---|---|
+| 0.50 | 11% | 29% |
+| 0.70 | 30% | 29% |
+| 0.80 | 44% | 29% |
+| 0.90 | 74% | 14% |
+| 0.99 | 93% | 14% |
+
+**There is no operating point at which lexical grounding both accepts notes
+written by clinicians and catches a single injected defect.** The best balance
+is 44% acceptance at 29% detection.
+
+The cause is in the calibration table: the lexical grader **cannot ground 60% of
+a median clinician-written note**, because clinicians write `3/7 hx of
+diarrhoea, mainly watery` and term matching has no idea that is the same fact as
+*"it's been about three days, it's quite runny"*.
+
+That is a property of the grader, not of the thresholds. No amount of tuning
+fixes it, and it is the measured argument for `graders/semantic.py` rather than
+an asserted one.
+
+## What the lexical grader does achieve
 
 `make validate`, on 1,140 clinician-graded notes:
 
 ```
 grader        lexical/1.0   (no model, no network, no API key)
-recall        48.3%   of attributable critical errors
-precision     21.4%   against one annotator
-              45.6%   against the union of all five annotators
+
+grounding     recall     48.3%   of attributable critical incorrect statements
+              precision  21.4%   against one annotator
+                         45.6%   against the union of all five
+
+omission      recall     30.0%
+              precision  26.0%   against one annotator
+                         51.0%   against the union of all five
 ```
 
-For scale, the five clinicians agree exactly with each other only **27.5%** of
-the time. No detector can be asked to agree with "the clinicians" more than the
-clinicians agree with one another, and roughly 21 points of the apparent
-imprecision above is one annotator not writing down what another one did.
+The five clinicians agree exactly with each other only **27.5%** of the time,
+and within one only 55%. No detector can be asked to agree with "the clinicians"
+more than the clinicians agree with one another, and roughly 21 points of the
+apparent imprecision above is one annotator not writing down what another one
+did. Both figures are reported, always, with the ceiling beside them.
 
-The grader shipped here contains **no model at all** — clinical term overlap
-with negation polarity treated as a first-class signal. It is the floor, not
-the ceiling, and it exists so that any later claim about an LLM grader has
-something interpretable to be measured against.
+## Breaking it on purpose
 
-## Run it
+`make prove` injects eight defects into a known baseline and checks that the
+**named** mechanism fires — not merely that something blocked.
 
-```bash
-git clone https://github.com/<user>/witness.git
-cd witness
+The eighth is a false-positive control: a paraphrase that changes no clinical
+content and must **not** be flagged. A harness that fires on every rewording is
+switched off in week two, and a disabled gate is worse than none because it
+still appears in the architecture diagram.
 
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-make corpus      # PriMock57, text only — audio is git-lfs and optional
-make check       # lint, tests, evidence, validation
-```
-
-About a minute. `make check` runs everything; `make evidence` and
-`make validate` reproduce the two tables above on their own.
+At the calibrated operating point the harness catches 1 of 7 injected defects
+with 0 false alarms. That number is low and it is reported as it is; see the
+sweep above for why, and `graders/semantic.py` for what fixes it.
 
 ## What this does not do
 
 Stated plainly, because a harness that overclaims has no standing to measure
 anything else.
 
-- **Omission detection is not built yet.** It is 62.5% of the critical errors
-  in this corpus and the harder half. Grounding reads the note against the
-  transcript and structurally cannot see what is missing.
-- **No LLM grader yet.** The interface exists; the lexical grader is the only
-  implementation. Every number above is a floor.
-- **No ASR layer yet.** The corpus ships human transcripts with utterance
-  timings, so grounding is measured against perfect transcription. Real ASR
-  error is a second failure surface and is not included here.
+- **The semantic grader is written but unmeasured here.** It needs a model. The
+  container this was built in has no API access and no Ollama, so every number
+  in this README is the lexical floor. Run `make validate` with Ollama running
+  to measure it.
+- **No ASR layer.** The corpus ships human transcripts with utterance timings,
+  so grounding is measured against perfect transcription. Real ASR error is a
+  second failure surface and is not included. Whisper's documented tendency to
+  fabricate on disfluent speech (Koenecke et al., FAccT 2024) matters most for
+  the sickest patients, and is not measured here.
+- **Primary care, not oncology.** PriMock57 is UK general practice. The mCODE
+  extraction layer — staging, ECOG, regimens — is specified in the design and
+  not built.
 - **The corpus is 2022-era model output.** Modern systems are much better. The
   98.4% contamination figure describes *this corpus*, not the state of the art.
   It is used because it is graded, not because it is representative.
-- **Primary care, not oncology.** PriMock57 is UK general practice. The
-  oncology layer — mCODE extraction, ECOG, staging — is specified but not
-  built.
 - **Single-annotator ground truth per row.** Mitigated by reporting the
   five-annotator union and the inter-rater ceiling, not solved.
+- **Thresholds are calibrated on the same 57 consultations they are evaluated
+  on.** There is no held-out split. With 57 encounters there was a choice
+  between a calibration set and an evaluation set, and neither would have been
+  large enough; the honest response is to say so rather than to report a number
+  that implies otherwise.
 
-See `docs/INCIDENTS.md` for four defects found while building this, including
-one where a silent join dropped 19% of the corpus and the run still printed a
-confident number.
+## Incidents
+
+`docs/INCIDENTS.md` records nine defects found while building this. Three are
+worth reading:
+
+**WIT-001** — a join dropped 19% of the corpus and the run still printed a
+confident number. A filter and a bug look identical from the outside.
+
+**WIT-006** — the sabotage harness reported "7 stopped, 0 missed" while six of
+the seven were caught by a rule other than the one the report named. The
+project's own thesis turned on itself: a check verifies the value it names, not
+the value the reader sees.
+
+**WIT-008** — the first thresholds, chosen by judgement, rejected 57 of 57 notes
+written by clinicians. Thresholds now come from a percentile of the human
+distribution and the operating point is published.
