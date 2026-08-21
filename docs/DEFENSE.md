@@ -67,7 +67,8 @@ PriMock57 pairs 57 transcripts with the notes clinicians wrote from them. That
 is a parallel corpus, so the shorthand is learnable rather than hand-written:
 PPMI over a term co-occurrence matrix, truncated SVD. Latent semantic analysis,
 1990 technology, no weights and no network. It recovers `inhaler` →
-`salbutamol` at 0.90, `diarrhoea` → `gastroenteritis`, `watery`, `rash` →
+`salbutamol` at 0.89–0.91 in every fold, `diarrhoea` → `gastroenteritis`,
+`watery`, `rash` →
 `bite`, `cetirizine`. Nobody wrote those down.
 
 Held out, it grounds 66.7% of a median clinician note against the lexical
