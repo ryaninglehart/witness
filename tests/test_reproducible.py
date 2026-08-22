@@ -88,7 +88,7 @@ class TestDeterminism:
 
 
 class TestRuntime:
-    """The README says ninety seconds. Nothing enforced it until now."""
+    """The README says about a minute. Nothing enforced it until now."""
 
     def test_grading_the_whole_corpus_stays_interactive(self, corpus: PriMock57):
         # The budget is deliberately loose -- this asserts the harness has not

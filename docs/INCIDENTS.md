@@ -470,3 +470,75 @@ treatment differs from the baseline. A test comparing something to itself passes
 forever and tells you nothing forever — and it will keep being written, by the
 same person, in the commit that fixes the last one, unless something mechanical
 checks for it.
+
+---
+
+## WIT-014 — Four numbers printed as command output that no command produced
+
+**What happened.** The README showed this, formatted as a fenced block under
+the heading `make validate`:
+
+```
+grounding     precision  21.4%   against one annotator
+                         45.6%   against the union of all five
+omission      recall     30.0%
+              precision  26.0%   against one annotator
+                         51.0%   against the union of all five
+```
+
+`make validate` printed the first line. It did not print the other four, and no
+code in the repository computed them. There was no union-of-annotators
+comparison and no omission matcher — `matching.py` had one function, and it
+scored incorrect statements against a single annotator.
+
+The 45.6% figure was load-bearing. It carried the whole precision defence: that
+21.4% understates the detector because it charges for annotator disagreement.
+That argument was being made with a number nothing produced.
+
+**How it was found.** Not by me. A reviewer was asked to extract every
+quantitative claim in the documentation and check each one against live output,
+with instructions to be adversarial and to classify anything absent as
+unverifiable rather than assumed. Four of the seven numbers in that block came
+back unverifiable within minutes. I had read past them repeatedly, because they
+sit inside a code fence and a code fence reads as evidence.
+
+**Why it survived.** Every incident in this file so far was a defect in code
+that a test could reach. This one was in prose, in the one region of prose that
+looks least like prose. The project's own rule — *nothing in this document
+should be said if the command stops printing it* — is written at the top of
+`docs/DEFENSE.md`, and the rule was not enforceable because nothing compared
+the documents to the outputs.
+
+**What changed.** `match_note_union` and `match_omissions` now exist and
+`make validate` prints all six figures. The real ones are worse in one place
+and better in another:
+
+| | claimed | measured |
+|---|---|---|
+| grounding precision, union | 45.6% | **40.0%** |
+| omission recall | 30.0% | **77.7%** |
+| omission precision, single | 26.0% | **15.0%** |
+| omission precision, union | 51.0% | **41.1%** |
+
+The omission numbers were not merely wrong, they described the wrong shape.
+The extractor nominates generously: it catches most of what the clinicians said
+was missing and nominates a great deal besides. "30% recall at 26% precision"
+told a story of a weak detector; "78% recall at 15% precision" is a differently
+calibrated one, and the trade-off is the interesting part.
+
+**The first implementation of the fix was also wrong.** `match_omissions`
+initially returned 100.0% recall, and it was 100% by construction: findings
+that matched went to the numerator, findings that did not went to
+`unmatchable`, and recall divided by `findings - unmatchable`. The denominator
+was the numerator. Attributability and detection are two questions — *could the
+extractor have seen this fact*, and *did it report the fact as missing* — and
+collapsing them makes recall a tautology. Only a figure that came out at
+exactly 100.0% made it visible.
+
+**The generalisation.** A number formatted as terminal output carries the
+authority of having been executed, and that authority is not checked by
+anything. Two habits follow. Never transcribe output by hand — generate it, or
+mark it as illustrative. And when a claim rests on a specific figure, find the
+line of code that computes it before repeating the figure; if there is no such
+line, the claim is not that the number is uncertain, it is that there is no
+number.

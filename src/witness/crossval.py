@@ -795,9 +795,47 @@ PUBLISHED: dict[str, tuple[float, float]] = {
     "statistical_recall": (0.316, 0.03),
     "lexical_best_acceptance": (0.39, 0.05),
     "lexical_best_detection": (0.21, 0.05),
+    # Tolerance is one-sided in effect: a rise is a regression, and a fall to
+    # zero is the WIT-013 signature rather than an improvement. The companion
+    # check is `control_live_rate` below -- a false-alarm rate of 0% earned by
+    # a control that stopped rewording anything would otherwise sail through.
     "statistical_false_alarm": (0.04, 0.04),
     "lexical_false_alarm": (0.04, 0.04),
 }
+
+
+#: Share of consultations on which the false-positive control must actually
+#: reword the note. Below this the control is not controlling for anything and
+#: its 0% false-alarm rate means nothing. WIT-013 sat at 2%.
+MIN_CONTROL_LIVE_RATE = 0.8
+
+
+def check_control_is_live(
+    corpus: PriMock57, consultations: dict[str, Consultation]
+) -> list[str]:
+    """Verify the false-positive control still changes the notes it is given.
+
+    A control that matches nothing reports zero false alarms, which reads as
+    the harness behaving impeccably. That is exactly how WIT-013 survived: the
+    number was good, so nobody asked whether it had been earned.
+    """
+    from witness.prove import SABOTAGES, clean_baseline
+
+    control = next((s for s in SABOTAGES if not s.should_block), None)
+    if control is None:
+        return ["no false-positive control is defined"]
+    live = 0
+    for cons in consultations.values():
+        base = clean_baseline(cons)
+        live += int(control.inject(base, cons) != base)
+    rate = live / len(consultations) if consultations else 0.0
+    if rate < MIN_CONTROL_LIVE_RATE:
+        return [
+            f"the false-positive control rewords only {rate:.0%} of notes "
+            f"({live}/{len(consultations)}); below {MIN_CONTROL_LIVE_RATE:.0%} it is "
+            "not a control and its false-alarm rate is meaningless (WIT-013)"
+        ]
+    return []
 
 
 def check_published(report: CrossValReport) -> list[str]:

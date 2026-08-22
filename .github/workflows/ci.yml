@@ -51,12 +51,12 @@ jobs:
           make check
           elapsed=$(( $(date +%s) - start ))
           echo "make check took ${elapsed}s"
-          # The README tells a reviewer this is about ninety seconds, which is
-          # the reason anyone tries it. Budgeted at 4x to absorb runner
-          # variance -- this catches the gate quietly becoming a nightly job,
-          # not a slow afternoon on shared CI.
-          if [ "$elapsed" -gt 360 ]; then
-            echo "::error::make check took ${elapsed}s; the README claims ~90s"
+          # The README tells a reviewer this is about a minute, which is the
+          # reason anyone tries it; it runs in ~57s here. Budgeted at 5x to
+          # absorb runner variance -- this catches the gate quietly becoming a
+          # nightly job, not a slow afternoon on shared CI.
+          if [ "$elapsed" -gt 300 ]; then
+            echo "::error::make check took ${elapsed}s; the README claims about a minute"
             exit 1
           fi
 

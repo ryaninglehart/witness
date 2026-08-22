@@ -15,7 +15,7 @@ cd witness
 python3 -m venv .venv && source .venv/bin/activate   # needs Python 3.11+
 pip install -r requirements.txt
 make corpus      # PriMock57, text only — audio is git-lfs and optional
-make check       # lint, 134 tests, and every number below
+make check       # lint, 143 tests, and every number below
 ```
 
 About a minute. No API key, no network egress, no GPU.
@@ -46,8 +46,10 @@ for incorrect statements and omissions, each marked critical or not.
 |---|---|---|
 | ROUGE-2-F1 (best of 24) | −0.094 | **22.9%** |
 | BertScore | −0.219 | 22.6% |
-| ROUGE-L-F1 | −0.092 | 16.3% |
-| WER | **+0.085** (wrong sign) | −1.6% |
+| ROUGE-3-F1 | −0.078 | 19.5% |
+| METEOR | −0.184 | 19.4% |
+| WMD | −0.088 | 19.1% |
+| WER (worst of 24) | **+0.085** (wrong sign) | −1.6% |
 | Post-edit effort | −0.713 | 64.9% — but only knowable *after* review |
 
 Selecting the notes the best text-similarity metric likes most cuts the
@@ -78,11 +80,14 @@ Overrides need a written reason and a named approver. The ruleset fingerprint
 covers **the threshold values themselves**, so a gate that has been quietly
 weakened cannot produce artifacts claiming an unchanged ruleset.
 
-`make crossval` re-derives every figure in this README with nothing scored
-in-sample, and **exits non-zero if any of them has drifted more than its stated
-tolerance**. It runs inside `make check`. A document making claims about
-held-out accuracy with nothing enforcing them would be the same defect this
-project exists to find in other people's systems.
+`make crossval` re-derives the held-out figures with nothing scored in-sample.
+It **exits non-zero** if any of eight enforced figures drifts past its
+tolerance, if the radius trade stops being monotone, or if the false-positive
+control stops rewording the notes it is given. The eight: the two
+median-grounded rates, the two recalls, the lexical best-balance pair, and the
+two false-alarm rates. Other numbers here are printed by their own commands and
+are not threshold-guarded — a smaller claim than "every figure is enforced",
+and the true one.
 
 `make review` writes a one-file page: click a claim, and the utterance that
 justifies it highlights with its timestamp.
@@ -100,6 +105,7 @@ consultations only. **Every number in this section is out-of-sample.**
 | 0.70 | 23% | 21% |
 | 0.80 | 39% | 21% |
 | 0.90 | 61% | 12% |
+| 0.95 | 75% | 11% |
 | 0.99 | 88% | 10% |
 
 **There is no operating point at which the gate both accepts notes written by
@@ -116,13 +122,15 @@ time — see WIT-013. The control was a no-op on 56 of 57 consultations, so it
 was testing nothing, and the 47% was the *baseline* failing the gate rather
 than any reaction to rewording.
 
-The cause is in the calibration table: the lexical grader **cannot ground 60% of
-a median clinician-written note**, because clinicians write `3/7 hx of
-diarrhoea, mainly watery` and term matching has no idea that is the same fact as
-*"it's been about three days, it's quite runny"*.
+What the calibration table shows is that the lexical grader **cannot ground 60%
+of a median clinician-written note**. The examples point at clinical shorthand —
+clinicians write `3/7 hx of diarrhoea, mainly watery` and term matching has no
+idea that is the same fact as *"it's been about three days, it's quite runny"* —
+but that attribution is read off examples rather than a measured decomposition
+of the 60%.
 
-That is a property of the grader, not of the thresholds. So the obvious fix was
-tried.
+The sweep does show the thresholds are not the binding constraint, since no
+percentile helps. So the obvious fix was tried.
 
 ## The obvious fix does not work either, and that is the useful part
 
@@ -173,10 +181,12 @@ wording the grader will look. Sweeping it, held out:
 | 0.85 | 40.0% | 47.6% | 29.6% |
 
 Monotone in both directions, and at the tight end it converges onto the lexical
-baseline it was meant to beat. **Widening the match radius cannot separate
-paraphrase from fabrication, because to a term matcher they are the same event:
-a claim whose words are not in the transcript.** Every point of coverage is paid
-for in detection.
+baseline it was meant to beat. **On this corpus, across this family of graders,
+widening the match radius does not separate paraphrase from fabrication** — to a
+term matcher they are the same event, a claim whose words are not in the
+transcript. Every point of coverage is paid for in detection. That is a result
+about term matching over 57 UK primary-care encounters, not a proof about
+distributional methods in general.
 
 It buys nothing on the joint trade either. Its best balance is 28% acceptance
 at 20% detection, against the lexical grader's 39% at 21% — worse on both axes.
@@ -192,38 +202,63 @@ similarity makes that judgement. Something has to read them.
 
 `make validate`, on 1,140 clinician-graded notes:
 
+<!-- verify: validate -->
 ```
 grader        lexical/1.0   (no model, no network, no API key)
 
 grounding     recall     48.3%   of attributable critical incorrect statements
               precision  21.4%   against one annotator
-                         45.6%   against the union of all five
+                         40.0%   against the union of all five
 
-omission      recall     30.0%
-              precision  26.0%   against one annotator
-                         51.0%   against the union of all five
+omission      recall     77.7%
+              precision  15.0%   against one annotator
+                         41.1%   against the union of all five
 ```
 
 Held out under five-fold cross-validation, that recall is 48.3% — the same
-figure. A grader that learns nothing cannot leak anything, and reproducing the
-in-sample number out-of-sample is the check that the cross-validation harness
-is itself sound.
+figure. A grader that learns nothing cannot leak anything, so the out-of-fold
+scoring path should reproduce the in-sample one exactly, and it does. That
+checks the scoring plumbing. It does not test the fold partition of the fitted
+model, which is the only place leakage was ever possible — a stateless grader
+is insensitive to that by construction.
 
 The five clinicians agree exactly with each other only **27.5%** of the time,
 and within one only 55%. No detector can be asked to agree with "the clinicians"
-more than the clinicians agree with one another, and roughly 21 points of the
-apparent imprecision above is one annotator not writing down what another one
-did. Both figures are reported, always, with the ceiling beside them.
+more than the clinicians agree with one another, and the ~19-point gap between
+the two grounding precision figures is one annotator not writing down what
+another one did.
+
+Neither number is the truth. The single-annotator figure understates precision
+by charging the detector for disagreement; the union overstates it by accepting
+anything anyone flagged. Both are reported, always, with the ceiling beside
+them, because picking whichever one flatters the detector is the thing this
+project objects to elsewhere.
+
+Omission recall is high and its precision low, and that is one fact rather than
+two: the salience extractor nominates generously, so it catches most of what
+the clinicians said was missing and nominates a great deal besides.
 
 ## Breaking it on purpose
 
-`make prove` injects eight defects into a known baseline and checks that the
+`make prove` injects twelve cases into a known baseline and checks that the
 **named** mechanism fires — not merely that something blocked.
 
-The eighth is a false-positive control: a paraphrase that changes no clinical
+The twelfth is a false-positive control: a paraphrase that changes no clinical
 content and must **not** be flagged. A harness that fires on every rewording is
 switched off in week two, and a disabled gate is worse than none because it
 still appears in the architecture diagram.
+
+**On one consultation at the calibrated p=0.90 point, 1 of 11 defects is
+stopped — and it is the ruleset-fingerprint case, which is not a defect in a
+note at all.** No note-content defect is caught there. That is the honest
+headline for this command, and it now prints above the taxonomy table every
+time it runs.
+
+The command exits non-zero if the control fires on a rewording, if any
+injection matches nothing, or if a silently weakened gate goes undetected. Low
+detection is the reported state of the project and does not fail the build;
+those three do, because each means a number above is not measuring what it
+says.
 
 `make crossval` runs the same cases against all 57 consultations with held-out
 thresholds — 552 detectable defects — and gets 12% at p=0.90, rising to 24% at
@@ -246,10 +281,13 @@ out would flatter the number.
 Stated plainly, because a harness that overclaims has no standing to measure
 anything else.
 
-- **The semantic grader is written but unmeasured.** It needs a model, and the
-  container this was built in has no API access, no Ollama and no route to
+- **The semantic grader has never been run against a model.** It needs one, and
+  the container this was built in has no API access, no Ollama and no route to
   pretrained weights. Every number here comes from graders that need neither.
-  `make validate` picks up a local Ollama automatically if one is running.
+  It has been exercised against a scripted provider, which measures no accuracy
+  and is not meant to — that suite tests the paths where the harness must
+  refuse a model's answer, and it found a crash. Whether the grader is any
+  good is unknown.
 - **No ASR layer.** The corpus ships human transcripts with utterance timings,
   so grounding is measured against perfect transcription. Real ASR error is a
   second failure surface and is not included. Whisper's documented tendency to
@@ -266,16 +304,18 @@ anything else.
 - **57 consultations is a small corpus.** Folds remove the leakage; they do not
   manufacture statistical power. Rather than asking the reader to discount the
   numbers by an unstated amount, every headline figure carries a bootstrap
-  interval: roughly ±6 points on grounding and ±5 on recall. Differences
-  smaller than that are not readable here. The two that the argument rests on
-  are much larger than that and are reported as paired intervals.
+  interval. They are not symmetric and the widest matters most: statistical
+  grounding is 66.7% but its interval runs [55.6, 69.2], so eleven points below
+  the point estimate is inside this corpus's resolution. Lexical grounding is
+  ±6 and both recalls are ±5. The two differences the argument rests on are far
+  larger than any of that, and are reported as paired intervals.
 - **One corpus, one country, one care setting.** Nothing here establishes that
   these numbers transfer to US primary care, to specialty clinics, or to a
   different scribe vendor's output.
 
 ## Incidents
 
-`docs/INCIDENTS.md` records eleven defects found while building this. Four are
+`docs/INCIDENTS.md` records fourteen defects found while building this. Four are
 worth reading:
 
 **WIT-001** — a join dropped 19% of the corpus and the run still printed a

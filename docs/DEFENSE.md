@@ -48,10 +48,19 @@ enforced in the type: a `GroundedAssertion` raises on construction if it is
 It is, and the ceiling matters more than the number. The five clinicians who
 graded this corpus agree exactly with each other 27.5% of the time and within
 one grade 55% of the time. Measured against the union of all five annotators
-rather than one, precision is 45.6%. Roughly 21 points of the apparent
-imprecision is one annotator not writing down what another one did. Both
-figures are reported everywhere, always with the ceiling beside them, because
-reporting only the flattering one is the thing this project is about.
+rather than one, precision is 40.0%. The ~19-point gap is one annotator not
+writing down what another one did.
+
+Neither figure is the truth. The single-annotator number understates precision
+by charging the detector for disagreement; the union overstates it by accepting
+anything anyone flagged. Both are reported everywhere with the ceiling beside
+them, because reporting only the flattering one is the thing this project is
+about.
+
+Omission is the other half: recall 77.7%, precision 15.0% against one annotator
+and 41.1% against the union. High recall with low precision is one fact, not
+two — the salience extractor nominates generously, so it catches most of what
+the clinicians said was missing and nominates a great deal besides.
 
 **"Why not use a real model?"**
 
@@ -73,7 +82,7 @@ PPMI over a term co-occurrence matrix, truncated SVD. Latent semantic analysis,
 `bite`, `cetirizine`. Nobody wrote those down.
 
 Held out, it grounds 66.7% of a median clinician note against the lexical
-grader's 40.0% — it closes half the gap the README complains about.
+grader's 40.0% — 27 of the 60 ungrounded points, just under half the gap.
 
 And it drops recall on clinician-flagged critical errors from 48.3% to 31.6%.
 
@@ -107,7 +116,13 @@ whatever varied between days.
 
 The internal check: the lexical grader learns nothing and therefore cannot
 leak, so its held-out recall should equal its in-sample recall. It does —
-48.3% both ways. That is how I know the harness itself is sound.
+48.3% both ways.
+
+I want to be precise about what that proves, because it is less than it looks.
+It shows the out-of-fold scoring path reproduces the in-sample path for a
+stateless grader. It does not test the fold partition of the *fitted* model,
+which is the only place leakage was ever possible — a stateless grader is
+insensitive to that by construction.
 
 **"How do you know the sabotage numbers mean anything?"**
 
@@ -183,7 +198,8 @@ gate, or a number that stopped making sense — several of them in code an
 assistant wrote and I approved. WIT-001 is a join that silently dropped 19% of
 the corpus while the run printed a confident number. WIT-010 is a learned
 lexicon whose nearest neighbour for `hx` was `yeah`, which survived because I
-inspected it on the terms that made it look good.
+inspected it on the terms that made it look good. WIT-014 is four numbers
+printed in the README as command output that no command produced.
 
 ## What I would do next, in order
 
@@ -203,4 +219,4 @@ inspected it on the terms that made it look good.
 - That this is production-ready. It is a measurement harness.
 - That the numbers transfer beyond UK primary care.
 - That the semantic grader works. It has never been run.
-- That AI-assisted code needs no review. Eleven incidents say otherwise.
+- That AI-assisted code needs no review. Fourteen incidents say otherwise.

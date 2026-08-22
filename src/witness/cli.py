@@ -18,7 +18,7 @@ from witness import validate as val
 from witness.corpus import PriMock57
 from witness.gate import Gate
 from witness.graders.lexical import LexicalGrader
-from witness.matching import MatchResult, match_note
+from witness.matching import MatchResult, match_note, match_note_union, match_omissions
 from witness.pipeline import Pipeline
 from witness.prove import format_report, run_proof, taxonomy_coverage
 from witness.providers import OllamaProvider, default_provider
@@ -78,23 +78,52 @@ def cmd_evidence(_: argparse.Namespace) -> int:
 
 
 def cmd_validate(_: argparse.Namespace) -> int:
+    from collections import defaultdict
+
+    from witness.omission import find_omissions
+
     c = _corpus()
     grader = LexicalGrader()
     anns = c.annotations()
     c.require_consultations({a.consultation_id for a in anns})
     consultations = {cid: c.load_consultation(cid) for cid in c.consultation_ids()}
 
-    totals = [0, 0, 0, 0, 0]
+    # Grouped by note, because the union figures pool the five clinicians who
+    # each reviewed the same note.
+    by_note: dict[tuple[str, str], list] = defaultdict(list)
     for a in anns:
-        g = grader.ground_note(
-            a.consultation_id,
-            a.model_id,
-            segment(a.generated_note),
-            consultations[a.consultation_id].utterances,
-        )
-        for i, v in enumerate(match_note(a, g)):
-            totals[i] += v
-    m = MatchResult(*totals)
+        by_note[(a.consultation_id, a.model_id)].append(a)
+
+    single = [0, 0, 0, 0, 0]
+    union = [0, 0, 0, 0, 0]
+    omit_single = [0, 0, 0, 0, 0]
+    omit_union = [0, 0, 0, 0, 0]
+
+    for (cid, model_id), group in by_note.items():
+        cons = consultations[cid]
+        note = group[0].generated_note
+        g = grader.ground_note(cid, model_id, segment(note), cons.utterances)
+        report = find_omissions(cons, note, model_id)
+        reported = [f.text for f in report.omitted]
+        # Everything the extractor judged salient, reported or not. This is
+        # the universe an annotator's omission has to be found in before the
+        # question "did Witness report it" can be asked at all.
+        salient = reported + [f.text for f in report.covered]
+
+        for a in group:
+            for i, v in enumerate(match_note(a, g)):
+                single[i] += v
+            for i, v in enumerate(match_omissions([a], salient, reported)):
+                omit_single[i] += v
+        for i, v in enumerate(match_note_union(group, g)):
+            union[i] += v
+        for i, v in enumerate(match_omissions(group, salient, reported)):
+            omit_union[i] += v
+
+    m = MatchResult(*single)
+    mu = MatchResult(*union)
+    om = MatchResult(*omit_single)
+    omu = MatchResult(*omit_union)
 
     print("\n  Does Witness flag the claims the clinicians flagged?")
     print("  " + "-" * 66)
@@ -105,9 +134,15 @@ def cmd_validate(_: argparse.Namespace) -> int:
         f"  ({m.unmatchable_findings / m.findings:.0%}, structural comments)"
     )
     print(f"  flags raised                        {m.flags:>6}")
-    print(f"\n  recall     {m.recall:>6.1%}   of attributable critical errors")
-    print(f"  precision  {m.precision:>6.1%}   of flags landing on a labelled error")
-    print(f"  f1         {m.f1:>6.1%}")
+    print()
+    print(f"  grounding     recall     {m.recall:>5.1%}   of attributable critical "
+          "incorrect statements")
+    print(f"                precision  {m.precision:>5.1%}   against one annotator")
+    print(f"                           {mu.precision:>5.1%}   against the union of all five")
+    print()
+    print(f"  omission      recall     {om.recall:>5.1%}")
+    print(f"                precision  {om.precision:>5.1%}   against one annotator")
+    print(f"                           {omu.precision:>5.1%}   against the union of all five")
 
     a1 = val.agreement_on(c, "day1_consultation01")
     if "exact_agreement" in a1:
@@ -117,7 +152,8 @@ def cmd_validate(_: argparse.Namespace) -> int:
             f"   within one {a1['within_one']:.1%}   rho {a1['spearman_rho']:+.3f}"
         )
         print("  No detector can be asked to agree with 'the clinicians' more")
-        print("  than the clinicians agree with one another.")
+        print("  than the clinicians agree with one another. The gap between the")
+        print("  two precision figures above is that disagreement, measured.")
     return 0
 
 
@@ -158,6 +194,10 @@ def cmd_crossval(ns: argparse.Namespace) -> int:
 
     drift = cx.check_published(report)
     shape = cx.monotone_violations(report.radius)
+    live = cx.check_control_is_live(
+        c, {cid: c.load_consultation(cid) for cid in c.consultation_ids()}
+    )
+    shape = shape + live
     if not drift and not shape:
         print("\n  every figure the README publishes reproduces within tolerance.")
         return 0
@@ -228,7 +268,39 @@ def cmd_prove(_: argparse.Namespace) -> int:
     )
     print(format_report(results))
     print(taxonomy_coverage(results))
-    return 0
+
+    # This command used to return 0 unconditionally. Ten missed defects
+    # produced a passing build, in a project whose entire argument is that a
+    # check exiting zero regardless is decoration. Low detection is the
+    # published state and must not fail the build; these three things must.
+    failures: list[str] = []
+    for r in results:
+        if r.vacuous:
+            failures.append(
+                f"{r.sabotage.key}: injection matched nothing, so this case tested nothing"
+            )
+        elif not r.sabotage.should_block and r.blocked:
+            failures.append(
+                f"{r.sabotage.key}: the harness fired on a rewording that changed no "
+                "clinical content"
+            )
+    caught = {r.sabotage.key for r in results if r.sabotage.should_block and r.blocked}
+    if "weakened_threshold" not in caught:
+        failures.append(
+            "weakened_threshold: a silently relaxed gate was not detected by the "
+            "ruleset fingerprint"
+        )
+    if not failures:
+        return 0
+    print("\n  SABOTAGE HARNESS INVALID")
+    print("  " + "-" * 68)
+    for line in failures:
+        print(f"    {line}")
+    print("\n  Low detection is the reported state of this project and does not")
+    print("  fail the build. A control that cannot fire, a false alarm on a")
+    print("  paraphrase, and an undetectable weakened gate all do -- each one")
+    print("  means a number printed above is not measuring what it says.")
+    return 1
 
 
 def cmd_review(ns: argparse.Namespace) -> int:
