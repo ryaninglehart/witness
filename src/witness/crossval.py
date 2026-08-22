@@ -47,6 +47,7 @@ from witness.gate import Gate, Thresholds
 from witness.graders.lexical import LexicalGrader
 from witness.graders.statistical import AssociationModel, StatisticalGrader, fit
 from witness.grounding import Grader, NoteGrounding, Verdict
+from witness.interval import Difference, Interval, bootstrap, median_of, paired_difference, ratio_of
 from witness.matching import MatchResult, match_note
 from witness.omission import Tier, find_omissions
 from witness.segment import segment
@@ -165,7 +166,7 @@ def out_of_fold_detection(
     corpus: PriMock57,
     models: list[FoldModels],
     consultations: dict[str, Consultation],
-) -> dict[str, MatchResult]:
+) -> tuple[dict[str, MatchResult], dict[str, dict[str, MatchResult]]]:
     """Precision and recall against the clinicians' own critical findings.
 
     Each generated note is graded by the model whose fold excluded the
@@ -180,11 +181,15 @@ def out_of_fold_detection(
 
     lexical = LexicalGrader()
     totals = {"lexical": [0, 0, 0, 0, 0], "statistical": [0, 0, 0, 0, 0]}
+    # Also kept per consultation, because the bootstrap resamples whole
+    # consultations and needs each one's contribution separately.
+    per_cid: dict[str, dict[str, MatchResult]] = {}
     for fm in models:
         grader = StatisticalGrader(fm.model)
         for cid in fm.fold.test:
             c = consultations[cid]
             index = grader.index_for(c.utterances)
+            local = {"lexical": [0, 0, 0, 0, 0], "statistical": [0, 0, 0, 0, 0]}
             for a in by_cid.get(cid, []):
                 assertions = segment(a.generated_note)
                 for key, g in (
@@ -196,7 +201,9 @@ def out_of_fold_detection(
                 ):
                     for i, v in enumerate(match_note(a, g)):
                         totals[key][i] += v
-    return {k: MatchResult(*v) for k, v in totals.items()}
+                        local[key][i] += v
+            per_cid[cid] = {k: MatchResult(*v) for k, v in local.items()}
+    return {k: MatchResult(*v) for k, v in totals.items()}, per_cid
 
 
 # -- held-out gate calibration -------------------------------------------
@@ -476,6 +483,8 @@ class CrossValReport:
     lexical_points: list[OperatingPoint]
     statistical_points: list[OperatingPoint]
     radius: list[RadiusPoint] = field(default_factory=list)
+    intervals: dict[str, Interval] = field(default_factory=dict)
+    differences: list[Difference] = field(default_factory=list)
 
     def best(self, points: list[OperatingPoint]) -> OperatingPoint:
         """The percentile maximising the weaker of the two rates.
@@ -563,7 +572,87 @@ class CrossValReport:
                 "  Widening the radius cannot separate paraphrase from fabrication: to a",
                 "  term matcher they are the same event, a claim whose words are absent.",
             ]
+        if self.intervals:
+            lines += [
+                "",
+                "  How precisely does a 57-consultation corpus pin these down?",
+                "  " + "-" * 68,
+                "  Bootstrap over whole consultations, 2000 resamples, seeded.",
+                "",
+            ]
+            for name, iv in self.intervals.items():
+                lines.append(f"  {name:<40}{iv!s:>28}")
+            lines += ["", "  Paired on identical resamples:"]
+            for d in self.differences:
+                lines.append(f"    {d}")
+            undecided = [d for d in self.differences if not d.distinguishable]
+            if undecided:
+                lines += [
+                    "",
+                    f"  {len(undecided)} of {len(self.differences)} comparisons are inside the",
+                    "  noise of this corpus. An interval containing zero means these 57",
+                    "  consultations cannot separate the two -- not that they are equal.",
+                ]
         return "\n".join(lines)
+
+
+def compute_intervals(
+    lex: dict[str, NoteGrounding],
+    stat: dict[str, NoteGrounding],
+    per_cid: dict[str, dict[str, MatchResult]],
+    resamples: int = 2000,
+) -> tuple[dict[str, Interval], list[Difference]]:
+    """Resample the headline figures so their precision is stated, not implied.
+
+    The unit is the consultation. Notes from one encounter share a transcript,
+    a patient and a clinician, so resampling notes would treat correlated
+    observations as independent and report intervals far narrower than the
+    corpus supports.
+    """
+    ids = sorted(set(lex) | set(stat))
+
+    def grounded(src: dict[str, NoteGrounding]) -> dict[str, float]:
+        return {
+            cid: (g.count(Verdict.SUPPORTED) + g.count(Verdict.INFERRED)) / g.n
+            for cid, g in src.items()
+            if g.n
+        }
+
+    lex_ground = median_of(grounded(lex))
+    stat_ground = median_of(grounded(stat))
+
+    # Recall is a pooled ratio, not a mean of per-consultation recalls.
+    def hits(key: str) -> dict[str, float]:
+        return {cid: float(m[key].matched) for cid, m in per_cid.items()}
+
+    def attributable(key: str) -> dict[str, float]:
+        return {
+            cid: float(m[key].findings - m[key].unmatchable_findings)
+            for cid, m in per_cid.items()
+        }
+
+    intervals: dict[str, Interval] = {
+        "lexical median grounded": bootstrap(ids, lex_ground, resamples),
+        "statistical median grounded": bootstrap(ids, stat_ground, resamples),
+    }
+    differences: list[Difference] = [
+        paired_difference(
+            ids, "grounding, statistical - lexical", stat_ground, lex_ground, resamples
+        )
+    ]
+
+    if per_cid:
+        det_ids = sorted(per_cid)
+        lex_recall = ratio_of(hits("lexical"), attributable("lexical"))
+        stat_recall = ratio_of(hits("statistical"), attributable("statistical"))
+        intervals["lexical recall"] = bootstrap(det_ids, lex_recall, resamples)
+        intervals["statistical recall"] = bootstrap(det_ids, stat_recall, resamples)
+        differences.append(
+            paired_difference(
+                det_ids, "recall, statistical - lexical", stat_recall, lex_recall, resamples
+            )
+        )
+    return intervals, differences
 
 
 def run(
@@ -572,6 +661,8 @@ def run(
     include_detection: bool = True,
     include_sabotage: bool = True,
     include_radius: bool = True,
+    include_intervals: bool = True,
+    resamples: int = 2000,
     **fit_kwargs: float | int,
 ) -> CrossValReport:
     ids = corpus.consultation_ids()
@@ -588,10 +679,11 @@ def run(
     }
 
     if include_detection:
-        detection = out_of_fold_detection(corpus, models, consultations)
+        detection, per_cid = out_of_fold_detection(corpus, models, consultations)
     else:
         empty = MatchResult(0, 0, 0, 0, 0)
         detection = {"lexical": empty, "statistical": empty}
+        per_cid = {}
 
     lex_sab: dict[str, list[GradedSabotage]] = {}
     stat_sab: dict[str, list[GradedSabotage]] = {}
@@ -604,9 +696,16 @@ def run(
                 lex_sab[cid] = grade_sabotages(c, lexical)
                 stat_sab[cid] = grade_sabotages(c, sgrader)
 
+    intervals: dict[str, Interval] = {}
+    differences: list[Difference] = []
+    if include_intervals:
+        intervals, differences = compute_intervals(lex, stat, per_cid, resamples)
+
     lex_name = LexicalGrader.name
     stat_name = StatisticalGrader(models[0].model).name
     return CrossValReport(
+        intervals=intervals,
+        differences=differences,
         k=k,
         lexical_profile=_profile(lex_name, lex.values()),
         statistical_profile=_profile(stat_name, stat.values()),

@@ -130,8 +130,22 @@ Held out, it does exactly what it was built to do — and the bill comes with it
 
 | grader | median note grounded | recall on clinician-flagged critical errors |
 |---|---|---|
-| lexical/1.0 | 40.0% | **48.3%** |
-| statistical/1.0 | **66.7%** | 31.6% |
+| lexical/1.0 | 40.0% [33.3, 46.2] | **48.3%** [42.5, 53.4] |
+| statistical/1.0 | **66.7%** [55.6, 69.2] | 31.6% [27.1, 36.1] |
+
+Brackets are 95% bootstrap intervals over 2,000 resamples of whole
+consultations — the consultation, not the note, because notes from one
+encounter share a transcript, a patient and a clinician. Paired on identical
+resamples, so the shared difficulty of a given encounter cancels:
+
+```
+grounding, statistical - lexical   +26.7%  [+15.6%, +31.4%]   distinguishable
+recall,    statistical - lexical   -16.8%  [-20.1%, -13.2%]   distinguishable
+```
+
+Neither interval is near zero. **The trade is not a small-sample artifact** —
+this corpus is small, and it is still large enough to see both halves of it
+clearly.
 
 The association floor is the one knob controlling how far from a claim's literal
 wording the grader will look. Sweeping it, held out:
@@ -226,10 +240,12 @@ anything else.
   It is used because it is graded, not because it is representative.
 - **Single-annotator ground truth per row.** Mitigated by reporting the
   five-annotator union and the inter-rater ceiling, not solved.
-- **57 consultations is a small corpus**, and five-fold cross-validation over
-  it gives wide confidence intervals on every figure above. Folds remove the
-  leakage; they do not manufacture statistical power. Treat differences of a
-  few points as noise and the monotone trends as the result.
+- **57 consultations is a small corpus.** Folds remove the leakage; they do not
+  manufacture statistical power. Rather than asking the reader to discount the
+  numbers by an unstated amount, every headline figure carries a bootstrap
+  interval: roughly ±6 points on grounding and ±5 on recall. Differences
+  smaller than that are not readable here. The two that the argument rests on
+  are much larger than that and are reported as paired intervals.
 - **One corpus, one country, one care setting.** Nothing here establishes that
   these numbers transfer to US primary care, to specialty clinics, or to a
   different scribe vendor's output.

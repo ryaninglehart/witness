@@ -118,12 +118,29 @@ incident log.
 
 **"57 consultations is nothing."**
 
-Correct, and it bounds every claim here. Five-fold cross-validation over 57
-encounters gives wide intervals; folds remove the leakage, they do not
-manufacture power. Treat differences of a few points as noise and the monotone
-trends as the result. It is also one country, one care setting, and 2022-era
-model output — nothing here establishes transfer to US primary care, to
-specialty clinics, or to a current vendor's system.
+Correct, and it bounds every claim here — so the bound is stated rather than
+gestured at. Every headline figure carries a 95% bootstrap interval over 2,000
+resamples of whole consultations. The unit is the consultation, not the note:
+notes from one encounter share a transcript, a patient and a clinician, and
+resampling notes would treat correlated observations as independent and report
+intervals far narrower than the corpus supports.
+
+Roughly ±6 points on grounding, ±5 on recall. So differences smaller than that
+are not readable on this corpus, and I do not read them.
+
+The two the argument rests on are much bigger. Paired on identical resamples,
+so the shared difficulty of a given encounter cancels: grounding +26.7%
+[+15.6%, +31.4%], recall −16.8% [−20.1%, −13.2%]. Neither is near zero. **The
+trade-off is not a small-sample artifact.**
+
+One thing I am careful about in how that is phrased: an interval containing
+zero would mean these 57 consultations cannot separate two graders. It would
+not mean they are equal, and reporting it that way is the same overclaim
+pointed in the other direction.
+
+It is also one country, one care setting, and 2022-era model output — nothing
+here establishes transfer to US primary care, to specialty clinics, or to a
+current vendor's system.
 
 **"Did you use AI to write this?"**
 
