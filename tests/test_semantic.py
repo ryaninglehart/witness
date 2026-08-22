@@ -273,3 +273,65 @@ class TestOllamaAvailability:
 def test_degenerate_payloads_do_not_raise(payload):
     g = _ground(ScriptedProvider(payload), [_assertion(0, "chest pain")])
     assert g.assertions[0].verdict is Verdict.UNSUPPORTED
+
+
+# -- shapes a real model actually emits ------------------------------------
+#
+# WIT-016. Everything above was written against a scripted provider, and the
+# scripts were written by the same person as the parser, so they all used the
+# envelope the prompt asks for. Against a live qwen2.5:7b that envelope arrived
+# 5 times in 19. These are the other fourteen.
+
+LIVE_SHAPES = {
+    "bare array": '[{"i":12,"v":"SUPPORTED","u":1,"why":"a"},{"i":13,"v":"UNSUPPORTED","u":null}]',
+    "prose then array": (
+        "Based on the dialogue, the claims can be summarized as follows:\n"
+        '[{"i":0,"v":"INFERRED","u":1,"why":"b"}]'
+    ),
+    "concatenated objects": '{"i":0,"v":"SUPPORTED","u":1},\n{"i":1,"v":"UNSUPPORTED","u":null}',
+    "single object": '{"i":0,"v":"CONTRADICTED","u":1,"why":"c"}',
+    "code fence": '```json\n[{"i":0,"v":"SUPPORTED","u":1}]\n```',
+    "prose then envelope": (
+        'Here you go!\n{"verdicts":[{"i":0,"v":"SUPPORTED","u":1}]}\nHope that helps.'
+    ),
+    "nested under another key": '{"result":{"verdicts":[{"i":0,"v":"SUPPORTED","u":1}]}}',
+    "truncated after one": '[{"i":0,"v":"SUPPORTED","u":1},{"i":1,"v":"SUPP',
+}
+
+
+@pytest.mark.parametrize("shape", sorted(LIVE_SHAPES), ids=lambda s: s.replace(" ", "-"))
+def test_shapes_a_real_model_emits_are_read(shape):
+    verdicts = SemanticGrader._parse(LIVE_SHAPES[shape])
+    assert verdicts, f"{shape!r} yielded nothing; every claim in it would be refused"
+    assert all("i" in v and "v" in v for v in verdicts)
+
+
+def test_a_verdict_is_not_just_any_dict():
+    # The opposite failure. A parser loose enough to accept the model's own
+    # commentary would reintroduce WIT-016 pointing the other way.
+    assert SemanticGrader._parse('{"note":"these all look fine to me"}') == []
+    assert SemanticGrader._parse('{"a":{"b":{"c":[1,2,3]}}}') == []
+    assert SemanticGrader._parse('{"verdicts": [null, 3, "x"]}') == []
+
+
+def test_a_restated_answer_votes_once():
+    twice = (
+        '{"verdicts":[{"i":0,"v":"SUPPORTED","u":1}]}\n'
+        'In summary: [{"i":0,"v":"UNSUPPORTED","u":null}]'
+    )
+    assert [v["v"] for v in SemanticGrader._parse(twice)] == ["SUPPORTED"]
+
+
+def test_unreadable_output_is_counted_not_just_absorbed():
+    # The heart of WIT-016 was not the parse failure, it was that nobody could
+    # see it. Blocking quietly is indistinguishable from a note that deserved
+    # to be blocked.
+    provider = ScriptedProvider(
+        "no json here at all", _verdicts({"i": 1, "v": "SUPPORTED", "u": 1})
+    )
+    g = SemanticGrader(provider)
+    g.ground_note("c1", "m", [_assertion(0, "x")], UTTERANCES)
+    g.ground_note("c1", "m", [_assertion(1, "y")], UTTERANCES)
+    assert g.batches == 2
+    assert g.unparsed_batches == 1
+    assert g.unparsed_rate == 0.5

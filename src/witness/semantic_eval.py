@@ -58,6 +58,11 @@ class GraderResult:
     replayed_calls: int = 0
     live_calls: int = 0
     seconds: float = 0.0
+    #: Share of model responses the parser could make nothing of. Every claim
+    #: in an unparsed batch becomes UNSUPPORTED, so a high rate here produces a
+    #: table that looks like a measurement of the grader and is a measurement
+    #: of the parser. See WIT-016.
+    unparsed_rate: float = 0.0
 
 
 @dataclass
@@ -83,6 +88,20 @@ class SemanticReport:
                 f"  {r.name[:45]:<46}{r.median_grounded:>9.1%}{r.recall:>9.1%}"
                 f"{r.precision:>8.1%}{r.f1:>8.1%}"
             )
+        flagged = [(r, degenerate_reasons(r)) for r in self.results]
+        flagged = [(r, why) for r, why in flagged if why]
+        if flagged:
+            lines += ["", "  NOT A MEASUREMENT", "  " + "-" * 82]
+            for r, why in flagged:
+                lines.append(f"  {r.name}")
+                for reason in why:
+                    lines.append(f"    - {reason}")
+            lines += [
+                "",
+                "  Rows above are printed so the failure is visible, not because they",
+                "  mean anything. Fix the pipeline and re-run; cassettes make the",
+                "  second run free.",
+            ]
         for r in self.results:
             if r.live_calls or r.replayed_calls:
                 lines += [
@@ -138,6 +157,31 @@ class _CountingProvider:
         else:
             self.live += 1
         return out
+
+
+#: A grader that witnesses nothing flags everything, so its recall is 100% by
+#: construction and its precision is the base rate. That is the signature of a
+#: broken pipeline, not a result, and it is what a live qwen2.5 produced when
+#: the parser was discarding three responses in four.
+def degenerate_reasons(r: GraderResult) -> list[str]:
+    """Why this row is not a measurement. Empty means it is one."""
+    out: list[str] = []
+    if r.notes_graded and r.median_grounded == 0.0:
+        out.append(
+            "grounded 0.0% -- the grader witnessed nothing in any note, so every "
+            "claim was refused"
+        )
+    if r.annotations_graded and r.recall >= 0.999:
+        out.append(
+            f"recall {r.recall:.1%} -- flagging everything makes recall 100% by "
+            "construction; it is not detection"
+        )
+    if r.unparsed_rate > 0.2:
+        out.append(
+            f"{r.unparsed_rate:.0%} of model responses were unreadable, and every "
+            "claim in those batches was scored UNSUPPORTED"
+        )
+    return out
 
 
 def _profile(groundings: list[NoteGrounding]) -> tuple[float, float]:
@@ -244,11 +288,17 @@ def evaluate(
         med_g, med_u = _profile(groundings)
         name = getattr(g, "name", label)
         counter = counters.get(label)
+        graded_by = lineup.get(label)
         results.append(
             GraderResult(
                 name=f"{label} ({name})" if name != label else label,
                 replayed_calls=counter.replayed if counter else 0,
                 live_calls=counter.live if counter else 0,
+                unparsed_rate=(
+                    graded_by.unparsed_rate
+                    if isinstance(graded_by, SemanticGrader)
+                    else 0.0
+                ),
                 median_grounded=med_g,
                 median_unsupported=med_u,
                 recall=m.recall,

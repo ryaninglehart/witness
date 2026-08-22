@@ -285,6 +285,15 @@ def cmd_semantic(ns: argparse.Namespace) -> int:
     print(report.render())
     out = se.write_report(report, _Path("data/out/semantic_report.json"))
     print(f"\n  wrote {out}")
+
+    # A degenerate row is not a result and must not exit zero. WIT-016: a run
+    # reporting grounded 0.0% / recall 100.0% was a parser failure wearing a
+    # measurement's clothes, and it took a careful reader to notice rather
+    # than the harness saying so.
+    broken = [r for r in report.results if se.degenerate_reasons(r)]
+    if broken:
+        print("\n  This run did not measure anything. See NOT A MEASUREMENT above.")
+        return 1
     return 0
 
 

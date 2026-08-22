@@ -620,3 +620,81 @@ in isolation: a hard-coded `True` that is genuinely correct for its case, a
 default argument, a loop level, a denominator with a reasonable definition. The
 defence is not more care. It is arranging for someone else to do the counting,
 which is what found all five of these within an hour of being asked to.
+
+---
+
+## WIT-016 — The first live run measured the parser, not the grader
+
+**What happened.** The semantic grader was finally run against a real model —
+`qwen2.5:7b-instruct` over Ollama, 19 batches. The table read:
+
+```
+semantic (semantic/1.0+ollama/qwen2.5:7b-inst      0.0%   100.0%    11.4%   20.4%
+```
+
+Grounded 0.0%, recall 100.0%. That is not a measurement. A grader that witnesses
+nothing refuses every claim, so it flags everything, so its recall is 100% by
+construction and its precision is the base rate of the corpus.
+
+The model was fine. It returned well-formed JSON with real utterance citations.
+The prompt asks for `{"verdicts":[...]}`, and against a live 7B that envelope
+arrived **5 times out of 19**. Eleven responses were a bare array —
+`[{"i":12,...},{"i":13,...}]` — and three opened with prose. The parser required
+the envelope and the extraction regex was `\{.*\}`, which on a bare array grabs
+first-brace-to-last-brace and yields several objects with no wrapper:
+
+```
+json.loads -> JSONDecodeError: Extra data: line 1 column 103 (char 102)
+```
+
+`_parse` returned `[]` by design, and every claim in those batches became
+UNSUPPORTED. **74% of the run was discarded and the remainder was printed as a
+result.**
+
+**Why the test suite missed it.** WIT-014's lesson was applied and did not
+reach far enough. `tests/test_semantic.py` covered `{"verdicts": null}`,
+truncated JSON, a prose preamble, a code fence, wrong types, a dead provider —
+and every one of those fixtures used the envelope, because the person who wrote
+the parser also wrote the scripts. The suite tested the failure modes I had
+imagined for a format I had assumed. It never asked what a model actually
+emits.
+
+The module docstring even names the failure class — *"a 7B model asked for JSON
+will wrap it in prose, truncate it mid-object"* — which made it worse, not
+better: the hazard was written down, the mitigation was written for it, and
+neither covered the common case.
+
+**Why it took a careful reader.** The run's stop condition was "if the semantic
+row is all zeros, stop." The row was not all zeros. `0.0% / 100.0% / 11.4%`
+slipped through a check written against the wrong shape of failure, and it was
+caught by someone reading the numbers and recognising that 100% recall beside
+0% grounding is a signature rather than a score.
+
+**What changed.**
+
+`_parse` now scans the response for every JSON value using `raw_decode` and
+keeps the verdict-shaped objects, whatever they were wrapped in: the envelope, a
+bare array, a single object, several concatenated objects, a value nested under
+some other key, or any of those buried in prose or a fence. A verdict is
+structurally defined — a dict with `i` and `v` — so a model's commentary object
+cannot become one; a parser loose enough to accept anything would reintroduce
+this defect pointing the other way. Replayed against the observed distribution,
+grounding goes from **0.0% to 53.1%**.
+
+The parse failure is no longer silent. `SemanticGrader` counts batches and
+unparsed batches, and `semantic_eval` prints the rate. Blocking quietly is
+indistinguishable from a note that deserved to be blocked, which is precisely
+how this survived.
+
+And `degenerate_reasons` refuses the whole class: a row with 0% grounding, or
+100% recall, or more than 20% unreadable responses is printed under **NOT A
+MEASUREMENT** with the reason, and `make semantic` exits non-zero. The harness
+now says what a reader had to notice.
+
+**The generalisation.** A test fixture written by the author of the code under
+test shares its assumptions, and no amount of adding cases fixes that — the
+fourteen shapes this parser could not read were not exotic, they were the
+majority, and I would not have invented any of them. Fixtures for anything
+parsing model output have to come from the model. One real run is worth more
+than a suite of imagined ones, and it should happen before the numbers are
+published rather than after.
