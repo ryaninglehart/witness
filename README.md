@@ -15,10 +15,16 @@ cd witness
 python3 -m venv .venv && source .venv/bin/activate   # needs Python 3.11+
 pip install -r requirements.txt
 make corpus      # PriMock57, text only — audio is git-lfs and optional
-make check       # lint, 77 tests, and every number below
+make check       # lint, 134 tests, and every number below
 ```
 
-About ninety seconds. No API key, no network egress, no GPU.
+About a minute. No API key, no network egress, no GPU.
+
+`make check` is the whole gate: lint, tests, the premise analysis, validation,
+calibration, the sabotage harness, and the held-out cross-validation — which
+**exits non-zero if any figure printed below has drifted past its tolerance**.
+CI additionally runs the evaluation twice in separate processes and diffs the
+output, because a number can be stable inside one run and drift between two.
 
 ---
 

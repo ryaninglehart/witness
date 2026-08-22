@@ -46,4 +46,33 @@ jobs:
         # lint, tests, evidence, validation, calibration, sabotage, and the
         # held-out cross-validation that checks the published figures still
         # reproduce. Any one of them exiting non-zero fails the build.
-        run: make check
+        run: |
+          start=$(date +%s)
+          make check
+          elapsed=$(( $(date +%s) - start ))
+          echo "make check took ${elapsed}s"
+          # The README tells a reviewer this is about ninety seconds, which is
+          # the reason anyone tries it. Budgeted at 4x to absorb runner
+          # variance -- this catches the gate quietly becoming a nightly job,
+          # not a slow afternoon on shared CI.
+          if [ "$elapsed" -gt 360 ]; then
+            echo "::error::make check took ${elapsed}s; the README claims ~90s"
+            exit 1
+          fi
+
+      - name: Reproducible across processes
+        # The in-process determinism tests cannot see a figure that drifts
+        # between runs -- a hash seeded per process, a solver that picks a
+        # different sign, a dict iteration order that leaks into a tie-break.
+        # Running the whole evaluation twice and diffing is the only check
+        # that covers those, and it costs a minute.
+        run: |
+          .venv/bin/python -m witness.cli crossval > /tmp/run1.txt
+          .venv/bin/python -m witness.cli crossval > /tmp/run2.txt
+          diff /tmp/run1.txt /tmp/run2.txt || {
+            echo "::error::crossval is not reproducible between runs"
+            exit 1
+          }
+          echo "identical across two processes"
+        env:
+          PYTHONPATH: src

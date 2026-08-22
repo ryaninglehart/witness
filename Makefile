@@ -1,7 +1,7 @@
 PY := .venv/bin/python
 export PYTHONPATH := src
 
-.PHONY: help corpus check test lint evidence validate calibrate sweep prove crossval semantic review clean
+.PHONY: help corpus check test lint evidence validate calibrate sweep prove crossval semantic reproduce review clean
 
 help:
 	@echo "  make corpus     fetch PriMock57 (CC BY 4.0, text only -- no audio needed)"
@@ -15,6 +15,7 @@ help:
 	@echo "  make prove      break it on purpose; see what is caught"
 	@echo "  make crossval   held-out evaluation; nothing scored in-sample"
 	@echo "  make semantic   measure the LLM grader (needs Ollama; not in make check)"
+	@echo "  make reproduce  run the evaluation twice and diff it"
 	@echo "  make review     export a one-file review page you can click through"
 
 corpus:
@@ -50,6 +51,16 @@ crossval:
 # minutes on a local 7B. Cassettes make the second run free.
 semantic:
 	@$(PY) -m witness.cli semantic $(ARGS)
+
+# Two processes, not two calls in one. A figure can be stable within a run and
+# drift between them -- a per-process hash seed, a solver sign flip, a dict
+# order leaking into a tie-break -- and none of the in-process tests can see it.
+reproduce:
+	@$(PY) -m witness.cli crossval > /tmp/witness-run1.txt
+	@$(PY) -m witness.cli crossval > /tmp/witness-run2.txt
+	@diff /tmp/witness-run1.txt /tmp/witness-run2.txt \
+		&& echo "  identical across two processes" \
+		|| (echo "  NOT REPRODUCIBLE"; exit 1)
 
 review:
 	@$(PY) -m witness.cli review
