@@ -342,3 +342,48 @@ transcript. That is now measured rather than argued.
 **The generalisation.** A disclosed limitation is still a limitation. Writing
 it down converts a hidden error into an honest one; it does not convert it into
 a result.
+
+---
+
+## WIT-012 — The review page executed its own input data
+
+**What happened.** `viewer.py` serialises a run with `json.dumps` and
+interpolates it into a `<script>` block. The HTML parser terminates a script
+element at the first literal `</script` in the byte stream, regardless of what
+JSON quoting says about it. So a transcript containing that sequence closed the
+block early and everything after it was parsed as markup.
+
+Verified in a browser rather than argued: an utterance reading
+`</script><script>window.__PWNED__=1;document.title='OWNED'</script>` set both.
+The page title became `OWNED`.
+
+**Why it is not hypothetical.** PriMock57 transcripts are full of angle
+brackets — 1,359 `<UNIN/>`, 1,132 `<UNSURE>` pairs, 814
+`<INAUDIBLE_SPEECH/>`. The evaluator notes are unconstrained free text. And the
+inputs this page is *designed* to display are generated notes and ASR output,
+neither of which is trustworthy by construction — the whole reason the harness
+exists is that model output cannot be taken at face value. The page took its
+own threat model's input and handed it to the parser.
+
+**The part that stings.** The page escapes text correctly everywhere it renders
+it: `esc()` covers `&<>"'` and every field goes through it. The defect was one
+level up, in the payload the escaping ran *inside*. The careful part was
+careful and the boundary underneath it was not.
+
+**What changed.** `_embed()` escapes `<`, `>` and `&` as JSON unicode escapes,
+which are valid inside a JSON string, decode back to the original characters,
+and are inert to the HTML parser. The title interpolation is HTML-escaped too —
+it is built from corpus ids and is very unlikely to matter, which is an argument
+for why this one is low risk and not an argument for leaving it, because "this
+field happens to be clean" is how the next one gets missed.
+
+`tests/test_viewer.py` pins the bytes, and three optional Playwright tests pin
+what a browser actually does with them: no execution, no page errors, no
+network requests, and the click-to-highlight still working. That last one
+matters — an escape that renders the page inert would pass a security test and
+fail the reviewer.
+
+**The generalisation.** Escaping applied at the leaves does not protect a
+boundary above them. And a security property asserted with string matching is a
+proxy; here the proxy would have looked fine while the page executed injected
+script. Check the property where it actually holds — in this case, in a browser.

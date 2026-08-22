@@ -189,6 +189,34 @@ h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;
 """
 
 
+#: Characters that let a JSON payload escape a <script> block. Escaped as
+#: JSON unicode sequences, which are valid inside a JSON string, decode back to
+#: the original characters, and are inert to the HTML parser.
+_SCRIPT_SAFE = {"<": "\\u003c", ">": "\\u003e", "&": "\\u0026"}
+
+
+def _embed(data: dict) -> str:
+    """Serialise a payload for inclusion inside a ``<script>`` element.
+
+    ``json.dumps`` alone is not safe here and this is not hypothetical. The
+    HTML parser terminates a script block at the first literal ``</script`` in
+    the byte stream regardless of JSON quoting, so any transcript containing
+    that sequence would break out of the block and the rest of the payload
+    would be parsed as markup. PriMock57 transcripts are full of angle
+    brackets already -- ``<UNIN/>``, ``<UNSURE>``, ``<INAUDIBLE_SPEECH/>`` --
+    and the free-text evaluator notes are unconstrained.
+
+    The stakes are specific to what this page is. It renders clinical content,
+    it is opened by a reviewer, and its whole privacy argument is that nothing
+    leaves the machine. A page that executes text arriving from its own input
+    data has given that up. See WIT-012.
+    """
+    out = json.dumps(data)
+    for ch, esc in _SCRIPT_SAFE.items():
+        out = out.replace(ch, esc)
+    return out
+
+
 def export(run: RunResult, consultation: Consultation, path: Path) -> Path:
     """Write a one-file review page for a single run."""
     payload = run.to_dict()
@@ -210,12 +238,30 @@ def export(run: RunResult, consultation: Consultation, path: Path) -> Path:
             for u in consultation.utterances
         ],
     }
-    html = _TEMPLATE.replace("__DATA__", json.dumps(data)).replace(
-        "__TITLE__", f"{run.consultation_id} / {run.model_id}"
+    html = _TEMPLATE.replace("__DATA__", _embed(data)).replace(
+        "__TITLE__", _escape_text(f"{run.consultation_id} / {run.model_id}")
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(html, encoding="utf-8")
     return path
+
+
+def _escape_text(s: str) -> str:
+    """Escape a value interpolated into markup rather than into a script.
+
+    The title is built from a consultation id and a model id, both of which
+    come from the corpus rather than from a user. That is an argument for why
+    this is unlikely to matter and not an argument for leaving it unescaped:
+    the ids are data, the rule is that data is escaped where it lands, and
+    "this particular field happens to be clean" is how the next one gets
+    missed.
+    """
+    return (
+        s.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 def _index_for(consultation: Consultation, start_s: float) -> int:
