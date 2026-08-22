@@ -24,7 +24,8 @@ then measured the gate honestly enough that it failed.
 
 There is no operating point where the gate both accepts notes written by
 practising clinicians and catches most injected defects. Best balance: 39%
-acceptance at 33% detection, with false alarms on 47% of paraphrase controls.
+acceptance at 21% detection, over 552 injected defects spanning eleven defect
+types drawn from the error taxonomy the corpus evaluators wrote for themselves.
 
 If someone reads that as a failed project, the answer is that a harness which
 reported success here would have been wrong, and I would not have known. The
@@ -108,13 +109,41 @@ The internal check: the lexical grader learns nothing and therefore cannot
 leak, so its held-out recall should equal its in-sample recall. It does —
 48.3% both ways. That is how I know the harness itself is sound.
 
+**"How do you know the sabotage numbers mean anything?"**
+
+Because they did not, and I found out. WIT-013: the false-positive control
+substituted a phrase that appears in one of 57 consultations, so on the other 56
+it compared a note to itself and passed. And `clean_baseline` — which strips
+ungrounded claims and was therefore supposed to pass the gate — fails on its own
+for 31 of 57, because stripped content is missing content. The published "47%
+false alarms" was neither a paraphrase nor an alarm. It was the baseline.
+
+Two fixes. The control now reorders sentences and expands abbreviations, so it
+applies to every note and every claim survives it intact; an injection that
+changes nothing is marked vacuous and excluded from both sides rather than
+scored as a pass. And every case is credited only for rules the injection
+*added* to the baseline's own findings.
+
+The honest figure is 4%. Fixing the injections so they fire on most
+consultations rather than on the one they were written against raised the
+defect count from 399 to 552 and dropped detection from 33% to 21% — the extra
+cases are ones the harness does not catch. Both corrections moved the numbers
+against the project, and one of them killed a selling point of the learned
+grader.
+
+What I take from it: the number was bad, and it agreed with the story I was
+already telling, so it read as confirmation. A figure that had come out
+implausibly good would have been audited the same day.
+
 **"What stops the README from going stale?"**
 
 `make crossval` exits non-zero if any published figure drifts past its stated
 tolerance, or if the monotone trade stops being monotone. It runs inside `make
 check`. I verified it fails as well as passes — a gate only tested in the
 passing direction is decoration, which is WIT-006 in this project's own
-incident log.
+incident log. It has since earned its keep: it is what refused the build when
+the WIT-013 correction moved the false-alarm figure, rather than leaving a
+stale number in the README.
 
 **"57 consultations is nothing."**
 

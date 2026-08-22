@@ -268,6 +268,9 @@ class GradedSabotage:
     #: The fingerprint case changes no note, only the bar. It is detected by
     #: the ruleset hash rather than by any threshold, so it is decided once.
     threshold_independent: bool = False
+    #: The injection matched nothing, so this case tested nothing. Excluded
+    #: from both numerator and denominator rather than counted as a pass.
+    vacuous: bool = False
 
 
 def grade_sabotages(
@@ -284,6 +287,22 @@ def grade_sabotages(
     from witness.prove import SABOTAGES, clean_baseline
 
     clean = clean_baseline(consultation, grader)
+    # The baseline's own findings, so each case can be scored as a delta.
+    # clean_baseline strips ungrounded claims, and stripped content is
+    # missing content -- on roughly half these consultations the "clean"
+    # note fails the gate on its own. Without this subtraction a case gets
+    # credit for a rule it never triggered. See WIT-013.
+    baseline = GradedSabotage(
+        key="__baseline__",
+        should_block=False,
+        expect_rule="",
+        grounding=grader.ground_note(
+            consultation.consultation_id, "baseline", segment(clean), consultation.utterances
+        ),
+        critical_omissions=len(
+            find_omissions(consultation, clean, "baseline").omitted_at(Tier.CRITICAL)
+        ),
+    )
     out: list[GradedSabotage] = []
     for s in SABOTAGES:
         if s.key == "weakened_threshold":
@@ -296,7 +315,14 @@ def grade_sabotages(
                                0, threshold_independent=True)
             )
             continue
-        note = s.inject(clean)
+        note = s.inject(clean, consultation)
+        if note == clean:
+            out.append(
+                GradedSabotage(s.key, s.should_block, s.expect_rule,
+                               baseline.grounding, baseline.critical_omissions,
+                               vacuous=True)
+            )
+            continue
         out.append(
             GradedSabotage(
                 key=s.key,
@@ -311,20 +337,30 @@ def grade_sabotages(
                 ),
             )
         )
-    return out
+    return [baseline, *out]
 
 
-def _blocked(g: GradedSabotage, gate: Gate, max_omissions: int) -> bool:
-    """Did the *named* mechanism fire? See WIT-006 -- a lucky catch is not a catch."""
-    if g.threshold_independent:
-        return True
-    result = gate.evaluate(g.grounding)
-    rules = {f.rule for f in result.unacknowledged_blocking}
+def _rules(g: GradedSabotage, gate: Gate, max_omissions: int) -> set[str]:
+    rules = {f.rule for f in gate.evaluate(g.grounding).unacknowledged_blocking}
     if g.critical_omissions > max_omissions:
         rules.add("critical_omission")
-    if not g.expect_rule:
-        return bool(rules)
-    return g.expect_rule in rules
+    return rules
+
+
+def _blocked(
+    g: GradedSabotage, gate: Gate, max_omissions: int, baseline: set[str]
+) -> bool:
+    """Did the *named* mechanism fire, and was it the injection that fired it?
+
+    Two subtractions, each from an incident. Only the named rule counts
+    (WIT-006: a defect stopped by an unrelated rule is a lucky catch). And
+    only rules the baseline was not already failing count (WIT-013: a baseline
+    that fails on its own hands every case a catch it did not make).
+    """
+    if g.threshold_independent:
+        return True
+    added = _rules(g, gate, max_omissions) - baseline
+    return g.expect_rule in added if g.expect_rule else bool(added)
 
 
 @dataclass
@@ -372,8 +408,18 @@ def operating_points(
                     r = gate.evaluate(groundings[cid])
                     if not r.unacknowledged_blocking and omissions.get(cid, 0) <= max_omit:
                         passed += 1
-                for g in sabotages.get(cid, []):
-                    hit = _blocked(g, gate, max_omit)
+                cases = sabotages.get(cid, [])
+                base_rules: set[str] = set()
+                for g in cases:
+                    if g.key == "__baseline__":
+                        base_rules = _rules(g, gate, max_omit)
+                        break
+                for g in cases:
+                    if g.key == "__baseline__" or g.vacuous:
+                        # A case that tested nothing is excluded from both
+                        # sides rather than scored as a pass.
+                        continue
+                    hit = _blocked(g, gate, max_omit, base_rules)
                     if g.should_block:
                         detectable += 1
                         caught += int(hit)
@@ -493,7 +539,16 @@ class CrossValReport:
         acceptance, or the best detection, and letting the reader assume the
         other held up is the standard way this curve gets misread.
         """
-        return max(points, key=lambda o: min(o.human_pass_rate, o.detection))
+        # Tie-break on the sum. Two points can share a weaker side while one
+        # of them is better on the other, and reporting the dominated one
+        # understates the harness for no reason.
+        return max(
+            points,
+            key=lambda o: (
+                min(o.human_pass_rate, o.detection),
+                o.human_pass_rate + o.detection,
+            ),
+        )
 
     def render(self) -> str:
         lines = [
@@ -739,9 +794,9 @@ PUBLISHED: dict[str, tuple[float, float]] = {
     "lexical_recall": (0.483, 0.03),
     "statistical_recall": (0.316, 0.03),
     "lexical_best_acceptance": (0.39, 0.05),
-    "lexical_best_detection": (0.33, 0.05),
-    "statistical_false_alarm": (0.33, 0.08),
-    "lexical_false_alarm": (0.47, 0.08),
+    "lexical_best_detection": (0.21, 0.05),
+    "statistical_false_alarm": (0.04, 0.04),
+    "lexical_false_alarm": (0.04, 0.04),
 }
 
 

@@ -90,17 +90,25 @@ consultations only. **Every number in this section is out-of-sample.**
 
 | Calibration percentile | Clinician notes accepted | Injected defects caught |
 |---|---|---|
-| 0.50 | 14% | 41% |
-| 0.70 | 23% | 35% |
-| 0.80 | 39% | 33% |
-| 0.90 | 61% | 20% |
-| 0.99 | 88% | 15% |
+| 0.50 | 14% | 24% |
+| 0.70 | 23% | 21% |
+| 0.80 | 39% | 21% |
+| 0.90 | 61% | 12% |
+| 0.99 | 88% | 10% |
 
 **There is no operating point at which the gate both accepts notes written by
 clinicians and catches most injected defects.** The best balance is 39%
-acceptance at 33% detection — and at that setting it also raises a false alarm
-on 47% of the paraphrase controls, which is the number that would get it
-switched off. 399 defects across 57 held-out consultations.
+acceptance at 21% detection. 552 injected defects across 57 held-out
+consultations — eleven defect types, each derived from the note or the
+transcript so that it fires on most encounters rather than on the one it was
+written against, and each tagged to the error taxonomy the corpus evaluators
+wrote for themselves.
+
+False alarms on paraphrase controls are 4%. An earlier version of this README
+said 47%, which was wrong in the harness's favour and against it at the same
+time — see WIT-013. The control was a no-op on 56 of 57 consultations, so it
+was testing nothing, and the 47% was the *baseline* failing the gate rather
+than any reaction to rewording.
 
 The cause is in the calibration table: the lexical grader **cannot ground 60% of
 a median clinician-written note**, because clinicians write `3/7 hx of
@@ -164,9 +172,10 @@ paraphrase from fabrication, because to a term matcher they are the same event:
 a claim whose words are not in the transcript.** Every point of coverage is paid
 for in detection.
 
-It does buy one real thing — false alarms on paraphrase controls fall from 47%
-to 33% — and it is worth having for that. But it does not find an operating
-point, and it cannot, for a reason that is now measured rather than asserted.
+It buys nothing on the joint trade either. Its best balance is 28% acceptance
+at 20% detection, against the lexical grader's 39% at 21% — worse on both axes.
+False alarms are 4% for both, so there is not even a specificity argument left
+once the control actually controls for something.
 
 This is the argument for `graders/semantic.py`. Not "an LLM would probably do
 better", but: the failure is a *judgement* about whether two differently-worded
@@ -210,13 +219,21 @@ content and must **not** be flagged. A harness that fires on every rewording is
 switched off in week two, and a disabled gate is worse than none because it
 still appears in the architecture diagram.
 
-On a single consultation at the calibrated operating point the harness catches
-1 of 7 with 0 false alarms. `make crossval` runs the same eight cases against
-every one of the 57 consultations with held-out thresholds — 399 detectable
-defects — and gets 20% at p=0.90, rising to 41% at p=0.50 as acceptance of
-clinician-written notes collapses to 14%. One consultation is not a
-measurement; that first number is kept only because it is what `make prove`
-prints and the two should not disagree silently.
+`make crossval` runs the same cases against all 57 consultations with held-out
+thresholds — 552 detectable defects — and gets 12% at p=0.90, rising to 24% at
+p=0.50 as acceptance of clinician-written notes collapses to 14%.
+
+Two subtractions make those numbers mean what they say. A case is credited only
+when the rule it *names* fires (WIT-006), and only when the uninjected baseline
+was not already failing on that rule (WIT-013). The baseline fails on its own
+for 31 of 57 consultations, so without the second subtraction most cases would
+claim catches they never made.
+
+Cases are tagged against the 13-category error taxonomy the PriMock57
+evaluators wrote for themselves; `make prove` prints coverage against it. Eight
+categories have a case, five are out of scope as prose quality rather than
+faithfulness — and those five stay in the denominator, because trimming them
+out would flatter the number.
 
 ## What this does not do
 

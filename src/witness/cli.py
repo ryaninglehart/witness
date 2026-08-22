@@ -20,7 +20,7 @@ from witness.gate import Gate
 from witness.graders.lexical import LexicalGrader
 from witness.matching import MatchResult, match_note
 from witness.pipeline import Pipeline
-from witness.prove import format_report, run_proof
+from witness.prove import format_report, run_proof, taxonomy_coverage
 from witness.providers import OllamaProvider, default_provider
 from witness.segment import segment
 from witness.viewer import export
@@ -227,6 +227,7 @@ def cmd_prove(_: argparse.Namespace) -> int:
         cons, cons.clinician_note, calib.thresholds, calib.max_critical_omissions
     )
     print(format_report(results))
+    print(taxonomy_coverage(results))
     return 0
 
 

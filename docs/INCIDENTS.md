@@ -387,3 +387,86 @@ fail the reviewer.
 boundary above them. And a security property asserted with string matching is a
 proxy; here the proxy would have looked fine while the page executed injected
 script. Check the property where it actually holds — in this case, in a browser.
+
+---
+
+## WIT-013 — The false-positive control never controlled for anything
+
+**What happened.** Two defects that hid each other, both in the sabotage
+harness, both producing numbers that were published.
+
+The false-positive control was supposed to prove the harness does not fire on a
+harmless rewording. Its injection substituted one specific phrase — `loss of
+appetite` → `reduced appetite` — which appears in **one** of the 57
+consultations. On the other 56 the regex matched nothing, the "paraphrased"
+note was byte-identical to the clean one, and the control passed by comparing a
+note to itself.
+
+Separately, `clean_baseline` was not clean. It builds a baseline by keeping only
+the claims the grader can witness, which was supposed to guarantee the gate
+passes it. Stripping ungrounded claims removes content, and removed content is
+an omission: **the baseline fails the gate on its own for 31 of 57
+consultations.**
+
+Together those produced the published figure "47% false alarms on paraphrase
+controls". Nothing in that sentence was true. There was no paraphrase, so there
+was no control, and the 47% was the baseline failing on notes nobody had
+touched. The real figure, once the control controls for something and each case
+is scored as a delta, is **4%**.
+
+**Why it survived.** The number was bad, and a bad number is the kind you
+believe. 47% false alarms fit the story the README was already telling — a gate
+too noisy to be usable, an argument for something better — so it read as
+confirmation rather than as something to check. A figure that had come out
+implausibly *good* would have been audited immediately.
+
+It also survived WIT-006, which is the same defect one layer up: that incident
+established that a case must be credited only for the rule it names. It did not
+ask whether the baseline was already failing that rule, or whether the
+injection had changed anything at all.
+
+**What changed.**
+
+The control now applies to any note: expand the abbreviations a clinician would
+expand, swap negation cues for synonyms the negation detector reads identically,
+and reverse the sentence order. Reordering is the strongest part — every claim
+survives intact, so anything that fires is reacting to presentation rather than
+content. Down from 56 vacuous cases to 7.
+
+An injection that changes nothing is now marked `vacuous`, reported, and
+excluded from both numerator and denominator. It is never scored as a pass.
+
+Every case is scored as a **delta from the baseline**: credit only for rules the
+injection *added*. This makes the comparison valid whether or not the baseline
+is clean, rather than depending on a property that turned out to be false.
+
+**Then the same defect turned up in the fix.** The test written to catch this —
+"no injection may be vacuous across the corpus" — immediately failed on four
+more cases, two of them added in the same commit as the incident report. Their
+injections were regexes over phrases from one consultation: `flipped_negation`
+fired on 6 of 57, `dropped_pertinent_negative` on 2, `stale_after_correction`
+on 1. Writing up a defect is not the same as understanding it.
+
+Every content-dependent injection now derives from the note or the transcript
+instead. `_unnegate_first` strips the first negation cue wherever it is;
+`_drop_first_negated` deletes whichever sentence carries one;
+`_keep_superseded_answer` reads the transcript for a patient utterance whose
+polarity a later utterance reverses, and writes the superseded version into the
+note — a real self-correction from a real encounter rather than a phrase chosen
+because it happened to be there. Injections now fire on 25–57 of 57
+consultations each, against 1–9 before.
+
+**What it cost, and what it did not.** The corrections moved every number
+against the project. Detectable defects rose from 399 to 552 as the injections
+started working, and detection at the best operating point fell from 33% to
+**21%** — the newly live cases are ones the harness does not catch. The claim
+that the learned grader buys lower false alarms (47% → 33%) evaporated
+entirely: both are 4%. The central finding — no operating point, and a monotone
+coverage/detection trade — was unaffected by any of it.
+
+**The generalisation.** A control that cannot fail is not a control, and the way
+to find one is to check that the manipulation actually happened. Assert that the
+treatment differs from the baseline. A test comparing something to itself passes
+forever and tells you nothing forever — and it will keep being written, by the
+same person, in the commit that fixes the last one, unless something mechanical
+checks for it.
