@@ -23,9 +23,11 @@ then measured the gate honestly enough that it failed.
 ## The result is negative. Lead with that.
 
 There is no operating point where the gate both accepts notes written by
-practising clinicians and catches most injected defects. Best balance: 39%
-acceptance at 21% detection, over 552 injected defects spanning eleven defect
-types drawn from the error taxonomy the corpus evaluators wrote for themselves.
+practising clinicians and catches more than a small minority of injected
+defects. Best usable balance: 39% acceptance at **12%** detection, over 495
+note-level defects spanning eleven types drawn from the error taxonomy the
+corpus evaluators wrote for themselves. At the percentiles where most clinician
+notes get through, it catches essentially nothing.
 
 If someone reads that as a failed project, the answer is that a harness which
 reported success here would have been wrong, and I would not have known. The
@@ -46,8 +48,17 @@ enforced in the type: a `GroundedAssertion` raises on construction if it is
 **"Your precision is 21%. That's unusable."**
 
 It is, and the ceiling matters more than the number. The five clinicians who
-graded this corpus agree exactly with each other 27.5% of the time and within
-one grade 55% of the time. Measured against the union of all five annotators
+graded this corpus agree exactly with each other 19.8% of the time and within
+one grade 47.1%, across all 2,280 pairs. (An earlier version of this document
+said 27.5% and 55%. Those are one consultation's figures — 40 pairs — quoted as
+a property of the corpus, which is the friendlier of the two numbers reported
+as though it were the general case. WIT-015.)
+
+One caveat travels with it: that is agreement on the *count* of critical
+statements per note, not on which statements they are. Two clinicians who each
+find three different errors agree perfectly by this measure. So it is context
+for an item-level precision figure, not a formal bound on it, and I do not
+present it as one. Measured against the union of all five annotators
 rather than one, precision is 40.0%. The ~19-point gap is one annotator not
 writing down what another one did.
 
@@ -57,10 +68,16 @@ anything anyone flagged. Both are reported everywhere with the ceiling beside
 them, because reporting only the flattering one is the thing this project is
 about.
 
-Omission is the other half: recall 77.7%, precision 15.0% against one annotator
-and 41.1% against the union. High recall with low precision is one fact, not
-two — the salience extractor nominates generously, so it catches most of what
-the clinicians said was missing and nominates a great deal besides.
+Omission is the other half, and the denominator matters more than the headline:
+recall 77.7% **of attributable omissions**, where only 1,666 of 5,792 clinician-
+reported critical omissions are attributable at all. The extractor never
+nominated the other 71%, so they are counted as neither hit nor miss. Against
+everything the clinicians said was missing, **22.4%** is found. Precision is
+15.0% against one annotator and 41.1% against the union.
+
+So the extractor nominates generously and still misses most of the problem.
+`make validate` prints all of that, because 77.7% on its own reads as three
+quarters of the problem solved and it is not.
 
 **"Why not use a real model?"**
 
@@ -76,10 +93,11 @@ That question turned out to be the most useful thing in the project.
 PriMock57 pairs 57 transcripts with the notes clinicians wrote from them. That
 is a parallel corpus, so the shorthand is learnable rather than hand-written:
 PPMI over a term co-occurrence matrix, truncated SVD. Latent semantic analysis,
-1990 technology, no weights and no network. It recovers `inhaler` →
-`salbutamol` at 0.89–0.91 in every fold, `diarrhoea` → `gastroenteritis`,
-`watery`, `rash` →
-`bite`, `cetirizine`. Nobody wrote those down.
+1990 technology, no weights and no network. It recovers `inhaler` → `salbutamol` at
+0.88–0.92 across the five folds, `diarrhoea` → `gastroenteritis`, `watery`, and
+`rash` → `bite`. Nobody wrote those down. The rest of the lexicon is noisier
+and fold-dependent, and the examples above are the stable ones — a claim about
+which examples I chose, not about the method.
 
 Held out, it grounds 66.7% of a median clinician note against the lexical
 grader's 40.0% — 27 of the 60 ungrounded points, just under half the gap.
@@ -130,13 +148,14 @@ Because they did not, and I found out. WIT-013: the false-positive control
 substituted a phrase that appears in one of 57 consultations, so on the other 56
 it compared a note to itself and passed. And `clean_baseline` — which strips
 ungrounded claims and was therefore supposed to pass the gate — fails on its own
-for 31 of 57, because stripped content is missing content. The published "47%
-false alarms" was neither a paraphrase nor an alarm. It was the baseline.
+for 21 of 57 at p=0.90 and 31 of 57 at p=0.80, because stripped content is
+missing content. The published "47% false alarms" was neither a paraphrase nor
+an alarm. It was the baseline.
 
-Two fixes. The control now reorders sentences and expands abbreviations, so it
-applies to every note and every claim survives it intact; an injection that
-changes nothing is marked vacuous and excluded from both sides rather than
-scored as a pass. And every case is credited only for rules the injection
+Two fixes. The control now reorders sentences and expands abbreviations rather
+than substituting one phrase, which takes it from 1 of 57 notes to 50 — not all
+57, and the gate requires 80%. An injection that changes nothing is marked
+vacuous and excluded from both sides rather than scored as a pass. And every case is credited only for rules the injection
 *added* to the baseline's own findings.
 
 The honest figure is 4%. Fixing the injections so they fire on most
@@ -152,8 +171,8 @@ implausibly good would have been audited the same day.
 
 **"What stops the README from going stale?"**
 
-`make crossval` exits non-zero if any published figure drifts past its stated
-tolerance, or if the monotone trade stops being monotone. It runs inside `make
+`make crossval` exits non-zero if any of eight enforced figures drifts past its
+stated tolerance, or if the monotone trade stops being monotone. It runs inside `make
 check`. I verified it fails as well as passes — a gate only tested in the
 passing direction is decoration, which is WIT-006 in this project's own
 incident log. It has since earned its keep: it is what refused the build when
@@ -169,8 +188,11 @@ notes from one encounter share a transcript, a patient and a clinician, and
 resampling notes would treat correlated observations as independent and report
 intervals far narrower than the corpus supports.
 
-Roughly ±6 points on grounding, ±5 on recall. So differences smaller than that
-are not readable on this corpus, and I do not read them.
+They are not symmetric, and the widest one matters most: statistical grounding
+is 66.7% with an interval of [55.6, 69.2], so eleven points below the point
+estimate is inside this corpus's resolution. Lexical grounding is ±6 and both
+recalls are ±5. Differences smaller than that are not readable here, and I do
+not read them.
 
 The two the argument rests on are much bigger. Paired on identical resamples,
 so the shared difficulty of a given encounter cancels: grounding +26.7%
@@ -192,7 +214,7 @@ Yes, daily, under a maintained `CLAUDE.md` that defines conventions, protects
 test fixtures from modification, and sets release rules. I wrote those rules
 after three releases broke in ways I should have caught.
 
-The verification layer is the engineering contribution. Eleven incidents in
+The verification layer is the engineering contribution. Fifteen incidents in
 `docs/INCIDENTS.md` are defects that got past me and were caught by a test, a
 gate, or a number that stopped making sense — several of them in code an
 assistant wrote and I approved. WIT-001 is a join that silently dropped 19% of
@@ -219,4 +241,4 @@ printed in the README as command output that no command produced.
 - That this is production-ready. It is a measurement harness.
 - That the numbers transfer beyond UK primary care.
 - That the semantic grader works. It has never been run.
-- That AI-assisted code needs no review. Fourteen incidents say otherwise.
+- That AI-assisted code needs no review. Fifteen incidents say otherwise.

@@ -542,3 +542,81 @@ mark it as illustrative. And when a claim rests on a specific figure, find the
 line of code that computes it before repeating the figure; if there is no such
 line, the claim is not that the number is uncertain, it is that there is no
 number.
+
+---
+
+## WIT-015 — Three ways of counting that each flattered the result
+
+A second adversarial audit, run after WIT-014 was written up, found that the
+corrections had not gone deep enough. Three separate counting errors, none of
+which raised anything, all of which moved a published number in the same
+direction.
+
+### A guaranteed hit inside the detection rate
+
+`weakened_threshold` — the case proving a silently relaxed gate cannot publish
+under the old fingerprint — is `threshold_independent`, which means `_blocked`
+returns `True` for it unconditionally. It is correct that it should: it is
+detected by the ruleset hash rather than by any threshold, and no operating
+point changes that.
+
+It was also being counted in the detection rate, once per consultation, at
+every percentile. Of 552 "injected defects", 57 were this case and all 57 were
+caught by construction. At the published operating point that was 57 of roughly
+116 catches — **half the detection figure was one case that modifies no note.**
+
+Corrected, note-level detection at the best usable point is **12%**, not 21%.
+At p=0.90, where 61% of clinician notes get through, it is **2%**. At 0.95 and
+above it is zero. Integrity cases are now reported separately, because "the
+gate cannot be weakened without the fingerprint changing" and "the grader finds
+a fabricated allergy" are different claims, and averaging them states neither.
+
+### An operating point nobody would run
+
+`best()` maximised the weaker of acceptance and detection, and selected p=0.50:
+14% of clinician notes accepted, 15% of defects caught, **and a false alarm on
+32% of rewordings**. This project's stated argument is that a harness firing on
+paraphrase is switched off in week two. The selector was recommending exactly
+that, and calling it the best balance.
+
+False alarms are now a constraint on candidacy rather than a term to be traded
+away. Above 10% an operating point is not a candidate whatever it catches.
+
+### The ceiling measured on one consultation out of 57
+
+`agreement_on` took a `consultation_id`, and the CLI passed
+`"day1_consultation01"`. The resulting 27.5% exact / 55% within-one — 40 pairs —
+was printed under "the five clinicians against each other" and quoted in both
+documents as a property of the corpus.
+
+Across all 2,280 pairs it is **19.8% and 47.1%**. The friendlier of the two
+numbers had been reported as though it were the general case, and this figure
+is load-bearing: it is the ceiling the precision defence rests on.
+
+A caveat that should have been there from the start now is. This is agreement
+on the *count* of critical statements per note, not on which statements they
+are — two clinicians finding three different errors each agree perfectly by
+this measure. It does not formally bound an item-level precision figure and is
+no longer presented as though it does.
+
+### And two more, found in the same pass
+
+`flags raised 4005` was `801 × 5`: the per-annotator loop accumulated the flag
+count once per evaluator. The ratios were unaffected — the factor cancels — but
+the printed number sat beside a finding count of 3,471 and invited exactly the
+comparison it would lose.
+
+Omission recall of **77.7%** is 77.7% *of attributable omissions*, and only
+1,666 of 5,792 clinician-reported critical omissions are attributable at all.
+The grounding side printed its 44% exclusion; the omission side printed
+nothing, while excluding 71%. Against everything the clinicians said was
+missing, the extractor finds **22.4%**. Both documents had said it "catches
+most of what the clinicians said was missing." It does not.
+
+**The generalisation.** Every one of these moved a number the flattering way,
+and that is not a coincidence — it is what selection pressure looks like when
+the person checking is the person hoping. None was a lie and none was careless
+in isolation: a hard-coded `True` that is genuinely correct for its case, a
+default argument, a loop level, a denominator with a reasonable definition. The
+defence is not more care. It is arranging for someone else to do the counting,
+which is what found all five of these within an hour of being asked to.

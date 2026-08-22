@@ -324,7 +324,7 @@ SABOTAGES: list[Sabotage] = [
         "Not a defect in the note -- a defect in the checking. Someone widens "
         "the tolerance and every subsequent build still claims the same ruleset.",
         True,
-        lambda note: note,  # the note is untouched; the gate is what changes
+        lambda note, _c: note,  # the note is untouched; the gate is what changes
         "the ruleset fingerprint, which covers threshold values and not just "
         "rule names",
         expect_rule="ruleset_hash_changed",

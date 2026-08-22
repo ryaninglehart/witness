@@ -5,9 +5,9 @@ claim in a generated note must name the utterance that witnessed it, or be
 refused.
 
 > Built and validated entirely on [PriMock57](https://github.com/babylonhealth/primock57)
-> (CC BY 4.0) — 57 mock consultations recorded with actors, and 1,140 notes
-> graded by five clinicians. **No real patient information was used and none is
-> present.**
+> (CC BY 4.0) — 57 mock consultations recorded with actors, and 228 generated
+> notes each graded by five clinicians, for 1,140 annotation rows. **No real
+> patient information was used and none is present.**
 
 ```bash
 git clone https://github.com/<user>/witness.git
@@ -15,7 +15,7 @@ cd witness
 python3 -m venv .venv && source .venv/bin/activate   # needs Python 3.11+
 pip install -r requirements.txt
 make corpus      # PriMock57, text only — audio is git-lfs and optional
-make check       # lint, 143 tests, and every number below
+make check       # lint, 144 tests, and the eight enforced figures
 ```
 
 About a minute. No API key, no network egress, no GPU.
@@ -101,20 +101,30 @@ consultations only. **Every number in this section is out-of-sample.**
 
 | Calibration percentile | Clinician notes accepted | Injected defects caught |
 |---|---|---|
-| 0.50 | 14% | 24% |
-| 0.70 | 23% | 21% |
-| 0.80 | 39% | 21% |
-| 0.90 | 61% | 12% |
-| 0.95 | 75% | 11% |
-| 0.99 | 88% | 10% |
+| 0.50 | 14% | 15% |
+| 0.70 | 23% | 12% |
+| 0.80 | 39% | 12% |
+| 0.90 | 61% | 2% |
+| 0.95 | 75% | 0% |
+| 0.99 | 88% | 0% |
 
 **There is no operating point at which the gate both accepts notes written by
-clinicians and catches most injected defects.** The best balance is 39%
-acceptance at 21% detection. 552 injected defects across 57 held-out
-consultations — eleven defect types, each derived from the note or the
-transcript so that it fires on most encounters rather than on the one it was
-written against, and each tagged to the error taxonomy the corpus evaluators
-wrote for themselves.
+clinicians and catches more than a small minority of injected defects.** The
+best usable balance is 39% acceptance at **12%** detection, and at the
+percentiles where most clinician notes get through it catches essentially
+nothing.
+
+495 note-level defects across 57 held-out consultations: eleven defect types,
+each derived from the note or the transcript rather than written against one
+encounter, each tagged to the error taxonomy the corpus evaluators wrote for
+themselves. They fire on 25–57 of the 57 consultations depending on type —
+`dropped_red_flag` needs a red flag to drop, so it is live on 25.
+
+A twelfth case, the silently weakened gate, is **excluded from that rate**. It
+changes no note and is caught by the ruleset fingerprint on all 57
+consultations by construction. Counting it put a guaranteed hit into every
+operating point and roughly doubled the published detection figure; see
+WIT-015.
 
 False alarms on paraphrase controls are 4%. An earlier version of this README
 said 47%, which was wrong in the harness's favour and against it at the same
@@ -139,14 +149,18 @@ PriMock57 pairs each transcript with the note the treating clinician wrote from
 it, which is a parallel corpus, so the mapping is learnable: PPMI over a term
 co-occurrence matrix, truncated SVD, no pretrained weights and no network.
 
-Fitted on a training fold it recovers `inhaler` → `salbutamol` (0.89–0.91 in
-every fold), `diarrhoea` → `gastroenteritis`, `watery`, and `rash` → `bite`,
-`cetirizine`. Nobody wrote those down.
+Fitted on a training fold it recovers `inhaler` → `salbutamol` at 0.88–0.92
+across the five folds, along with `diarrhoea` → `gastroenteritis`, `watery` and
+`rash` → `bite`. Nobody wrote those down.
 
-It also thinks `allergic` means `pv` and `active`, and that is left in the
-output rather than trimmed out of it. `AssociationModel.nearest` exists so the
-lexicon can be read, and WIT-010 is the incident where the first version of
-this model was inspected only on the terms that made it look good.
+The rest of the lexicon is less tidy and is left that way. `allergic` gets `pv`
+and `active` in two folds and `reaction`, `peanut` in others; `rash` →
+`cetirizine` appears in the top four of only one fold. Neighbour lists are
+fold-specific and the examples above are the stable ones — which is a claim
+about which examples were chosen, not about the method.
+`AssociationModel.nearest` exists so the lexicon can be read, and WIT-010 is the
+incident where the first version of this model was inspected only on the terms
+that made it look good.
 
 Held out, it does exactly what it was built to do — and the bill comes with it:
 
@@ -188,10 +202,10 @@ transcript. Every point of coverage is paid for in detection. That is a result
 about term matching over 57 UK primary-care encounters, not a proof about
 distributional methods in general.
 
-It buys nothing on the joint trade either. Its best balance is 28% acceptance
-at 20% detection, against the lexical grader's 39% at 21% — worse on both axes.
-False alarms are 4% for both, so there is not even a specificity argument left
-once the control actually controls for something.
+It buys nothing on the joint trade either. Its best usable balance is 28%
+acceptance at 11% detection, against the lexical grader's 39% at 12% — worse on
+both axes. False alarms are 4% for both, so there is not even a specificity
+argument left once the control actually controls for something.
 
 This is the argument for `graders/semantic.py`. Not "an LLM would probably do
 better", but: the failure is a *judgement* about whether two differently-worded
@@ -200,19 +214,35 @@ similarity makes that judgement. Something has to read them.
 
 ## What the lexical grader does achieve
 
-`make validate`, on 1,140 clinician-graded notes:
+`make validate`, on 228 generated notes and the 1,140 annotations of them:
 
+<!-- Pasted verbatim from the command. WIT-014: a block that only looks
+     like output is how four invented figures survived here. -->
 <!-- verify: validate -->
 ```
-grader        lexical/1.0   (no model, no network, no API key)
+  Does Witness flag the claims the clinicians flagged?
+  ------------------------------------------------------------------
+  grader                              lexical/1.0  (no model, no network)
+  clinician critical findings           3471
+  not attributable to a claim           1537  (44%, structural comments)
+  flags raised                           801
 
-grounding     recall     48.3%   of attributable critical incorrect statements
-              precision  21.4%   against one annotator
-                         40.0%   against the union of all five
+  grounding     recall     48.3%   of attributable critical incorrect statements
+                precision  21.4%   against one annotator
+                           40.0%   against the union of all five
 
-omission      recall     77.7%
-              precision  15.0%   against one annotator
-                         41.1%   against the union of all five
+  omission      recall     77.7%   of attributable critical omissions
+                            1666 of 5792 are attributable (29%); the extractor never
+                                 nominated the rest, so they are counted
+                                 as neither hit nor miss. Of all 5792, 22.4% are found.
+                precision  15.0%   against one annotator
+                           41.1%   against the union of all five
+
+  For scale -- the five clinicians against each other, all 2280 pairs:
+  exact agreement 19.8%   within one 47.1%   rho +0.315
+  No detector can be asked to agree with 'the clinicians' more
+  than the clinicians agree with one another. The gap between the
+  two precision figures above is that disagreement, measured.
 ```
 
 Held out under five-fold cross-validation, that recall is 48.3% — the same
@@ -222,8 +252,10 @@ checks the scoring plumbing. It does not test the fold partition of the fitted
 model, which is the only place leakage was ever possible — a stateless grader
 is insensitive to that by construction.
 
-The five clinicians agree exactly with each other only **27.5%** of the time,
-and within one only 55%. No detector can be asked to agree with "the clinicians"
+The five clinicians agree exactly with each other only **19.8%** of the time,
+and within one only 47.1%, across all 2,280 pairs — and that is agreement on the
+*count* of critical statements per note, not on which ones, so it is context for
+the precision figures rather than a formal bound on them. No detector can be asked to agree with "the clinicians"
 more than the clinicians agree with one another, and the ~19-point gap between
 the two grounding precision figures is one annotator not writing down what
 another one did.
@@ -248,11 +280,11 @@ content and must **not** be flagged. A harness that fires on every rewording is
 switched off in week two, and a disabled gate is worse than none because it
 still appears in the architecture diagram.
 
-**On one consultation at the calibrated p=0.90 point, 1 of 11 defects is
-stopped — and it is the ruleset-fingerprint case, which is not a defect in a
-note at all.** No note-content defect is caught there. That is the honest
-headline for this command, and it now prints above the taxonomy table every
-time it runs.
+**On one consultation at the calibrated p=0.90 point, 1 of 11 cases is stopped
+— and it is the ruleset-fingerprint case, which is not a defect in a note at
+all.** No note-content defect is caught there. The taxonomy table the command
+prints says the same thing in its own words: *0 of those are caught at this
+operating point*.
 
 The command exits non-zero if the control fires on a rewording, if any
 injection matches nothing, or if a silently weakened gate goes undetected. Low
@@ -261,14 +293,16 @@ those three do, because each means a number above is not measuring what it
 says.
 
 `make crossval` runs the same cases against all 57 consultations with held-out
-thresholds — 552 detectable defects — and gets 12% at p=0.90, rising to 24% at
-p=0.50 as acceptance of clinician-written notes collapses to 14%.
+thresholds — 495 note-level defects — and gets 2% at p=0.90, rising to 15% at
+p=0.50 as acceptance of clinician-written notes collapses to 14% and false
+alarms rise to 32%.
 
 Two subtractions make those numbers mean what they say. A case is credited only
 when the rule it *names* fires (WIT-006), and only when the uninjected baseline
 was not already failing on that rule (WIT-013). The baseline fails on its own
-for 31 of 57 consultations, so without the second subtraction most cases would
-claim catches they never made.
+for 21 of 57 consultations at p=0.90 and 31 of 57 at p=0.80 — it is a function
+of the threshold, not a fixed property — so without the second subtraction many
+cases would claim catches they never made.
 
 Cases are tagged against the 13-category error taxonomy the PriMock57
 evaluators wrote for themselves; `make prove` prints coverage against it. Eight
@@ -315,7 +349,7 @@ anything else.
 
 ## Incidents
 
-`docs/INCIDENTS.md` records fourteen defects found while building this. Four are
+`docs/INCIDENTS.md` records fifteen defects found while building this. Five are
 worth reading:
 
 **WIT-001** — a join dropped 19% of the corpus and the run still printed a
@@ -339,3 +373,12 @@ the sample before looking at the output.
 **WIT-011** — every published number was scored in-sample. It was disclosed in
 this README, which made it an honest error rather than a hidden one, and not a
 result either. `make crossval` now runs in the default gate.
+
+**WIT-015** — an adversarial audit found three counting errors that each moved
+a published figure the flattering way: a case hard-coded to "caught" sitting
+inside the detection rate, an operating-point selector recommending a gate that
+false-alarms on a third of rewordings, and the inter-rater ceiling measured on
+one consultation out of 57 and quoted as the corpus. Detection at the best
+usable point fell from 21% to 12%. None was a lie and none was careless in
+isolation; all five went the same direction, which is what selection pressure
+looks like when the person checking is the person hoping.

@@ -133,20 +133,43 @@ def cmd_validate(_: argparse.Namespace) -> int:
         f"  not attributable to a claim         {m.unmatchable_findings:>6}"
         f"  ({m.unmatchable_findings / m.findings:.0%}, structural comments)"
     )
-    print(f"  flags raised                        {m.flags:>6}")
+    # From the union path, which counts each note once. The per-annotator
+    # accumulation multiplies flags by five -- harmless in the ratios, where
+    # it cancels, and badly misleading printed next to a finding count.
+    print(f"  flags raised                        {mu.flags:>6}")
     print()
     print(f"  grounding     recall     {m.recall:>5.1%}   of attributable critical "
           "incorrect statements")
     print(f"                precision  {m.precision:>5.1%}   against one annotator")
     print(f"                           {mu.precision:>5.1%}   against the union of all five")
     print()
-    print(f"  omission      recall     {om.recall:>5.1%}")
+    # The attributability share is printed for omissions for the same reason
+    # it is printed for grounding above: 77.7% "of attributable" reads as
+    # 77.7% of the problem unless the reader is told what was excluded, and
+    # here far more is excluded than on the grounding side.
+    print(
+        f"  omission      recall     {om.recall:>5.1%}   of attributable critical "
+        "omissions"
+    )
+    print(
+        f"                           {omu.findings - omu.unmatchable_findings:>5}"
+        f" of {omu.findings} are attributable "
+        f"({1 - omu.unmatchable_findings / omu.findings:.0%}); the extractor never"
+    )
+    print("                                 nominated the rest, so they are counted")
+    print(
+        f"                                 as neither hit nor miss. Of all "
+        f"{omu.findings}, {omu.matched / omu.findings:.1%} are found."
+    )
     print(f"                precision  {om.precision:>5.1%}   against one annotator")
     print(f"                           {omu.precision:>5.1%}   against the union of all five")
 
-    a1 = val.agreement_on(c, "day1_consultation01")
+    a1 = val.agreement_on(c)
     if "exact_agreement" in a1:
-        print("\n  For scale -- the five clinicians, against each other:")
+        print(
+            f"\n  For scale -- the five clinicians against each other, "
+            f"all {int(a1['pairs'])} pairs:"
+        )
         print(
             f"  exact agreement {a1['exact_agreement']:.1%}"
             f"   within one {a1['within_one']:.1%}   rho {a1['spearman_rho']:+.3f}"
@@ -199,7 +222,13 @@ def cmd_crossval(ns: argparse.Namespace) -> int:
     )
     shape = shape + live
     if not drift and not shape:
-        print("\n  every figure the README publishes reproduces within tolerance.")
+        print(
+            f"\n  The {len(cx.PUBLISHED)} enforced figures reproduce within tolerance, "
+            "the radius trade"
+        )
+        print("  is still monotone, and the false-positive control still rewords the")
+        print("  notes it is given. Other numbers in the README are printed by their")
+        print("  own commands and are not threshold-guarded.")
         return 0
 
     # Exit non-zero. A README whose numbers have quietly stopped being true is

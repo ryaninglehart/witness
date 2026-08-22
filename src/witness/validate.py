@@ -117,19 +117,41 @@ def validate(corpus: PriMock57, grader: LexicalGrader | None = None) -> Validati
     )
 
 
-def agreement_on(corpus: PriMock57, consultation_id: str) -> dict[str, float]:
-    """Inter-annotator agreement among the five clinicians on one consultation.
+def agreement_on(
+    corpus: PriMock57, consultation_id: str | None = None
+) -> dict[str, float]:
+    """Inter-annotator agreement among the five clinicians.
+
+    Pass a consultation id for one encounter; pass nothing for the whole
+    corpus, which is what any statement about "the clinicians" needs. The
+    published figure used to be one consultation's -- 27.5% exact on 40 pairs
+    -- quoted as a property of the corpus. Across all 2,280 pairs it is 19.8%.
+    Reporting the friendlier of the two as though it were the general case is
+    the error this project spends its time finding elsewhere. See WIT-015.
 
     This is the ceiling. Witness cannot meaningfully be asked to agree with
     "the clinicians" more than the clinicians agree with each other, and the
     scoping review (medRxiv 2025) names unreported inter-rater reliability as
-    one of the field's four systematic failures. Reporting it costs nothing and
-    is the honest denominator for every agreement number elsewhere.
+    one of the field's four systematic failures.
+
+    One caveat travels with it: this is agreement on the *count* of critical
+    incorrect statements per note, not on which statements those are. Two
+    clinicians who each find three different errors agree perfectly here. So
+    it bounds nothing formally -- it is context for an item-level precision
+    figure, not a derivation, and treating it as a hard ceiling would be one
+    more unit mismatch.
     """
-    rows = [a for a in corpus.annotations() if a.consultation_id == consultation_id]
-    by_model: dict[str, list[Annotation]] = {}
+    rows = (
+        [a for a in corpus.annotations() if a.consultation_id == consultation_id]
+        if consultation_id is not None
+        else list(corpus.annotations())
+    )
+    # Keyed by note, not by model: the same model id appears across every
+    # consultation, and pooling those would pair clinicians who reviewed
+    # different encounters.
+    by_model: dict[tuple[str, str], list[Annotation]] = {}
     for a in rows:
-        by_model.setdefault(a.model_id, []).append(a)
+        by_model.setdefault((a.consultation_id, a.model_id), []).append(a)
 
     pairs: list[tuple[int, int]] = []
     for anns in by_model.values():

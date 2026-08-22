@@ -40,6 +40,7 @@ from __future__ import annotations
 import statistics
 from collections.abc import Iterable
 from dataclasses import dataclass, field
+from typing import ClassVar
 
 from witness.calibration import Distribution
 from witness.corpus import Consultation, PriMock57
@@ -369,13 +370,23 @@ class OperatingPoint:
     grader: str
     #: Held-out clinician notes the gate accepts.
     human_pass_rate: float
-    #: Injected defects the *named* mechanism caught, on held-out consultations.
+    #: Defects in the *note* that the named mechanism caught. The
+    #: ruleset-fingerprint case is excluded: it modifies no note, it is
+    #: detected by construction rather than by any threshold, and counting it
+    #: put a guaranteed hit into every percentile of the headline figure.
+    #: See WIT-015.
     detection: float
     #: Paraphrase controls wrongly flagged. A harness that fires on rewording
     #: gets switched off, and a switched-off gate is worse than none.
     false_alarm_rate: float
     notes: int
     defects: int
+    #: Harness-integrity cases, reported separately because "the gate cannot
+    #: be weakened without the fingerprint changing" and "the grader finds a
+    #: fabricated allergy" are different claims, and averaging them states
+    #: neither.
+    integrity_detection: float = 0.0
+    integrity_cases: int = 0
 
 
 def operating_points(
@@ -395,6 +406,7 @@ def operating_points(
     points: list[OperatingPoint] = []
     for p in percentiles:
         passed = total = caught = detectable = alarms = controls = 0
+        integrity_hit = integrity_total = 0
         for f in fold_list:
             thresholds, max_omit = _thresholds_from(
                 (groundings[c] for c in f.train if c in groundings),
@@ -420,7 +432,13 @@ def operating_points(
                         # sides rather than scored as a pass.
                         continue
                     hit = _blocked(g, gate, max_omit, base_rules)
-                    if g.should_block:
+                    if g.threshold_independent:
+                        # Detected by the fingerprint, not by the gate. Kept
+                        # out of the note-defect rate it would otherwise
+                        # inflate at every operating point.
+                        integrity_total += 1
+                        integrity_hit += int(hit)
+                    elif g.should_block:
                         detectable += 1
                         caught += int(hit)
                     else:
@@ -433,6 +451,10 @@ def operating_points(
                 human_pass_rate=passed / total if total else 0.0,
                 detection=caught / detectable if detectable else 0.0,
                 false_alarm_rate=alarms / controls if controls else 0.0,
+                integrity_detection=(
+                    integrity_hit / integrity_total if integrity_total else 0.0
+                ),
+                integrity_cases=integrity_total,
                 notes=total,
                 defects=detectable,
             )
@@ -532,18 +554,34 @@ class CrossValReport:
     intervals: dict[str, Interval] = field(default_factory=dict)
     differences: list[Difference] = field(default_factory=list)
 
-    def best(self, points: list[OperatingPoint]) -> OperatingPoint:
-        """The percentile maximising the weaker of the two rates.
+    #: Above this, a gate is switched off in week two and its detection rate
+    #: stops mattering. The project makes exactly that argument about other
+    #: people's systems, so it is applied here as a constraint on candidacy
+    #: rather than as a term to be traded away: an operating point that fires
+    #: on a third of rewordings is not a candidate, whatever it catches.
+    MAX_USABLE_FALSE_ALARM: ClassVar[float] = 0.10
 
-        A gate is only as good as its worse side. Reporting the best
-        acceptance, or the best detection, and letting the reader assume the
-        other held up is the standard way this curve gets misread.
+    def best(self, points: list[OperatingPoint]) -> OperatingPoint:
+        """The most balanced operating point a clinician would tolerate.
+
+        A gate is only as good as its worst side. Scoring on acceptance and
+        detection alone selected p=0.50 -- 14% of clinician notes accepted,
+        15% of defects caught, and a false alarm on 32% of rewordings. That is
+        a gate nobody would leave switched on, and it was being presented as
+        the best available.
+
+        So false alarms gate candidacy, and among the survivors the weaker of
+        the two remaining rates decides, with the sum as a tie-break so a
+        dominated point is never reported. If nothing is under the bound the
+        full set is used and the printed false-alarm figure says so, because
+        silently returning nothing would hide the situation rather than state
+        it.
         """
-        # Tie-break on the sum. Two points can share a weaker side while one
-        # of them is better on the other, and reporting the dominated one
-        # understates the harness for no reason.
+        usable = [
+            o for o in points if o.false_alarm_rate <= self.MAX_USABLE_FALSE_ALARM
+        ] or points
         return max(
-            points,
+            usable,
             key=lambda o: (
                 min(o.human_pass_rate, o.detection),
                 o.human_pass_rate + o.detection,
@@ -601,7 +639,12 @@ class CrossValReport:
             f"{bs.detection:.0%} caught   (p={bs.percentile:.2f}, "
             f"{bs.false_alarm_rate:.0%} false alarms)",
             "",
-            f"  {bl.defects} injected defects across {bl.notes} held-out consultations.",
+            f"  {bl.defects} note-level defects across {bl.notes} held-out consultations.",
+            f"  Separately, {bl.integrity_cases} harness-integrity cases (a silently",
+            f"  weakened gate) are caught at {bl.integrity_detection:.0%} by the ruleset",
+            "  fingerprint. Those are excluded from the rates above: the fingerprint",
+            "  detects by construction rather than by any threshold, so including it",
+            "  put a guaranteed hit into every operating point. See WIT-015.",
         ]
         if self.radius:
             lines += [
@@ -794,7 +837,7 @@ PUBLISHED: dict[str, tuple[float, float]] = {
     "lexical_recall": (0.483, 0.03),
     "statistical_recall": (0.316, 0.03),
     "lexical_best_acceptance": (0.39, 0.05),
-    "lexical_best_detection": (0.21, 0.05),
+    "lexical_best_detection": (0.12, 0.04),
     # Tolerance is one-sided in effect: a rise is a regression, and a fall to
     # zero is the WIT-013 signature rather than an improvement. The companion
     # check is `control_live_rate` below -- a false-alarm rate of 0% earned by

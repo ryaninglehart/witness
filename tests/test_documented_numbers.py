@@ -35,7 +35,11 @@ _BLOCK = re.compile(
     r"<!--\s*verify:\s*(?P<cmd>[\w\s-]+?)\s*-->\s*\n```(?:\w+)?\n(?P<body>.*?)```",
     re.DOTALL,
 )
-_PERCENT = re.compile(r"\d+\.\d+%")
+#: Every percentage, integer or decimal. The first version required a decimal
+#: point, so a tagged block mixing `40.0%` and `39%` was checked on the first
+#: and silently ignored the second -- a verifier with a hole in it is worse
+#: than none, because it certifies the part it did not read.
+_PERCENT = re.compile(r"\d+(?:\.\d+)?%")
 
 
 def _run(subcommand: str) -> str:
@@ -49,6 +53,15 @@ def _run(subcommand: str) -> str:
         env={"PYTHONPATH": "src", "PATH": "/usr/bin:/bin"},
         check=False,
     )
+    # A non-zero exit means the command is reporting a problem, and its output
+    # is then a description of that problem rather than the figures the README
+    # is quoting. Ignoring the return code let a drifted `crossval` satisfy
+    # this test with the very report that says the figures have drifted.
+    if proc.returncode != 0:
+        raise AssertionError(
+            f"`witness {subcommand}` exited {proc.returncode}; its output cannot be "
+            f"used to verify documentation.\n{proc.stdout[-2000:]}\n{proc.stderr[-2000:]}"
+        )
     return proc.stdout
 
 
@@ -58,8 +71,18 @@ def _blocks() -> list[tuple[str, str]]:
 
 def test_at_least_one_block_is_verified():
     # If the marker is removed or renamed, this file would pass by checking
-    # nothing -- which is WIT-013's failure mode applied to WIT-014's fix.
+    # nothing -- WIT-013's failure mode applied to WIT-014's fix.
     assert _blocks(), "no verify-tagged blocks found in README.md"
+
+
+def test_the_corpus_is_present_so_this_file_is_not_skipping_silently():
+    # Without this, a missing corpus turns every real check below into a skip
+    # while the file still reports green. `make check` fetches the corpus, so
+    # in the gate this is an assertion; for a contributor without it, it is
+    # the one honest skip.
+    if not (ROOT / "primock57").exists():
+        pytest.skip("PriMock57 not fetched; run `make corpus`")
+    assert (ROOT / "primock57").is_dir()
 
 
 @pytest.mark.parametrize("command,body", _blocks(), ids=lambda x: str(x)[:24])
