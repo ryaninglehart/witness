@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions having IBS in the past, but does not explicitly state a family history of kidney, bladder, or bowel issues.\"},\n    {\"i\":13,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient states 'not that I, not anything I know about' when asked about family history, but this is not a definitive statement of nil.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":84,\"why\":\"The patient explicitly states 'I don't smoke, uh, I do drink, like on the weekends, yeah.'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

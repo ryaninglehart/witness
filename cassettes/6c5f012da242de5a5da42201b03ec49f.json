@@ -1,0 +1,5 @@
+{
+  "text": "```json\n{\n  \"verdicts\": [\n    {\n      \"i\": 12,\n      \"v\": \"INFERRED\",\n      \"u\": 23,\n      \"why\": \"The patient mentioned using a steroid cream, which is inferred to be a type of steroid.\"\n    },\n    {\n      \"i\": 13,\n      \"v\": \"UNSUPPORTED\",\n      \"u\": null,\n      \"why\": \"The transcript does not mention Betnovate BD specifically.\"\n    },\n    {\n      \"i\": 14,\n      \"v\": \"UNSUPPORTED\",\n      \"u\": null,\n      \"why\": \"The transcript does not mention the specific dosing of the steroid cream.\"\n    },\n    {\n      \"i\": 15,\n      \"v\": \"INFERRED\",\n      \"u\": 108,\n      \"why\": \"The doctor suggests coming back in a week to ten days, which is inferred to be the review period.\"\n    }\n  ]\n}\n```",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

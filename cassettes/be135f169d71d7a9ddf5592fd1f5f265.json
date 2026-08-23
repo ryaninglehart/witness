@@ -1,0 +1,5 @@
+{
+  "text": "Based on the dialogue, the patient's chief complaints and relevant information can be summarized as follows:\n\n0. Shortness of breath\n1. Sore throat\n2. Dry cough\n3. No significant chest pain\n4. No significant weight loss\n5. Past Medical History (PMH): nil\n6. Past Surgical History (DH): nil\n7. Allergic to peanuts\n\nAdditional details:\n- The patient mentions a recent cold and a bit of a headache.\n- The patient has a family history of lung cancer (mother).\n- The patient has been experiencing variable symptoms, feeling better and worse over the past few days.\n- The patient has lost their appetite recently but has not lost any weight.\n- The patient does not have any lumps or bumps around the neck.\n- The patient is concerned about the possibility of lung cancer due to the family history.\n- The doctor reassures the patient that tuberculosis is unlikely and advises to seek medical attention if symptoms worsen.",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

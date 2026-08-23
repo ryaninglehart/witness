@@ -1,0 +1,5 @@
+{
+  "text": "Here are the key claims extracted from the dialogue:\n\n12. **Living Situation and Habits:**\n   - SH lives in student halls.\n   - SH does not smoke.\n   - SH drinks alcohol socially.\n\n13. **Impression:**\n   - The doctor suspects a UTI (Urinary Tract Infection) or cystitis based on the patient's symptoms.\n\n14. **Further Investigations:**\n   - The doctor recommends providing a urine sample for testing.\n   - A midstream urine sample (MSU) will be sent to the lab for analysis.\n\n15. **Management:**\n   - Simple analgesia (e.g., Paracetamol) is advised for pain relief.\n   - Antibiotics (Trimethoprim or Nitrofurantoin) will be prescribed for treatment.\n   - The patient is advised to stay well hydrated by drinking plenty of fluids.\n\n16. **Follow-Up:**\n   - The patient should review the doctor in one to two weeks if symptoms have not improved.\n   - The patient should contact the doctor if symptoms worsen, specifically mentioning fever, back pain, or vomiting.",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

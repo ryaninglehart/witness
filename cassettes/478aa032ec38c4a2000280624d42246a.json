@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":27,\"why\":\"Patient reports 'a bit of tightness' in the chest, which aligns with wheezing.\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions eczema and being allergic to penicillin, indicating there is past medical history.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"Patient explicitly states 'I'm allergic to penicillin'.\"},{\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient does not mention any regular medication.\"},{\"i\":4,\"v\":\"INFERRED\",\"u\":35,\"why\":\"Patient mentions 'a bit of blotching', which is a symptom of sinusitis.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":99,\"why\":\"Patient explicitly states 'I live alone.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

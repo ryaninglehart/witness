@@ -63,6 +63,14 @@ class GraderResult:
     #: table that looks like a measurement of the grader and is a measurement
     #: of the parser. See WIT-016.
     unparsed_rate: float = 0.0
+    #: The same figures over only the notes where every batch was read. The
+    #: contaminated notes are not noise -- they bias the two headline numbers
+    #: in *opposite* directions, so the full-set row cannot be corrected by
+    #: reasoning about it and has to be recomputed without them.
+    clean_notes: int = 0
+    clean_median_grounded: float = 0.0
+    clean_recall: float = 0.0
+    clean_precision: float = 0.0
 
 
 @dataclass
@@ -88,6 +96,35 @@ class SemanticReport:
                 f"  {r.name[:45]:<46}{r.median_grounded:>9.1%}{r.recall:>9.1%}"
                 f"{r.precision:>8.1%}{r.f1:>8.1%}"
             )
+        dropped = [
+            r for r in self.results if r.clean_notes and r.clean_notes < r.notes_graded
+        ]
+        if dropped:
+            lines += [
+                "",
+                "  Recomputed over only the notes where every batch was read",
+                "  " + "-" * 82,
+                "  An unreadable batch refuses every claim in it, which pushes grounding",
+                "  DOWN and detection UP. The two biases point opposite ways, so the row",
+                "  above cannot be corrected by argument -- only by dropping those notes.",
+                "  All three graders are rescored on the same surviving notes; comparing",
+                "  a clean subset against a full set would be a different corpus.",
+                "",
+                f"  {'grader':<46}{'notes':>8}{'grounded':>10}{'recall':>9}{'prec':>8}",
+            ]
+            for r in dropped:
+                lines.append(
+                    f"  {r.name[:45]:<46}{r.clean_notes:>4}/{r.notes_graded:<3}"
+                    f"{r.clean_median_grounded:>10.1%}{r.clean_recall:>9.1%}"
+                    f"{r.clean_precision:>8.1%}"
+                )
+            lines += [
+                "",
+                "  This subset is not a random sample of the corpus. The notes that",
+                "  survive are the ones the model stayed on-format for, and if it drops",
+                "  format on the harder encounters these figures are optimistic. It is a",
+                "  better estimate than the contaminated row, not a clean one.",
+            ]
         flagged = [(r, degenerate_reasons(r)) for r in self.results]
         flagged = [(r, why) for r, why in flagged if why]
         if flagged:
@@ -184,6 +221,17 @@ def degenerate_reasons(r: GraderResult) -> list[str]:
     return out
 
 
+def _was_contaminated(grader: object, consultation_id: str, model_id: str) -> bool:
+    """Did any batch for this note fail to parse?
+
+    Only the semantic grader can be contaminated -- the offline graders read no
+    model output -- so for anything else this is always False and the clean
+    subset is the full set.
+    """
+    notes = getattr(grader, "unparsed_notes", None)
+    return bool(notes) and (consultation_id, model_id) in notes
+
+
 def _profile(groundings: list[NoteGrounding]) -> tuple[float, float]:
     grounded, unsup = [], []
     for g in groundings:
@@ -253,60 +301,86 @@ def evaluate(
             counters[label] = counter
             lineup[label] = SemanticGrader(counter, batch_size=grader.batch_size)
 
-    results: list[GraderResult] = []
-    # The statistical grader varies by fold, so it is evaluated by hand rather
-    # than through the same loop.
+    # Per-note results are kept rather than accumulated, because the clean
+    # subset is not known until every grader has run: it is defined by which
+    # notes the *semantic* grader could read, and the offline graders have to
+    # be scored on that same subset or the comparison is between different
+    # corpora. Aggregating twice at the end is the only way to get that right.
+    per_note: dict[str, dict[str, tuple]] = {}
+    profiles: dict[str, dict[str, NoteGrounding]] = {}
+    meta: dict[str, tuple[str, object]] = {}
+    contaminated: set[str] = set()
+
     for label, grader in [("statistical", None), *lineup.items()]:
         started = time.time()
-        groundings: list[NoteGrounding] = []
-        totals = [0, 0, 0, 0, 0]
-        n_ann = 0
+        profiles[label] = {}
+        per_note[label] = {}
         for n, cid in enumerate(ids, 1):
             c = consultations[cid]
             g = grader or stat_for[cid]
             if progress:
-                # Overwrite in place on a terminal; one line per consultation
-                # when piped to a file, because a log full of carriage returns
-                # is unreadable and this run is long enough to be logged.
                 tty = sys.stdout.isatty()
                 print(
                     f"    {label:<12} {n:>3}/{len(ids)}  {cid}",
                     end="\r" if tty else "\n",
                     flush=True,
                 )
-            groundings.append(
-                g.ground_note(cid, "clinician", segment(c.clinician_note), c.utterances)
+            profiles[label][cid] = g.ground_note(
+                cid, "clinician", segment(c.clinician_note), c.utterances
             )
+            if _was_contaminated(g, cid, "clinician"):
+                contaminated.add(cid)
+            rows = [0, 0, 0, 0, 0]
             for a in sampled.get(cid, []):
-                n_ann += 1
                 ga = g.ground_note(cid, a.model_id, segment(a.generated_note), c.utterances)
+                if _was_contaminated(g, cid, a.model_id):
+                    contaminated.add(cid)
                 for i, v in enumerate(match_note(a, ga)):
-                    totals[i] += v
+                    rows[i] += v
+            per_note[label][cid] = tuple(rows)
         if progress and sys.stdout.isatty():
             print(" " * 70, end="\r")
-        m = MatchResult(*totals)
-        med_g, med_u = _profile(groundings)
-        name = getattr(g, "name", label)
+        meta[label] = (getattr(g, "name", label), g, time.time() - started)
+
+    clean_ids = [cid for cid in ids if cid not in contaminated]
+
+    def _aggregate(label: str, subset: list[str]) -> tuple[float, float, MatchResult]:
+        med_g, med_u = _profile([profiles[label][c] for c in subset])
+        totals = [0, 0, 0, 0, 0]
+        for c in subset:
+            for i, v in enumerate(per_note[label][c]):
+                totals[i] += v
+        return med_g, med_u, MatchResult(*totals)
+
+    results: list[GraderResult] = []
+    for label in ["statistical", *lineup]:
+        name, grader_obj, seconds = meta[label]
+        med_g, med_u, m = _aggregate(label, list(ids))
+        clean_g, _, cm = _aggregate(label, clean_ids)
         counter = counters.get(label)
-        graded_by = lineup.get(label)
+        n_ann = sum(len(sampled.get(c, [])) for c in ids)
         results.append(
             GraderResult(
                 name=f"{label} ({name})" if name != label else label,
-                replayed_calls=counter.replayed if counter else 0,
-                live_calls=counter.live if counter else 0,
-                unparsed_rate=(
-                    graded_by.unparsed_rate
-                    if isinstance(graded_by, SemanticGrader)
-                    else 0.0
-                ),
                 median_grounded=med_g,
                 median_unsupported=med_u,
                 recall=m.recall,
                 precision=m.precision,
                 f1=m.f1,
-                notes_graded=len(groundings),
+                notes_graded=len(ids),
                 annotations_graded=n_ann,
-                seconds=time.time() - started,
+                replayed_calls=counter.replayed if counter else 0,
+                live_calls=counter.live if counter else 0,
+                unparsed_rate=(
+                    grader_obj.unparsed_rate
+                    if isinstance(grader_obj, SemanticGrader)
+                    else 0.0
+                ),
+                clean_notes=len(clean_ids),
+                clean_median_grounded=clean_g,
+                clean_recall=cm.recall,
+                clean_precision=cm.precision,
+                seconds=seconds,
             )
         )
 
@@ -322,3 +396,42 @@ def write_report(report: SemanticReport, path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(report.to_json(), encoding="utf-8")
     return path
+
+
+# -- published-figure gate ------------------------------------------------
+
+#: The semantic figures this project publishes, with tolerances. Enforced by
+#: `make semantic` exactly as the offline figures are enforced by
+#: `make crossval`. Replay makes this free: the 148 recorded responses ship
+#: with the repository, so a reviewer re-derives every number here without a
+#: model, a key or a network.
+PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {
+    "clean_notes": (38.0, 0.0),
+    "semantic_clean_grounded": (0.821, 0.02),
+    "semantic_clean_recall": (0.692, 0.03),
+    "lexical_clean_grounded": (0.400, 0.02),
+    "lexical_clean_recall": (0.404, 0.03),
+    "semantic_unparsed_rate": (0.291, 0.03),
+}
+
+
+def check_published(report: SemanticReport) -> list[str]:
+    """Compare a replayed run against the figures the README prints."""
+    by_label = {r.name.split(" (")[0]: r for r in report.results}
+    sem, lex = by_label.get("semantic"), by_label.get("lexical")
+    if sem is None or lex is None:
+        return []
+    actual = {
+        "clean_notes": float(sem.clean_notes),
+        "semantic_clean_grounded": sem.clean_median_grounded,
+        "semantic_clean_recall": sem.clean_recall,
+        "lexical_clean_grounded": lex.clean_median_grounded,
+        "lexical_clean_recall": lex.clean_recall,
+        "semantic_unparsed_rate": sem.unparsed_rate,
+    }
+    drift: list[str] = []
+    for key, (expected, tol) in PUBLISHED_SEMANTIC.items():
+        got = actual[key]
+        if abs(got - expected) > tol:
+            drift.append(f"{key}: README says {expected}, this run gives {got:.4g}")
+    return drift

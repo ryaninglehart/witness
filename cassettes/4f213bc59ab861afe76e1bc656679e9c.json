@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"INFERRED\",\"u\":104,\"why\":\"The doctor suggests taking time off work, and the patient agrees, indicating understanding and agreement with the plan.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":106,\"why\":\"The doctor mentions exploring counselling options and provides a link for self-referral, which the patient does not object to.\"},\n    {\"i\":14,\"v\":\"INFERRED\",\"u\":117,\"why\":\"The doctor sets a follow-up appointment in a week's time, and the patient agrees to this plan.\"},\n    {\"i\":15,\"v\":\"INFERRED\",\"u\":123,\"why\":\"The patient explicitly states that they will book an appointment in the agreed time, indicating understanding and happiness with the plan.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":108,\"why\":\"Patient explicitly states 'I don't know' to the question about smoking or drinking alcohol.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":89,\"why\":\"Patient reports that the pain is getting worse, which implies an investigation into the cause of the abdominal pain is needed.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":133,\"why\":\"Doctor explicitly advises the patient to contact the support line if the pain gets worse or if new symptoms arise.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

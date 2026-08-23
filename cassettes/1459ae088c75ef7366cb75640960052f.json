@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":17,\"why\":\"Patient described headaches, loss of appetite, tingling, feeling hot, and palpitations. He also mentioned that the symptoms are random and occur at work.\"},\n    {\"i\":1,\"v\":\"INFERRED\",\"u\":41,\"why\":\"Patient mentioned feeling nauseous but did not specifically mention vomiting. This can be inferred from the claim.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":84,\"why\":\"Patient confirmed a loss of 5 pounds and stated that it was unintentional.\"},\n    {\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient did not mention any allergies.\"},\n    {\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient did not mention any past medical history.\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":155,\"why\":\"Doctor mentioned plans for further examination and blood tests.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

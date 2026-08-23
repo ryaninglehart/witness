@@ -52,6 +52,12 @@ crossval:
 semantic:
 	@$(PY) -m witness.cli semantic $(ARGS)
 
+# The 148 recorded responses are committed, so this re-derives every semantic
+# figure with no model, no key and no network -- the same standard the offline
+# numbers are held to.
+semantic-replay:
+	@$(PY) -m witness.cli semantic
+
 # Two processes, not two calls in one. A figure can be stable within a run and
 # drift between them -- a per-process hash seed, a solver sign flip, a dict
 # order leaking into a tie-break -- and none of the in-process tests can see it.

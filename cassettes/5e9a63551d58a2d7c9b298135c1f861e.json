@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient's response is unclear and does not definitively state whether they are a smoker or drinker of alcohol.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

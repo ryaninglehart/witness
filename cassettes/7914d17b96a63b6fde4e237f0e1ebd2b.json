@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"Utterance 37 states 'No, nothing, nothing coming out.'\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":38,\"why\":\"Utterance 38 states 'Any pain in the ear, or from the ear?' and patient responds 'No, no, no, no, don't think so.'\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":41,\"why\":\"Utterance 41 states 'No, nothing like that.'\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":59,\"why\":\"Utterance 59 states 'No, No.'\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"Utterance 62 states 'Uh, no just Latex.'\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":64,\"why\":\"Utterance 64 states 'My brother had, Neurofibromatosis, I think it is. Other than that everyone else is OK.'\"},\n    {\"i\":6,\"v\":\"SUPPORTED\",\"u\":70,\"why\":\"Utterance 70 states 'Yeah, yeah.' and Utterance 73 states 'No, no pets.'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

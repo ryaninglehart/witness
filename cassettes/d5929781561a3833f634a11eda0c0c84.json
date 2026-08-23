@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"Patient explicitly states 'No, nothing.'\"},\n    {\"i\":1,\"SUPPORTED\":\"INFERRED\",\"u\":45,\"why\":\"Patient says 'I don't think so, um.' which implies no fever\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient mentions 'premature ovarian failure, um, and I've taken HRT'\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"Patient explicitly states 'No, I've been pretty healthy I think, um, yeah.'\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":null,\"why\":\"Abbreviation NKDA stands for 'No Known Drug Allergies'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

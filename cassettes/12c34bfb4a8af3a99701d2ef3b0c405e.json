@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":49,\"why\":\"Patient explicitly states 'No.' to both fever and sweating.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":26,\"why\":\"Patient explicitly states 'I work as a teacher'.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":39,\"why\":\"Patient explicitly states 'No.' to any other symptoms.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"Patient explicitly states 'Yeah, I think I have been, quite tired.'.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":41,\"why\":\"Patient explicitly states 'It's pretty good, yeah. I'm not on any medication.'.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":54,\"why\":\"Patient explicitly states 'Microgynon' and doctor confirms it's a contraceptive pill.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"Patient explicitly states 'I think, um, I might be lactose intolerant.'.\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient explicitly states 'Um, yeah, so um, my dad has asthma, and, my mum has hayfever.'.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

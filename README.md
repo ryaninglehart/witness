@@ -92,6 +92,17 @@ and the true one.
 `make review` writes a one-file page: click a claim, and the utterance that
 justifies it highlights with its timestamp.
 
+## The result, in one line
+
+Term matching cannot gate clinical notes — measured twice, two different
+graders, no operating point. A 7B model reading for meaning **can**: +42 points
+of grounding and +29 points of recall over the lexical baseline, both intervals
+clear of zero. It also abandons the output format on 29% of batches, so it is a
+result about a grader and not yet a shippable component.
+
+The rest of this document is how each of those was established, in the order it
+happened.
+
 ## The main result is negative
 
 `make crossval` splits the 57 consultations into five folds. Thresholds are
@@ -212,6 +223,68 @@ better", but: the failure is a *judgement* about whether two differently-worded
 statements assert the same clinical fact, and no amount of distributional
 similarity makes that judgement. Something has to read them.
 
+## What does work — and what it costs
+
+`make semantic` runs `graders/semantic.py` against `qwen2.5:7b-instruct` over
+Ollama. 57 consultations, 148 batches, 47 minutes on a laptop. **The 148
+recorded responses ship with this repository**, so every figure below re-derives
+in seconds with no model, no key and no network:
+
+```
+make semantic-replay
+```
+
+Scored on the 38 notes where the model stayed on format — all three graders on
+the same 38, because a clean subset compared against a full set is a different
+corpus:
+
+| grader | note grounded | recall | precision |
+|---|---|---|---|
+| lexical/1.0 | 40.0% [33.3, 48.9] | 40.4% [26.5, 54.4] | 17.1% |
+| statistical/1.0 | 63.3% | 25.0% | 16.0% |
+| **semantic/1.0 + qwen2.5:7b** | **82.1%** [75.0, 88.2] | **69.2%** [54.9, 83.3] | **40.2%** |
+
+Paired bootstrap over the same resamples:
+
+```
+grounding, semantic - lexical   +42.1%  [+32.4%, +51.3%]   distinguishable
+recall,    semantic - lexical   +28.8%  [ +9.7%, +48.0%]   distinguishable
+```
+
+**The trade breaks.** Both term-matching graders sit on the curve — the learned
+one buys coverage by paying recall. The semantic grader steps off it: it grounds
+twice as much of a clinician's note *and* catches substantially more of what the
+clinicians flagged, and precision more than doubles. That is what the earlier
+sections predicted and could not demonstrate, and it is now measured rather than
+argued.
+
+### The part that is not ready
+
+**qwen2.5:7b abandoned the output format on 29% of batches** — 43 of 148. Not a
+parsing problem: those responses contain no verdict anywhere. The model stops
+classifying and starts narrating (*"Based on the dialogue, the claims can be
+summarized as follows…"*). The parser handles every recoverable shape; there is
+nothing in these to recover.
+
+That is why the full-corpus row is refused rather than published. An unreadable
+batch refuses every claim in it, which pushes grounding **down** and detection
+**up** — the biases point opposite ways, so the contaminated row cannot be
+corrected by argument, only by dropping those notes. `make semantic` prints it
+under `NOT A MEASUREMENT` and exits non-zero.
+
+Three honest limits on the 38-note result:
+
+- **The subset is not random.** These are the encounters the model stayed on
+  format for. If it drops format on harder consultations, the figures are
+  optimistic. This is a better estimate than the contaminated row, not a clean
+  one.
+- **n=38**, which is why the recall interval runs from +9.7% to +48.0%. The
+  direction is solid; the magnitude is not pinned down.
+- **One model, one corpus, one setting.** Constrained decoding (Ollama's
+  `format: json`) or retry-on-unparsed is the obvious fix for the 29%, and
+  neither has been tried. Until one is, this is a result about a grader, not a
+  shippable component.
+
 ## What the lexical grader does achieve
 
 `make validate`, on 228 generated notes and the 1,140 annotations of them:
@@ -315,13 +388,14 @@ out would flatter the number.
 Stated plainly, because a harness that overclaims has no standing to measure
 anything else.
 
-- **The semantic grader has never been run against a model.** It needs one, and
-  the container this was built in has no API access, no Ollama and no route to
-  pretrained weights. Every number here comes from graders that need neither.
-  It has been exercised against a scripted provider, which measures no accuracy
-  and is not meant to — that suite tests the paths where the harness must
-  refuse a model's answer, and it found a crash. Whether the grader is any
-  good is unknown.
+- **The semantic grader is measured on 38 of 57 notes, not 57.** It abandons
+  the output format on 29% of batches and those notes are excluded rather than
+  scored. It is not a deployable component until that is fixed, and the fix
+  (constrained decoding) has not been tried.
+- **The gate has never been calibrated against the semantic grader.** Every
+  operating point, sweep and sabotage figure above comes from the offline
+  graders. What the release gate does with a grader this much better is
+  unmeasured, and it is the obvious next run.
 - **No ASR layer.** The corpus ships human transcripts with utterance timings,
   so grounding is measured against perfect transcription. Real ASR error is a
   second failure surface and is not included. Whisper's documented tendency to

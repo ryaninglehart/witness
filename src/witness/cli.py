@@ -290,9 +290,20 @@ def cmd_semantic(ns: argparse.Namespace) -> int:
     # reporting grounded 0.0% / recall 100.0% was a parser failure wearing a
     # measurement's clothes, and it took a careful reader to notice rather
     # than the harness saying so.
+    drift = se.check_published(report)
+    if drift:
+        print("\n  PUBLISHED SEMANTIC FIGURES HAVE DRIFTED")
+        print("  " + "-" * 68)
+        for line in drift:
+            print(f"    {line}")
+        return 1
+
     broken = [r for r in report.results if se.degenerate_reasons(r)]
     if broken:
-        print("\n  This run did not measure anything. See NOT A MEASUREMENT above.")
+        # The contaminated row is refused, but the clean-subset row beside it
+        # is a real comparison and the reason this command still has a point.
+        print("\n  The full-corpus row is contaminated and is refused. The")
+        print("  clean-subset row above is the measurement; see WIT-016.")
         return 1
     return 0
 

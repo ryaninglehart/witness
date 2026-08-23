@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The transcript does not mention a urine dip or MSU being ordered.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":98,\"why\":\"The patient agreed to take antibiotics instead of going for tests, which implies regular paracetamol for pain.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":96,\"why\":\"The doctor advised the patient to come back in a few days if symptoms were not getting better or if they were getting worse.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":122,\"why\":\"The doctor explicitly states 'I'll be asking for something called thick and thin blood films, to check for malaria. And inflammatory markers and things like those, technical terms, but they'll understand what that, what I'm talking about.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

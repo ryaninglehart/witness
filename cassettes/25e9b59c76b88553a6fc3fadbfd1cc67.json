@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":94,\"why\":\"Patient explicitly mentions suffering from hay fever.\"}]};",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

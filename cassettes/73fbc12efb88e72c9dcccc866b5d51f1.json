@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":23,\"why\":\"Patient reported coughing yesterday\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of fever, chills, or positional symptoms in the transcript\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":52,\"why\":\"Patient explicitly stated no chest pain and no pain on deep breath\"},{\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of blood thinners in the transcript\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"Patient mentioned being allergic to Ibuprofen\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":91,\"why\":\"Doctor suggested further examination and investigation in the hospital\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

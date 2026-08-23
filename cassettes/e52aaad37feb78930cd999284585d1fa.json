@@ -1,0 +1,5 @@
+{
+  "text": "Based on the dialogue, the key claims are:\n\n12. Regular paracetamol: The doctor advises the patient to try Paracetamol if they are feeling feverish or have tummy pain.\n\n13. Review in 48 hours, or earlier if worsening sx: The doctor instructs the patient to call back if symptoms aren't settling in 48 hours or if they are getting dehydrated.\n\nThese claims accurately summarize the doctor's advice given at the end of the consultation.",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

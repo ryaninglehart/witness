@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":21,\"why\":\"Patient states 'feel no pain but just, uh, can't move it'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":32,\"why\":\"Patient lists the medications: 'Metformin losartan and Amlodipine'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"Patient states 'only penicillin, I believe'\"},{\"i\":3,\"v\":\"INFERRED\",\"u\":73,\"why\":\"Patient states 'yes' to living alone and 'I used to' to smoking, and 'I will have a few drinks over the weekend. Um, maybe a, a couple more during the week.'\"},{\"i\":4,\"v\":\"INFERRED\",\"u\":50,\"why\":\"Patient's symptoms and doctor's concern about stroke\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

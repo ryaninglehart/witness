@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":121,\"why\":\"Doctor explicitly states that the pharmacist can show the patient how to use the inhaler.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":123,\"why\":\"Doctor suggests increasing the salbutamol to 2-4 puffs every four hours and arranging a review in a week.\"},\n    {\"i\":14,\"v\":\"INFERRED\",\"u\":125,\"why\":\"Doctor advises to call back if the patient feels worse, indicating a potential need for further medication if symptoms worsen.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

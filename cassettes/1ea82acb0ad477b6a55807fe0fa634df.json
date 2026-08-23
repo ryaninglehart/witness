@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":107,\"why\":\"Doctor diagnosed contact dermatitis based on patient's symptoms and history.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":110,\"why\":\"Doctor recommended steroid creams to help with inflammation.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":117,\"why\":\"Doctor advised patient to return in 1-2 weeks if symptoms do not improve.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"Patient explicitly states 'Clindamycin' as an allergy.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient states 'I live with friends'.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Patient states 'One glass of wine a week' which is occasional alcohol consumption.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Patient explicitly states 'No fever at all'.\"}]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

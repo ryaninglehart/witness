@@ -1,0 +1,5 @@
+{
+  "text": "Based on the dialogue, the claims can be summarized as follows:\n\n12. **Rest, fluids, regular paracetamol**: The doctor advised the patient to stay rested, drink plenty of fluids, and take regular Paracetamol if they feel hot and cold and sweaty.\n\n13. **Delayed script for amoxicillin abx**: The doctor mentioned that if the patient's symptoms do not improve, they can start a course of Amoxicillin (one tablet, three times a day) after 24 to 48 hours.\n\n14. **Review in 1/52 INB, or earlier if worsening sx (chest pain, SOB, fevers)**: The doctor suggested that the patient should return if they are still feeling breathless and run-down after 24 to 48 hours, or if their symptoms worsen (such as chest pain, shortness of breath, or fever).",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

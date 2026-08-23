@@ -1,0 +1,5 @@
+{
+  "text": "Based on the conversation, the claims can be summarized as follows:\n\n0. 5/7 day history of cough and runny nose\n1. Dry cough, keeps patient up at night\n2. Runny nose, no ear pain, no sore throat\n3. No shortness of breath (SOB) or chest pain\n4. Feeling tired, weak, and muscle pain (myalgia)\n5. Feeling shivery, hot/cold, possibly a fever\n6. No nausea or vomiting\n7. Appetite maintained\n8. Initial diarrhea\n9. No urinary symptoms\n10. Past medical history (PMH): Type 2 diabetes, hypertension\n11. Past medical history (PMH): Metformin for diabetes, Lisinopril for hypertension",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

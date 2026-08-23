@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":116,\"why\":\"The doctor infers a migraine based on the patient's symptoms.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":122,\"why\":\"The doctor suggests strong painkillers and anti-inflammatories for headache management.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":132,\"why\":\"The doctor explicitly states the patient should return if symptoms worsen or if there are any concerns.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

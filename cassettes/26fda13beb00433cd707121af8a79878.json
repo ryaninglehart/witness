@@ -1,0 +1,5 @@
+{
+  "text": "Based on the dialogue, here are the claims that can be extracted:\n\n12. The patient reports a tight chest.\n13. The patient mentions a slight cough.\n14. The patient still has symptoms of a cold and cough.\n15. The patient has a cough.\n16. The patient mentions having a dust allergy.\n17. The patient is currently using Ventolin and Clenil Modulite inhalers.\n18. The patient had an asthma exacerbation in the past, specifically when they were 16-17 years old.\n19. The doctor suggests prescribing further salbutamol and Clenil Modulite inhalers.\n20. The doctor prescribes 40mg of steroids for five days.\n21. The doctor warns the patient about potential side effects of the steroids, including mood changes, hyperglycemia, nausea, and a rash.",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

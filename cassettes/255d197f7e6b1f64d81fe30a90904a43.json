@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":14,\"why\":\"Patient stated 'Yeah, yeah, it's just like, coughing, and like, runny nose, and stuff, and, like'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":14,\"why\":\"Patient described symptoms of cough and runny nose\"},{\"i\":2,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient stated 'Yeah, yeah, it's just like, coughing, and like, runny nose, and stuff, and, like' which does not explicitly state no sputum\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":30,\"why\":\"Patient explicitly stated 'No shortness <UNIN/>, like yeah, I'm breathing fine.'\"},{\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":39,\"why\":\"Patient mentioned 'regular medication' and later stated 'I take, um, uh, what's it called, it's like <UNSURE>metformin</UNSURE>. I'm a diabetic, so. And, um, I also, like have, uh, <UNIN/> <UNSURE>lisinopril </UNSURE>.'\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":35,\"why\":\"Patient stated 'I'll just like pass it along.' and later explicitly stated 'Paracetamol, OK. Any Ibuprofen at all? <UNSURE>No</UNSURE>'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

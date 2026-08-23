@@ -81,12 +81,13 @@ quarters of the problem solved and it is not.
 
 **"Why not use a real model?"**
 
-I should, and `graders/semantic.py` is written for it. I could not run it: the
-build environment had no API access, no local model server, and no route to
-pretrained weights. So rather than shipping an unmeasured module and describing
-it as the solution, I asked whether the gap could be closed without one.
+I did, eventually — `qwen2.5:7b-instruct` over Ollama, 148 batches, 47 minutes
+on a laptop. But not first. The build environment had no model access, so
+before reaching for one I asked whether the gap could be closed without it.
 
-That question turned out to be the most useful thing in the project.
+That question turned out to be the most useful thing in the project, because
+the answer was no, and establishing *why* is what makes the eventual positive
+result mean anything.
 
 **"So what did you do instead?"**
 
@@ -121,6 +122,34 @@ that judgement. Something has to read them.
 
 That is the argument for a semantic grader — measured, not asserted. It is a
 stronger argument than the one it replaced.
+
+**"So did the model fix it?"**
+
+Yes, and by more than I expected. On the 38 notes where it stayed on format —
+all three graders scored on the same 38 — grounding goes 40.0% → 82.1% and
+recall 40.4% → 69.2%. Paired bootstrap: +42.1% [+32.4, +51.3] on grounding,
++28.8% [+9.7, +48.0] on recall. Precision more than doubles, 17.1% → 40.2%.
+
+Both term-matching graders sit on the trade-off curve. The semantic one steps
+off it. That is exactly what the negative result predicted, and the prediction
+was published before the test was run.
+
+**"Then why isn't it in production?"**
+
+Because it dropped the output format on 29% of batches — 43 of 148 responses
+stopped classifying and started narrating, with no verdict anywhere in them.
+Not a parsing problem; there is nothing in those to recover.
+
+I refuse the full-corpus row rather than publishing it, because an unreadable
+batch refuses every claim in it, which pushes grounding down and detection up.
+The two biases point opposite ways, so that row cannot be corrected by
+argument — only by dropping those notes. The harness prints it under NOT A
+MEASUREMENT and exits non-zero.
+
+And the 38-note subset is not random: it is the encounters the model stayed on
+format for. If it drops format on harder consultations, my figures are
+optimistic. I would fix the format compliance with constrained decoding and
+re-run before claiming anything about deployment.
 
 **"How do I know your numbers aren't in-sample?"**
 
@@ -225,14 +254,18 @@ printed in the README as command output that no command produced.
 
 ## What I would do next, in order
 
-1. **Run the semantic grader.** Everything above is the floor. The specific
-   question it should answer: does an LLM adjudicating `INFERRED` claims break
-   the coverage/detection trade that distributional similarity cannot?
-2. **An ASR layer.** Grounding is currently measured against perfect human
+1. **Fix format compliance and re-run.** Ollama's constrained JSON mode, or
+   retry-on-unparsed. That takes the 38-note result to a 57-note one and is the
+   difference between a finding and a component.
+2. **Calibrate the gate against the semantic grader.** Every operating point
+   and sabotage figure in this project comes from the offline graders. What a
+   release gate does with a grader this much better is unmeasured, and it is
+   the question the whole harness was built to answer.
+3. **An ASR layer.** Grounding is currently measured against perfect human
    transcripts. Whisper's documented tendency to fabricate on disfluent speech
    (Koenecke et al., FAccT 2024) matters most for the sickest patients and is a
    second failure surface entirely.
-3. **More annotators, or a second corpus.** The inter-rater ceiling is doing a
+4. **More annotators, or a second corpus.** The inter-rater ceiling is doing a
    lot of work in the precision story and it deserves to be tested rather than
    relied on.
 
@@ -240,5 +273,6 @@ printed in the README as command output that no command produced.
 
 - That this is production-ready. It is a measurement harness.
 - That the numbers transfer beyond UK primary care.
-- That the semantic grader works. It has never been run.
+- That the semantic grader is deployable. It is measured on 38 of 57 notes and
+  drops its output format on 29% of batches.
 - That AI-assisted code needs no review. Fifteen incidents say otherwise.

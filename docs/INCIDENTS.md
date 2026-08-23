@@ -698,3 +698,65 @@ majority, and I would not have invented any of them. Fixtures for anything
 parsing model output have to come from the model. One real run is worth more
 than a suite of imagined ones, and it should happen before the numbers are
 published rather than after.
+
+---
+
+## WIT-017 — The contaminated run answered the question, once it was asked properly
+
+**Not a defect.** Recorded because the reasoning is the part worth keeping, and
+because the first reading of this run was wrong in a way that would have been
+easy to publish.
+
+**What happened.** The first full semantic run — 57 consultations, 148 batches,
+47 minutes — printed a table showing the semantic grader beating the lexical
+baseline on grounding *and* recall *and* precision. It also tripped the WIT-016
+guard: 29% of the model's responses were unreadable.
+
+The tempting reading is "invalid, discard." The correct reading is that the
+contamination is not noise, and it does not push one way:
+
+- An unreadable batch refuses every claim in it. Refused claims are not
+  grounded, so contamination pushes **grounding down**. The reported 71.4% was
+  a floor.
+- Refused claims are also flagged, and flagging everything catches defects for
+  free, so contamination pushes **detection up**. The reported 74.3% was a
+  ceiling.
+
+Two biases in opposite directions cannot be reasoned away, and a single
+"invalid" verdict throws out a real result along with a fake one. The only
+correct move is to recompute on the notes where no batch failed — which the
+recorded responses made possible with zero additional inference.
+
+**What it showed.** On the 38 clean notes, with all three graders rescored on
+that same subset:
+
+| grader | grounded | recall | precision |
+|---|---|---|---|
+| lexical | 40.0% | 40.4% | 17.1% |
+| statistical | 63.3% | 25.0% | 16.0% |
+| semantic | **82.1%** | **69.2%** | **40.2%** |
+
+Paired bootstrap: grounding **+42.1% [+32.4, +51.3]**, recall **+28.8% [+9.7,
++48.0]**. Both clear of zero.
+
+Both biases moved as predicted once removed — grounding rose from 71.4% to
+82.1%, recall fell from 74.3% to 69.2%. The prediction about the direction of
+each bias was made before the recomputation and held.
+
+**The methodological point.** Comparing the semantic grader's clean subset
+against the lexical grader's full corpus would have been a comparison between
+two different corpora. The first version of this analysis did exactly that and
+overstated the recall gap. All three graders are now scored on the same 38
+notes.
+
+**What is still not known.** The 38 are not a random sample — they are the
+encounters the model stayed on format for. If format compliance correlates with
+difficulty, these figures are optimistic. That is stated wherever the numbers
+appear, and it is the first thing a fixed run should settle.
+
+**Why the recorded responses are committed.** All 148 ship with the repository,
+so `make semantic-replay` re-derives every figure above in seconds with no
+model, no key and no network. `providers.py` argued for this before there was
+anything to replay: *an evaluation harness that cannot reproduce its own numbers
+without a network and a credit card is not much of a harness*. This is the first
+time that claim cost anything, and it is the run where it mattered most.

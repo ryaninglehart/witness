@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported the diarrhea started three days ago.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":27,\"why\":\"The patient stated 'four to five' times a day.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":32,\"why\":\"The patient explicitly denied blood and mucus.\"},{\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentioned a slight fever.\"},{\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":43,\"why\":\"The patient reported a loss of appetite, not normal appetite.\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":19,\"why\":\"The patient mentioned vomiting once, which is abdominal pain.\"},{\"i\":6,\"v\":\"UNSUPPORTED\",\"u\":55,\"why\":\"The patient mentioned asthma and a family history of hypertension and bowel cancer.\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"The patient stated 'my dad had hypertension. Has hypertension. Had hypertension. Yeah he died of bowel cancer ten years ago.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

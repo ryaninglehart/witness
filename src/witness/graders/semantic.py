@@ -94,6 +94,12 @@ class SemanticGrader:
         #: blocked.
         self.batches = 0
         self.unparsed_batches = 0
+        #: Notes with at least one unparsed batch, as (consultation_id,
+        #: model_id). A note is contaminated by a single failed batch: every
+        #: claim in it was refused, which drags the note's grounding down and
+        #: pushes its detection up. Tracked so those notes can be excluded
+        #: rather than reasoned about. See WIT-016.
+        self.unparsed_notes: set[tuple[str, str]] = set()
         #: Claims per request. Small batches keep the transcript in context and
         #: stop a long note from pushing the early claims out of attention;
         #: large batches are cheaper. Twelve is a compromise, not a finding.
@@ -119,9 +125,12 @@ class SemanticGrader:
         transcript = "\n".join(
             f"[{i}] {u.speaker}: {u.text}" for i, u in enumerate(utterances)
         )
+        before = self.unparsed_batches
         for start in range(0, len(assertions), self.batch_size):
             batch = assertions[start : start + self.batch_size]
             graded.extend(self._grade_batch(batch, transcript, utterances))
+        if self.unparsed_batches > before:
+            self.unparsed_notes.add((consultation_id, model_id))
         return NoteGrounding(consultation_id, model_id, self.name, graded)
 
     def _grade_batch(

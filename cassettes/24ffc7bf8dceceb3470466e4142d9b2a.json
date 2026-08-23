@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The transcript does not provide enough information to support or infer that management decisions were taken in line with necessity and advice at this time which may be outside of normal guidelines.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"The patient explicitly states 'Yeah.' in response to the doctor's question about neck pain or stiffness.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"The patient explicitly states 'No.' in response to the doctor's question about recent head injuries.\"},\n    {\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reports that Ibuprofen does not help, which contradicts the claim that it helps.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"The patient explicitly states 'Mm not that I know of.' in response to the doctor's question about drug allergies.\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"The patient explicitly states 'Uh I live with housemates. So, three of them. So we're four.'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}
