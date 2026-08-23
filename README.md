@@ -421,6 +421,27 @@ anything else.
   these numbers transfer to US primary care, to specialty clinics, or to a
   different scribe vendor's output.
 
+## How this was built
+
+Written with Claude Code, daily, under the conventions in `CLAUDE.md`. Every
+rule in that file was added after something went wrong, and each one cites the
+incident that produced it.
+
+That is the part worth looking at. The assistant's failure mode is not bad code
+— it is plausible code with a silent defect, meeting an author willing to accept
+a number that matches what he expected. Of the seventeen incidents in
+`docs/INCIDENTS.md`, the ones that survived longest are the ones where the wrong
+answer was *flattering*: a false-alarm rate that fit the story being told, a
+learned lexicon inspected only on the terms that made it look good, three
+counting errors that each moved a figure the helpful way.
+
+So the repository is arranged so that being wrong is expensive: figures carry
+tolerances and fail the build when they drift, gates are verified failing as
+well as passing, documented output is checked against real output, and a
+separate agent was pointed at the documentation twice with instructions to be
+adversarial. Those two audits found 23 defects in about an hour, including four
+numbers printed as command output that no command produced.
+
 ## Incidents
 
 `docs/INCIDENTS.md` records fifteen defects found while building this. Five are
