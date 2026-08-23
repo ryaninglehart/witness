@@ -17,6 +17,7 @@ help:
 	@echo "  make semantic   measure the LLM grader (needs Ollama; not in make check)"
 	@echo "  make reproduce  run the evaluation twice and diff it"
 	@echo "  make review     export a one-file review page you can click through"
+	@echo "                  ARGS=\"--consultation <id> --grader semantic\""
 
 corpus:
 	@test -d primock57 || GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 \
@@ -69,7 +70,7 @@ reproduce:
 		|| (echo "  NOT REPRODUCIBLE"; exit 1)
 
 review:
-	@$(PY) -m witness.cli review
+	@$(PY) -m witness.cli review $(ARGS)
 
 check: lint test evidence validate calibrate prove crossval
 	@echo "  all checks passed"

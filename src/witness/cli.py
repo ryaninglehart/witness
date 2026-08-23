@@ -353,18 +353,76 @@ def cmd_prove(_: argparse.Namespace) -> int:
 
 
 def cmd_review(ns: argparse.Namespace) -> int:
+    """Export a page a human can actually check the grader against.
+
+    The grader is selectable because auditing the lexical one only reconfirms
+    what the sweep already shows -- it cannot read shorthand, and a clinician
+    reading its verdicts learns that in four clicks. The question worth a
+    clinician's time is whether the *semantic* grader's judgement is sound:
+    whether a claim it marked INFERRED is a leap a doctor would actually make,
+    and whether one it marked SUPPORTED really is. Nothing in this repository
+    can answer that, and no amount of agreement with annotations substitutes
+    for it.
+    """
+    from witness.graders.semantic import SemanticGrader
+    from witness.providers import default_provider
+
     c = _corpus()
     calib = cal.calibrate(c, 0.90)
+
+    grader = None
+    if ns.grader == "semantic":
+        provider = default_provider()
+        if provider is None:
+            print("\n  No model provider is reachable, and the semantic grader needs one.")
+            print("  Run `make semantic` first: it records every response, after which")
+            print("  this command replays them for free.")
+            return 2
+        grader = SemanticGrader(provider)
+    elif ns.grader == "statistical":
+        from witness.crossval import fit_folds, folds
+        from witness.graders.statistical import StatisticalGrader
+
+        ids = c.consultation_ids()
+        cons_all = {i: c.load_consultation(i) for i in ids}
+        for fm in fit_folds(c, folds(ids, 5), cons_all):
+            if ns.consultation in fm.fold.test:
+                grader = StatisticalGrader(fm.model)
+                break
+
     pipe = Pipeline(
-        gate=Gate(calib.thresholds), max_critical_omissions=calib.max_critical_omissions
+        gate=Gate(calib.thresholds),
+        max_critical_omissions=calib.max_critical_omissions,
+        grader=grader,
     )
     cons = c.load_consultation(ns.consultation)
     anns = [a for a in c.annotations() if a.consultation_id == ns.consultation]
     note = anns[0].generated_note if anns else cons.clinician_note
     model = anns[0].model_id if anns else "clinician"
     run = pipe.run(cons, note, model, publish=False)
-    out = export(run, cons, Path("data/out") / f"{ns.consultation}.html")
+
+    # Refuse to write a page whose verdicts come from a grader that could not
+    # reach its model. Every claim comes back UNSUPPORTED with the reason
+    # buried in a rationale, so the page renders as twelve red verdicts and
+    # reads as a damning review of the grader rather than a broken pipeline.
+    # WIT-016 in a new place: a reviewer trusts this page precisely because it
+    # looks like evidence.
+    stranded = [
+        a for a in run.grounding.assertions if "grader unavailable" in (a.rationale or "")
+    ]
+    if stranded:
+        print(f"\n  {len(stranded)} of {run.grounding.n} claims could not be graded: the")
+        print("  grader could not reach its model and no recorded response matched.")
+        print(f"  e.g. {stranded[0].rationale[:110]}")
+        print("\n  Refusing to write the page. Every claim would render UNSUPPORTED and")
+        print("  the result would look like a verdict on the grader rather than on the")
+        print("  connection. Run `make semantic` to record responses, then retry.")
+        return 2
+
+    suffix = "" if ns.grader == "lexical" else f".{ns.grader}"
+    out = export(run, cons, Path("data/out") / f"{ns.consultation}{suffix}.html")
     print(f"\n  wrote {out}")
+    print(f"  grader: {run.grounding.grader}")
     print(f"  {run.grounding.summary()}")
     print(f"  gate: {'passed' if run.gate.published else 'refused'}")
     print("  open it and click any claim to see the utterance that justifies it.")
@@ -403,6 +461,12 @@ def main(argv: list[str] | None = None) -> int:
     sm.set_defaults(fn=cmd_semantic)
     rv = sub.add_parser("review", help="export a one-file review page")
     rv.add_argument("--consultation", default="day1_consultation01")
+    rv.add_argument(
+        "--grader",
+        default="lexical",
+        choices=["lexical", "statistical", "semantic"],
+        help="which grader's verdicts to review (semantic needs recorded responses)",
+    )
     rv.set_defaults(fn=cmd_review)
     ns = p.parse_args(argv)
     return ns.fn(ns)
