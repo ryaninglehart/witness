@@ -122,6 +122,14 @@ the evaluation twice and diffs it. **WIT-011**
 **Never claim something works without having run it.** Not "this should pass" —
 run it, paste the output.
 
+**Confirm CI actually ran, not that it exists.** The first push landed on
+`master` while `ci.yml` triggered on `main`, so no job fired and GitHub never
+registered the workflow. The repository looked published and healthy while
+testing nothing — the same shape as WIT-006, moved up a level: an unregistered
+workflow and a passing one are indistinguishable from the repository page. After
+any push that changes branches, workflow files or triggers, check `gh run list`
+for a run against that commit rather than assuming one happened.
+
 ---
 
 ## On the assistant

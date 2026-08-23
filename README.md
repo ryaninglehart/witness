@@ -26,6 +26,17 @@ calibration, the sabotage harness, and the held-out cross-validation — which
 CI additionally runs the evaluation twice in separate processes and diffs the
 output, because a number can be stable inside one run and drift between two.
 
+## The result, in one line
+
+Term matching cannot gate clinical notes — measured twice, two different
+graders, no operating point. A 7B model reading for meaning **can**: +42 points
+of grounding and +29 points of recall over the lexical baseline, both intervals
+clear of zero. It also abandons the output format on 29% of batches, so it is a
+result about a grader and not yet a shippable component.
+
+The rest of this document is how each of those was established, in the order it
+happened.
+
 ---
 
 ## The problem
@@ -91,17 +102,6 @@ and the true one.
 
 `make review` writes a one-file page: click a claim, and the utterance that
 justifies it highlights with its timestamp.
-
-## The result, in one line
-
-Term matching cannot gate clinical notes — measured twice, two different
-graders, no operating point. A 7B model reading for meaning **can**: +42 points
-of grounding and +29 points of recall over the lexical baseline, both intervals
-clear of zero. It also abandons the output format on 29% of batches, so it is a
-result about a grader and not yet a shippable component.
-
-The rest of this document is how each of those was established, in the order it
-happened.
 
 ## The main result is negative
 
