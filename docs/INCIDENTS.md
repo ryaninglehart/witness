@@ -760,3 +760,68 @@ model, no key and no network. `providers.py` argued for this before there was
 anything to replay: *an evaluation harness that cannot reproduce its own numbers
 without a network and a credit card is not much of a harness*. This is the first
 time that claim cost anything, and it is the run where it mattered most.
+
+---
+
+## WIT-018 — The clinical-content filter matched stems as whole words
+
+**What happened.** While preparing a hands-on walkthrough of `make review` — not
+while testing — one consultation produced 2 assertions from a 101-word note
+where the median note produces 9. The dropped lines included
+*"Aggs: weakness, numbness in right hand, not extending up the arm."*
+
+The cause is one character. `_CLINICAL_HINT` is a list of stems wrapped in word
+boundaries:
+
+```
+\b(pain|...|swell|breath|chest|abdo|head|dizz|weak|...)\b
+```
+
+The trailing `\b` makes every entry an exact word. `weak` does not match
+"weakness". `swell` does not match "swelling". `abdo` does not match
+"abdominal", `vomit` not "vomiting", `dizz` not "dizziness", `head` not
+"headache", `cramp` not "cramping", `itch` not "itching", `breath` not
+"breathless". **Nine of the thirteen stems never fired on their own inflected
+forms.**
+
+A fragment matching neither the hint nor a slot pattern is dropped before
+grading — a filter added in WIT-002 to stop non-clinical text reaching the
+grader. It was also stopping clinical text. **143 claims across the corpus were
+silently discarded**, and the sample is not random: *"no sweating"*, *"No
+vomiting"*, *"no night sweats"*, *"No headaches, no visual disturbance"*, *"No
+muscle joint pains"*, *"The headache came on suddenly"*.
+
+Those are largely **pertinent negatives** — the category `omission.py` calls
+"clinically load-bearing and among the most commonly dropped things in a
+generated note". The harness was not grading the claims it argues most about.
+
+**My stated reason for the impact was wrong.** On finding it I wrote that a
+dropped claim cannot be ungrounded, so the defect must have *inflated* grounding.
+Measured, lexical grounding went **up** when the claims were restored, 40.0% →
+45.0%. The discarded claims were easier to ground than average, because the
+stems that identify them — "weakness", "numbness", "swelling" — are content
+words patients say out loud. The direction was predicted confidently and
+backwards, in the same paragraph that fixed the bug.
+
+**What changed.** The stems are stems: the trailing `\b` is gone, `numb` and
+`tingl` are added. Every one of the 143 newly admitted fragments was checked by
+hand and all are clinical; nothing junk came in with them.
+
+Figures moved. Lexical grounding 40.0% → 45.0%, recall 48.3% → 48.7%,
+statistical recall 31.6% → 32.5%, and the grounding gap between the two graders
+narrows from +26.7 to +21.7 points. Findings that could not be attributed to any
+claim fell from 44% to 34% — more of what the clinicians flagged now has a claim
+to attach to, which is the clearest sign the fix is right.
+
+**What it cost.** Segmentation determines the claims put to the model, so the
+prompts change, so 137 of the 164 recorded responses no longer match. The
+semantic result — 38 clean notes, 82.1% grounding, 69.2% recall — cannot be
+re-derived by replay and is **withdrawn**, not restated. `PUBLISHED_SEMANTIC` is
+empty until a live re-run on the fixed code refills it.
+
+**The generalisation.** Two things. A regex of abbreviations is a lexicon, and a
+lexicon needs the same scrutiny as a threshold — this one had been read many
+times without anyone checking that `weak` matches "weakness". And the filter
+protecting a measurement is part of the measurement: WIT-002 added this one to
+stop the harness grading noise, and nothing ever asked what else it was
+stopping. A silent exclusion is a silent result.

@@ -832,18 +832,18 @@ def run(
 #: project's name. Tolerances are wide enough to absorb a library version and
 #: narrow enough that a real regression cannot pass.
 PUBLISHED: dict[str, tuple[float, float]] = {
-    "lexical_median_grounded": (0.400, 0.03),
+    "lexical_median_grounded": (0.450, 0.03),
     "statistical_median_grounded": (0.667, 0.03),
-    "lexical_recall": (0.483, 0.03),
-    "statistical_recall": (0.316, 0.03),
+    "lexical_recall": (0.487, 0.03),
+    "statistical_recall": (0.325, 0.03),
     "lexical_best_acceptance": (0.39, 0.05),
-    "lexical_best_detection": (0.12, 0.04),
+    "lexical_best_detection": (0.11, 0.04),
     # Tolerance is one-sided in effect: a rise is a regression, and a fall to
     # zero is the WIT-013 signature rather than an improvement. The companion
     # check is `control_live_rate` below -- a false-alarm rate of 0% earned by
     # a control that stopped rewording anything would otherwise sail through.
     "statistical_false_alarm": (0.04, 0.04),
-    "lexical_false_alarm": (0.04, 0.04),
+    "lexical_false_alarm": (0.02, 0.04),
 }
 
 

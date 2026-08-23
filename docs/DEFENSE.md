@@ -24,7 +24,7 @@ then measured the gate honestly enough that it failed.
 
 There is no operating point where the gate both accepts notes written by
 practising clinicians and catches more than a small minority of injected
-defects. Best usable balance: 39% acceptance at **12%** detection, over 495
+defects. Best usable balance: 39% acceptance at **11%** detection, over 506
 note-level defects spanning eleven types drawn from the error taxonomy the
 corpus evaluators wrote for themselves. At the percentiles where most clinician
 notes get through, it catches essentially nothing.
@@ -59,7 +59,7 @@ statements per note, not on which statements they are. Two clinicians who each
 find three different errors agree perfectly by this measure. So it is context
 for an item-level precision figure, not a formal bound on it, and I do not
 present it as one. Measured against the union of all five annotators
-rather than one, precision is 40.0%. The ~19-point gap is one annotator not
+rather than one, precision is 39.7%. The ~19-point gap is one annotator not
 writing down what another one did.
 
 Neither figure is the truth. The single-annotator number understates precision
@@ -101,7 +101,7 @@ and fold-dependent, and the examples above are the stable ones — a claim about
 which examples I chose, not about the method.
 
 Held out, it grounds 66.7% of a median clinician note against the lexical
-grader's 40.0% — 27 of the 60 ungrounded points, just under half the gap.
+grader's 45.0% — about 22 of the 55 ungrounded points.
 
 And it drops recall on clinician-flagged critical errors from 48.3% to 31.6%.
 
@@ -125,10 +125,19 @@ stronger argument than the one it replaced.
 
 **"So did the model fix it?"**
 
-Yes, and by more than I expected. On the 38 notes where it stayed on format —
-all three graders scored on the same 38 — grounding goes 40.0% → 82.1% and
-recall 40.4% → 69.2%. Paired bootstrap: +42.1% [+32.4, +51.3] on grounding,
-+28.8% [+9.7, +48.0] on recall. Precision more than doubles, 17.1% → 40.2%.
+It looked that way, and I have withdrawn the number rather than quote it.
+
+The first run said yes by a wide margin — roughly double the grounding and a
+large recall gain, paired intervals clear of zero. Then I found a segmentation
+defect that had been dropping 143 clinical claims before anything reached the
+grader, most of them pertinent negatives. Fixing it changes the claims put to
+the model, which changes the prompts, which invalidates 137 of the 164 recorded
+responses. The result cannot be reproduced from what I have, so it is not a
+result.
+
+It is being re-run on the fixed code. If you ask me what a semantic grader buys,
+the honest answer today is: the first measurement was encouraging and I do not
+yet stand behind the number.
 
 Both term-matching graders sit on the trade-off curve. The semantic one steps
 off it. That is exactly what the negative result predicted, and the prediction
@@ -151,6 +160,18 @@ format for. If it drops format on harder consultations, my figures are
 optimistic. I would fix the format compliance with constrained decoding and
 re-run before claiming anything about deployment.
 
+**"You withdrew your headline result. Why should I trust the rest?"**
+
+Because the same machinery that produced it is what caught the defect and what
+refused to let the old number stand. The drift gate failed the build the moment
+segmentation changed and named the figure that had moved. Nothing quietly
+updated itself.
+
+I would rather show you a withdrawn result than a number I cannot reproduce. The
+offline figures in this document were all re-derived on the fixed code before I
+sent it, and the semantic section says withdrawn instead of restating what it
+used to say.
+
 **"How do I know your numbers aren't in-sample?"**
 
 They were, and it is written up as WIT-011. Every figure is now produced by
@@ -163,7 +184,7 @@ whatever varied between days.
 
 The internal check: the lexical grader learns nothing and therefore cannot
 leak, so its held-out recall should equal its in-sample recall. It does —
-48.3% both ways.
+48.7% both ways.
 
 I want to be precise about what that proves, because it is less than it looks.
 It shows the out-of-fold scoring path reproduces the in-sample path for a
@@ -218,9 +239,8 @@ resampling notes would treat correlated observations as independent and report
 intervals far narrower than the corpus supports.
 
 They are not symmetric, and the widest one matters most: statistical grounding
-is 66.7% with an interval of [55.6, 69.2], so eleven points below the point
-estimate is inside this corpus's resolution. Lexical grounding is ±6 and both
-recalls are ±5. Differences smaller than that are not readable here, and I do
+is 66.7% with an interval of [57.1, 75.0]. Lexical grounding runs [37.5, 50.0]
+and both recalls are about ±5. Differences smaller than that are not readable here, and I do
 not read them.
 
 The two the argument rests on are much bigger. Paired on identical resamples,
@@ -243,7 +263,7 @@ Yes, daily, under a maintained `CLAUDE.md` that defines conventions, protects
 test fixtures from modification, and sets release rules. I wrote those rules
 after three releases broke in ways I should have caught.
 
-The verification layer is the engineering contribution. Fifteen incidents in
+The verification layer is the engineering contribution. Eighteen incidents in
 `docs/INCIDENTS.md` are defects that got past me and were caught by a test, a
 gate, or a number that stopped making sense — several of them in code an
 assistant wrote and I approved. WIT-001 is a join that silently dropped 19% of
@@ -273,6 +293,7 @@ printed in the README as command output that no command produced.
 
 - That this is production-ready. It is a measurement harness.
 - That the numbers transfer beyond UK primary care.
-- That the semantic grader is deployable. It is measured on 38 of 57 notes and
-  drops its output format on 29% of batches.
-- That AI-assisted code needs no review. Fifteen incidents say otherwise.
+- That the semantic grader beats the baseline. The measurement is withdrawn
+  pending a re-run (WIT-018), and it drops its output format on 29% of batches
+  regardless.
+- That AI-assisted code needs no review. Eighteen incidents say otherwise.

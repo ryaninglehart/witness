@@ -129,10 +129,17 @@ def classify_slot(text: str) -> Slot:
     return Slot.SYMPTOM if _looks_clinical(text) else Slot.OTHER
 
 
+#: Stems, not words. The trailing ``\b`` this pattern used to carry made every
+#: entry an exact match, so ``weak`` did not match "weakness", ``swell`` did not
+#: match "swelling", and ``abdo`` did not match "abdominal" -- nine of the
+#: thirteen stems never fired on their own inflected forms. Claims carrying
+#: them were dropped before grading, and a dropped claim cannot be ungrounded,
+#: so the omission inflated every grounding figure. See WIT-018.
 _CLINICAL_HINT = re.compile(
-    r"\b(pain|ache|fever|cough|nausea|vomit|diarrh?o?ea|blood|stool|urine|rash|"
+    r"\b(pain|ache|fever|cough|nausea|vomit|diarrh|blood|stool|urine|rash|"
     r"swell|breath|chest|abdo|head|dizz|weak|tired|lethargic|appetite|sleep|"
-    r"bowel|bladder|sweat|weight|lump|discharge|itch|sore|cramp|nil|history)\b",
+    r"bowel|bladder|sweat|weight|lump|discharge|itch|sore|cramp|numb|tingl|"
+    r"nil|history)",
     re.IGNORECASE,
 )
 

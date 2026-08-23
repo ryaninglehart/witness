@@ -29,10 +29,12 @@ output, because a number can be stable inside one run and drift between two.
 ## The result, in one line
 
 Term matching cannot gate clinical notes — measured twice, two different
-graders, no operating point. A 7B model reading for meaning **can**: +42 points
-of grounding and +29 points of recall over the lexical baseline, both intervals
-clear of zero. It also abandons the output format on 29% of batches, so it is a
-result about a grader and not yet a shippable component.
+graders, no operating point. A 7B model reading for meaning appeared to break
+that trade by a wide margin, and **that measurement is currently withdrawn**: a
+segmentation defect was found afterwards which dropped 143 clinical claims
+before grading, and fixing it invalidates the recorded model responses the
+figures came from (WIT-018). The offline results below are re-derived on the
+fixed code; the semantic comparison is being re-run.
 
 The rest of this document is how each of those was established, in the order it
 happened.
@@ -112,20 +114,20 @@ consultations only. **Every number in this section is out-of-sample.**
 
 | Calibration percentile | Clinician notes accepted | Injected defects caught |
 |---|---|---|
-| 0.50 | 14% | 15% |
-| 0.70 | 23% | 12% |
-| 0.80 | 39% | 12% |
-| 0.90 | 61% | 2% |
-| 0.95 | 75% | 0% |
+| 0.50 | 12% | 15% |
+| 0.70 | 28% | 11% |
+| 0.80 | 39% | 11% |
+| 0.90 | 63% | 2% |
+| 0.95 | 74% | 0% |
 | 0.99 | 88% | 0% |
 
 **There is no operating point at which the gate both accepts notes written by
 clinicians and catches more than a small minority of injected defects.** The
-best usable balance is 39% acceptance at **12%** detection, and at the
+best usable balance is 39% acceptance at **11%** detection, and at the
 percentiles where most clinician notes get through it catches essentially
 nothing.
 
-495 note-level defects across 57 held-out consultations: eleven defect types,
+506 note-level defects across 57 held-out consultations: eleven defect types,
 each derived from the note or the transcript rather than written against one
 encounter, each tagged to the error taxonomy the corpus evaluators wrote for
 themselves. They fire on 25–57 of the 57 consultations depending on type —
@@ -143,7 +145,7 @@ time — see WIT-013. The control was a no-op on 56 of 57 consultations, so it
 was testing nothing, and the 47% was the *baseline* failing the gate rather
 than any reaction to rewording.
 
-What the calibration table shows is that the lexical grader **cannot ground 60%
+What the calibration table shows is that the lexical grader **cannot ground 55%
 of a median clinician-written note**. The examples point at clinical shorthand —
 clinicians write `3/7 hx of diarrhoea, mainly watery` and term matching has no
 idea that is the same fact as *"it's been about three days, it's quite runny"* —
@@ -177,8 +179,8 @@ Held out, it does exactly what it was built to do — and the bill comes with it
 
 | grader | median note grounded | recall on clinician-flagged critical errors |
 |---|---|---|
-| lexical/1.0 | 40.0% [33.3, 46.2] | **48.3%** [42.5, 53.4] |
-| statistical/1.0 | **66.7%** [55.6, 69.2] | 31.6% [27.1, 36.1] |
+| lexical/1.0 | 45.0% [37.5, 50.0] | **48.7%** [43.7, 53.4] |
+| statistical/1.0 | **66.7%** [57.1, 75.0] | 32.5% [28.1, 36.8] |
 
 Brackets are 95% bootstrap intervals over 2,000 resamples of whole
 consultations — the consultation, not the note, because notes from one
@@ -186,8 +188,8 @@ encounter share a transcript, a patient and a clinician. Paired on identical
 resamples, so the shared difficulty of a given encounter cancels:
 
 ```
-grounding, statistical - lexical   +26.7%  [+15.6%, +31.4%]   distinguishable
-recall,    statistical - lexical   -16.8%  [-20.1%, -13.2%]   distinguishable
+grounding, statistical - lexical   +21.7%  [+12.7%, +28.6%]   distinguishable
+recall,    statistical - lexical   -16.2%  [-19.3%, -13.2%]   distinguishable
 ```
 
 Neither interval is near zero. **The trade is not a small-sample artifact** —
@@ -199,11 +201,11 @@ wording the grader will look. Sweeping it, held out:
 
 | floor | median note grounded | recall | f1 |
 |---|---|---|---|
-| 0.45 | 66.7% | 31.6% | 24.7% |
-| 0.55 | 60.0% | 35.3% | 26.4% |
-| 0.65 | 53.3% | 39.3% | 27.6% |
-| 0.75 | 44.4% | 45.6% | 29.4% |
-| 0.85 | 40.0% | 47.6% | 29.6% |
+| 0.45 | 66.7% | 32.5% | 24.8% |
+| 0.55 | 58.8% | 36.2% | 26.4% |
+| 0.65 | 55.6% | 39.6% | 27.2% |
+| 0.75 | 50.0% | 45.8% | 28.9% |
+| 0.85 | 47.6% | 47.9% | 29.2% |
 
 Monotone in both directions, and at the tight end it converges onto the lexical
 baseline it was meant to beat. **On this corpus, across this family of graders,
@@ -214,8 +216,8 @@ about term matching over 57 UK primary-care encounters, not a proof about
 distributional methods in general.
 
 It buys nothing on the joint trade either. Its best usable balance is 28%
-acceptance at 11% detection, against the lexical grader's 39% at 12% — worse on
-both axes. False alarms are 4% for both, so there is not even a specificity
+acceptance at 11% detection, against the lexical grader's 39% at 11% — no
+better, having paid 16 points of recall for it. False alarms are 2–4%, so there is not even a specificity
 argument left once the control actually controls for something.
 
 This is the argument for `graders/semantic.py`. Not "an LLM would probably do
@@ -223,67 +225,37 @@ better", but: the failure is a *judgement* about whether two differently-worded
 statements assert the same clinical fact, and no amount of distributional
 similarity makes that judgement. Something has to read them.
 
-## What does work — and what it costs
+## What does work — withdrawn, being re-measured
 
 `make semantic` runs `graders/semantic.py` against `qwen2.5:7b-instruct` over
-Ollama. 57 consultations, 148 batches, 47 minutes on a laptop. **The 148
-recorded responses ship with this repository**, so every figure below re-derives
-in seconds with no model, no key and no network:
+Ollama. The first full run — 57 consultations, 148 batches, 47 minutes on a
+laptop — indicated that the semantic grader breaks the trade by a wide margin,
+grounding roughly twice as much of a clinician's note while also catching
+substantially more of what clinicians flagged, with paired bootstrap intervals
+clear of zero.
 
-```
-make semantic-replay
-```
+**Those figures are withdrawn and are not restated here.** A segmentation
+defect found afterwards (WIT-018) dropped 143 clinical claims — many of them
+pertinent negatives, the category this project argues matters most — before
+anything was graded. Fixing it changes the claims put to the model, which
+changes the prompts, which invalidates 137 of the 164 recorded responses. The
+result cannot be re-derived by replay, so it is not published.
 
-Scored on the 38 notes where the model stayed on format — all three graders on
-the same 38, because a clean subset compared against a full set is a different
-corpus:
+It is being re-run on the fixed segmentation. The measurement stands or falls
+on that run; quoting the old number while the code that produced it is known to
+be wrong is the thing this repository exists to object to.
 
-| grader | note grounded | recall | precision |
-|---|---|---|---|
-| lexical/1.0 | 40.0% [33.3, 48.9] | 40.4% [26.5, 54.4] | 17.1% |
-| statistical/1.0 | 63.3% | 25.0% | 16.0% |
-| **semantic/1.0 + qwen2.5:7b** | **82.1%** [75.0, 88.2] | **69.2%** [54.9, 83.3] | **40.2%** |
+What the first run did establish, and what does not depend on the segmentation:
 
-Paired bootstrap over the same resamples:
-
-```
-grounding, semantic - lexical   +42.1%  [+32.4%, +51.3%]   distinguishable
-recall,    semantic - lexical   +28.8%  [ +9.7%, +48.0%]   distinguishable
-```
-
-**The trade breaks.** Both term-matching graders sit on the curve — the learned
-one buys coverage by paying recall. The semantic grader steps off it: it grounds
-twice as much of a clinician's note *and* catches substantially more of what the
-clinicians flagged, and precision more than doubles. That is what the earlier
-sections predicted and could not demonstrate, and it is now measured rather than
-argued.
-
-### The part that is not ready
-
-**qwen2.5:7b abandoned the output format on 29% of batches** — 43 of 148. Not a
-parsing problem: those responses contain no verdict anywhere. The model stops
-classifying and starts narrating (*"Based on the dialogue, the claims can be
-summarized as follows…"*). The parser handles every recoverable shape; there is
-nothing in these to recover.
-
-That is why the full-corpus row is refused rather than published. An unreadable
-batch refuses every claim in it, which pushes grounding **down** and detection
-**up** — the biases point opposite ways, so the contaminated row cannot be
-corrected by argument, only by dropping those notes. `make semantic` prints it
-under `NOT A MEASUREMENT` and exits non-zero.
-
-Three honest limits on the 38-note result:
-
-- **The subset is not random.** These are the encounters the model stayed on
-  format for. If it drops format on harder consultations, the figures are
-  optimistic. This is a better estimate than the contaminated row, not a clean
-  one.
-- **n=38**, which is why the recall interval runs from +9.7% to +48.0%. The
-  direction is solid; the magnitude is not pinned down.
-- **One model, one corpus, one setting.** Constrained decoding (Ollama's
-  `format: json`) or retry-on-unparsed is the obvious fix for the 29%, and
-  neither has been tried. Until one is, this is a result about a grader, not a
-  shippable component.
+- The model abandons the required output format on **29% of batches** — 43 of
+  148 responses contain no verdict anywhere, narrating instead of classifying.
+  Not a parsing problem; there is nothing in them to recover.
+- Unreadable batches bias the two headline figures in *opposite* directions —
+  grounding down, detection up — so a contaminated run cannot be corrected by
+  argument. `make semantic` prints it under `NOT A MEASUREMENT` and exits
+  non-zero.
+- Constrained decoding (Ollama's `format: json`) is the obvious untried fix and
+  should land before the re-run is treated as final.
 
 ## What the lexical grader does achieve
 
@@ -297,12 +269,12 @@ Three honest limits on the 38-note result:
   ------------------------------------------------------------------
   grader                              lexical/1.0  (no model, no network)
   clinician critical findings           3471
-  not attributable to a claim           1537  (44%, structural comments)
-  flags raised                           801
+  not attributable to a claim           1163  (34%, structural comments)
+  flags raised                           980
 
-  grounding     recall     48.3%   of attributable critical incorrect statements
-                precision  21.4%   against one annotator
-                           40.0%   against the union of all five
+  grounding     recall     48.7%   of attributable critical incorrect statements
+                precision  21.0%   against one annotator
+                           39.7%   against the union of all five
 
   omission      recall     77.7%   of attributable critical omissions
                             1666 of 5792 are attributable (29%); the extractor never
@@ -318,7 +290,7 @@ Three honest limits on the 38-note result:
   two precision figures above is that disagreement, measured.
 ```
 
-Held out under five-fold cross-validation, that recall is 48.3% — the same
+Held out under five-fold cross-validation, that recall is 48.7% — the same
 figure. A grader that learns nothing cannot leak anything, so the out-of-fold
 scoring path should reproduce the in-sample one exactly, and it does. That
 checks the scoring plumbing. It does not test the fold partition of the fitted
@@ -366,9 +338,8 @@ those three do, because each means a number above is not measuring what it
 says.
 
 `make crossval` runs the same cases against all 57 consultations with held-out
-thresholds — 495 note-level defects — and gets 2% at p=0.90, rising to 15% at
-p=0.50 as acceptance of clinician-written notes collapses to 14% and false
-alarms rise to 32%.
+thresholds — 506 note-level defects — and gets 2% at p=0.90, rising to 15% at
+p=0.50 as acceptance of clinician-written notes collapses to 12%.
 
 Two subtractions make those numbers mean what they say. A case is credited only
 when the rule it *names* fires (WIT-006), and only when the uninjected baseline
@@ -413,9 +384,8 @@ anything else.
   manufacture statistical power. Rather than asking the reader to discount the
   numbers by an unstated amount, every headline figure carries a bootstrap
   interval. They are not symmetric and the widest matters most: statistical
-  grounding is 66.7% but its interval runs [55.6, 69.2], so eleven points below
-  the point estimate is inside this corpus's resolution. Lexical grounding is
-  ±6 and both recalls are ±5. The two differences the argument rests on are far
+  grounding is 66.7% but its interval runs [57.1, 75.0]. Lexical grounding runs
+  [37.5, 50.0] and both recalls are about ±5. The two differences the argument rests on are far
   larger than any of that, and are reported as paired intervals.
 - **One corpus, one country, one care setting.** Nothing here establishes that
   these numbers transfer to US primary care, to specialty clinics, or to a
@@ -444,7 +414,7 @@ numbers printed as command output that no command produced.
 
 ## Incidents
 
-`docs/INCIDENTS.md` records fifteen defects found while building this. Five are
+`docs/INCIDENTS.md` records eighteen defects found while building this. Five are
 worth reading:
 
 **WIT-001** — a join dropped 19% of the corpus and the run still printed a
