@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentioned his father had high blood pressure and died of bowel cancer, but there is no mention of the patient himself having hypertension or a history of it.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":70,\"why\":\"Patient explicitly states he lives alone and his occupation is software engineer.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":79,\"why\":\"Patient states he does not smoke and drinks alcohol infrequently, socially.\"},{\"i\":15,\"v\":\"INFERRED\",\"u\":81,\"why\":\"Doctor infers gastroenteritis based on the patient's symptoms of diarrhea, vomiting, and feeling unwell.\"},{\"i\":16,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"There is no mention of the patient taking regular paracetamol.\"},{\"i\":17,\"v\":\"INFERRED\",\"u\":94,\"why\":\"Doctor suggests a follow-up in 3-5 days or sooner if symptoms worsen.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

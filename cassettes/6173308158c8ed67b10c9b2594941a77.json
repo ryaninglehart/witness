@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"There is no mention of the patient using any medication regularly, and no indication of a QDS (three times daily) regimen.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":null,\"why\":\"The doctor suggests a follow-up in one week, which implies a review of symptoms in 1/52 (approximately 1 week) or earlier if there are worsening symptoms or concerns.\"}]};",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

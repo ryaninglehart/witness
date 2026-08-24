@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":21,\"why\":\"Patient reported that the skin on her hands is itchy.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"Patient explicitly stated 'No.' to the question about bowel problems.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":50,\"why\":\"Patient explicitly stated 'No.' to the question about urinary problems.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":59,\"why\":\"Patient mentioned having diabetes.\"},{\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentioned diabetes in the family history but did not specify any other conditions.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":95,\"why\":\"Patient stated 'a couple of pints a week' which is equivalent to 1-2 units per week.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

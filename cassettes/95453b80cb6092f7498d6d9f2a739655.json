@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":116,\"why\":\"Doctor explicitly suggests prescribing a peak flow meter and a spacer.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":118,\"why\":\"Patient asks the doctor to show how to use the spacer.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":123,\"why\":\"Doctor suggests increasing salbutamol to 2-4 puffs every four hours and arranging a review in a week.\"},\n    {\"i\":15,\"v\":\"INFERRED\",\"u\":125,\"why\":\"Doctor suggests arranging a review in a week to assess the patient's asthma, implying the possibility of needing another inhaler if the condition worsens.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

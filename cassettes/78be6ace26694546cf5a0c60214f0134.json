@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":10,\"why\":\"Utterance 15 states 'It's on the left side at the back, sort of here.'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":15,\"why\":\"Utterance 15 states 'It's on the left side at the back, sort of here.'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":21,\"why\":\"Patient denies any of the symptoms listed.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":41,\"why\":\"Patient states 'Not really.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":41,\"why\":\"Patient states 'Not really.'\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No information about past headaches is provided in the transcript.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":69,\"why\":\"Patient states 'My partner.'\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"Patient rates the headache as 8 out of 10.\"},{\"i\":8,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"Doctor advises taking naproxen instead of ibuprofen.\"},{\"i\":9,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Doctor advises contacting the doctor if the pain is getting worse or new symptoms appear.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

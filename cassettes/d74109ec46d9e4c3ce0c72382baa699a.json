@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient explicitly states 'Ohh no' when asked about medication allergies, and later confirms 'No, I'm not allergic to anything'. There is no mention of 'nil' allergies.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

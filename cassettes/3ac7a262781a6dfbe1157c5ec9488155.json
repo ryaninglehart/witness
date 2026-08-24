@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":21,\"why\":\"Patient states 'can't move it'\"},{\"i\":1,\"v\":\"INFERRED\",\"u\":34,\"why\":\"Patient mentions 'tingling on the left side of my face'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Patient lists 'type two diabetes and, uh, high blood pressure'\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient lists 'Metformin losartan and Amlodipine'\"},{\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of NKDA in the transcript\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of alcohol consumption in units per week\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

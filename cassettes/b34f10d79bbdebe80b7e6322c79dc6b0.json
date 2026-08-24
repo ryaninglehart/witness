@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Utterance 60 states 'Yeah, definitely sort of tired and, um, yeah, less energy, sort of probably less than I, I would normally be.'\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":72,\"why\":\"Utterance 72 states 'Uh, yeah, sort of aching shoulders, back, the hips, knees, but sort of, yeah. Not [UNIN/], which implies no other rashes.'\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":73,\"why\":\"Utterance 73 states 'No, [UNIN/].'\"},\n    {\"i\":15,\"v\":\"SUPPORTED\",\"u\":74,\"why\":\"Utterance 74 states 'No, [UNIN/].'\"},\n    {\"i\":16,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"There is no mention of night sweats in the transcript.\"},\n    {\"i\":17,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"There is no mention of alcohol consumption in the transcript.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

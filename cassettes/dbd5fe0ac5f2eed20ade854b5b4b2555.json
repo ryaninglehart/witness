@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":21,\"why\":\"Patient stated 'feel no pain but just, uh, can't move it'.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":36,\"why\":\"Patient stated 'since I woke up. Um, since I started to feel the , since, since the the arm really it stopped moving, so an hour ago.'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient listed 'Metformin losartan and Amlodipine'.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"Patient stated 'only penicillin, I believe'.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"Patient stated 'Not really.' and 'Uh, yes.' regarding living alone and smoking history. Patient also mentioned 'I will have a few drinks over the weekend. Um, maybe a, a couple more during the week.' regarding alcohol intake.\"},{\"i\":5,\"v\":\"INFERRED\",\"u\":85,\"why\":\"Patient's symptoms of arm paralysis and facial tingling, along with the doctor's concern about stroke, suggest a possible ischemic stroke (CVA).\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

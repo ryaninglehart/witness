@@ -1,0 +1,5 @@
+{
+  "text": "```json\n{\n  \"verdicts\": [\n    {\"i\": 0, \"v\": \"UNSUPPORTED\", \"u\": null, \"why\": \"No mention of management decisions or NHS advice in the transcript.\"},\n    {\"i\": 1, \"v\": \"SUPPORTED\", \"u\": 28, \"why\": \"Patient explicitly states 'no my left ear'.\"},\n    {\"i\": 2, \"v\": \"SUPPORTED\", \"u\": 30, \"why\": \"Patient does not mention any discharge.\"},\n    {\"i\": 3, \"v\": \"SUPPORTED\", \"u\": 33, \"why\": \"Patient does not mention any fever.\"},\n    {\"i\": 4, \"v\": \"SUPPORTED\", \"u\": 35, \"why\": \"Patient explicitly states 'nah I'll do it' which implies not itchy.\"},\n    {\"i\": 5, \"v\": \"SUPPORTED\", \"u\": 49, \"why\": \"Patient explicitly states 'No' to chest pain and palpitations.\"}\n  ]\n}\n```",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

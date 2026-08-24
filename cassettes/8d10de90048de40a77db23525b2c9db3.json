@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":15,\"why\":\"Patient mentions difficulty breathing since being stung by a wasp.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":22,\"why\":\"Patient denies swelling of lips.\"},\n    {\"i\":2,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions tingling in lips, not throat.\"},\n    {\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of sweating in the transcript.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":26,\"why\":\"Patient mentions a bit of tightness in chest.\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"Patient states no significant past medical or surgical history.\"},\n    {\"i\":6,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"Patient mentions being allergic to penicillin.\"},\n    {\"i\":7,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of regular medication in the transcript.\"},\n    {\"i\":8,\"v\":\"SUPPORTED\",\"u\":35,\"why\":\"Patient mentions blotching, which is consistent with sinusitis.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

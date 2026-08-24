@@ -1,0 +1,5 @@
+{
+  "text": "Here are the key claims extracted from the dialogue:\n\n0. The patient has a 5-7 year history of generally feeling unwell, accompanied by cough and cold symptoms.\n1. The main symptom is a dry cough.\n2. The patient does not experience chest pain.\n3. The patient feels hot and cold, and is sweating.\n4. There are no reported fevers.\n5. The patient has a sore throat and blocked ears.\n6. There is no nausea or vomiting.\n7. There are no bowel symptoms.\n8. The patient has a past medical history of obesity and diabetes.\n9. The patient is currently taking metformin, lisinopril, and aspirin.\n10. The patient denies any known drug allergies.\n11. The patient's social history includes living with his wife, working in a factory or manufacturing setting, and consuming alcohol socially, as well as using a vaping device to reduce smoking.",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

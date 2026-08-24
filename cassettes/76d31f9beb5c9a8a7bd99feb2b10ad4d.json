@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":23,\"why\":\"Patient explicitly states it is itchy and dry.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"Patient denies having any temperature, joint pains, or fever.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":38,\"why\":\"Patient mentions a history of eczema.\"},\n    {\"i\":3,\"v\":\"INFERRED\",\"u\":83,\"why\":\"Patient's response suggests they do not use inhalers regularly, which is a common asthma medication.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient explicitly states 'I, I have asthma, and, uh, in my family, uh, there's hypothyroidism and migraine. My mother has migraine.'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

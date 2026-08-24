@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":16,\"why\":\"Patient mentions that the wheezing started after cleaning the house and thinks it might be due to an allergy to dust.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":30,\"why\":\"Patient reports feeling short of breath and finding it hard to talk.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"Patient explicitly states that she does not experience pain.\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":39,\"why\":\"Patient explicitly states that she does not experience dizziness.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"Patient mentions a history of asthma as a child and hay fever in the summer.\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":40,\"why\":\"Patient states she is 'fit and well' with no other medical problems, which is a common shorthand for NKDA (No Known Drug Allergy).\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

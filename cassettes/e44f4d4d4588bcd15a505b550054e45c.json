@@ -1,0 +1,5 @@
+{
+  "text": "Based on the dialogue, here are the claims that can be extracted:\n\n12. **Medications**: The patient is currently taking Lisinopril, and the doctor confirms that there are no issues with this medication. The patient also mentions taking a small amount of aspirin occasionally, but no other medications are explicitly mentioned.\n\n13. **Allergies**: The patient states, \"Uh, not that I'm, not that I'm aware of. You know, I mean, what, what are the, what are the allergies you get? Just, you know, nah, not.\" This indicates that the patient does not have any known allergies. Therefore, the claim \"Allergies: NKDA\" (No Known Drug Allergies) is accurate.\n\nSo, the extracted claims are:\n\n12. Medications: Lisinopril, Aspirin (occasional use)\n13. Allergies: NKDA",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

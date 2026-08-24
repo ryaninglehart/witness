@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported feeling short of breath while watching TV just an hour ago, not last night.\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported a cough the day before, which contradicts this claim.\"},{\"i\":2,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient's symptoms are described as coming on quickly and not worsening.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":52,\"why\":\"The patient explicitly states that the shortness of breath does not cause chest pain.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":28,\"why\":\"The patient mentions having a C-section a few weeks ago.\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions taking Codeine regularly, but does not specify the frequency.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"The patient admits to not knowing the effects of Ibuprofen, confirming the allergy.\"}]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

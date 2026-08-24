@@ -1,0 +1,5 @@
+{
+  "text": "Based on the conversation, the claims can be summarized as follows:\n\n0. Shortness of breath: The patient mentions feeling slightly short of breath.\n1. Sore throat: The patient mentions a sore throat.\n2. Dry cough: The patient describes a dry cough.\n3. Slight chest pain: The patient does not mention any chest pain.\n4. Feverish at first, hot and cold: The patient mentions being a little bit feverish at first, with hot and cold sensations.\n5. Headaches come and go: The patient mentions having headaches that come and go.\n6. No significant weight loss: The patient mentions not having significant weight loss, but has been losing their appetite.\n7. No rashes: The patient mentions not having any rashes.\n8. No neck lumps: The patient does not mention any lumps or bumps around the neck.\n9. PMH: nil - The patient mentions no significant past medical history.\n10. DH: nil - The patient mentions no significant family history.\n11. Allergic to peanuts: The patient mentions being allergic to peanuts.",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "```json\n{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient explicitly states that she has not taken any medications, but the note does not state that she has taken nil medications.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":78,\"why\":\"The patient explicitly states 'No, no.' when asked about weakness in arms or legs.\"}]}\n```",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

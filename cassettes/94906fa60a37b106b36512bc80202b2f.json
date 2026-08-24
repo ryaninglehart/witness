@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":76,\"why\":\"Patient stated 'my height is five foot five, and my weight is sixty five kilograms'.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":80,\"why\":\"Patient stated 'Yes, the odd cherry.'\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":94,\"why\":\"Patient stated 'I sometimes suffer from some, like, hay fever. But, um, but it's not bad <INAUDIBLE_SPEECH/>'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

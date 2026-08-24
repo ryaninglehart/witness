@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentioned drinking more than usual but also eating less than usual, which suggests a change in appetite but not necessarily normal.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":78,\"why\":\"The patient explicitly stated 'Um no, no.' when asked about rashes.\"},\n    {\"i\":14,\"v\":\"UNSUPPORTED\",\"u\":80,\"why\":\"The patient reported muscle pain and aches, which contradicts the claim of no muscle or joint pain.\"},\n    {\"i\":15,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"The patient stated 'Um, so otherwise that, uh, I'm I'm fine. There's um, there isn't anything that I'm taking or, I'm being treated for.'\"},\n    {\"i\":16,\"v\":\"SUPPORTED\",\"u\":103,\"why\":\"The patient explicitly stated 'I'm an, I'm an accountant.'\"},\n    {\"i\":17,\"v\":\"SUPPORTED\",\"u\":99,\"why\":\"The patient stated 'Ohh um, I live alone.'\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

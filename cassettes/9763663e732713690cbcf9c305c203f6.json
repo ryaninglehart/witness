@@ -1,0 +1,5 @@
+{
+  "text": "12. The doctor mentioned that after the patient receives a text message with the appointment details, they should book in for another appointment. This is implied in the doctor's statement: \"And when you get the result, you will receive a text message through your phone to tell you to book an appointment. If you're feeling poorly, don't wait for that. Just get in touch with us again, yeah?\"\n\n13. The doctor provided safety netting advice, instructing the patient to contact them urgently if they experience new symptoms such as chest pain with palpitations or changes in bowel habits. This is evident in the doctor's statement: \"If you have any chest pains, or change in bowel habits, do get in touch with us.\"",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

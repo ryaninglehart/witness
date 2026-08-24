@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":12,\"why\":\"Patient stated 'headache started uh, first. And then sort of yeah, fever sort of came along a bit afterwards.'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":25,\"why\":\"Patient explicitly stated 'No, no I haven't been sick.'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":27,\"why\":\"Patient explicitly stated 'Uh, no. No cough.'\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":31,\"why\":\"Patient stated 'Um, no it's, it seems to be OK. It, it's fine.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":35,\"why\":\"Patient stated 'Um just, I, I suppose general aching, body aching.'\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":60,\"why\":\"Patient described a rash, which contradicts the claim.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":40,\"why\":\"Patient stated 'Uh no, um general medical history is fine.'\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":48,\"why\":\"Patient stated 'Yep.'\"},{\"i\":8,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"Patient stated 'Uh, no. Um'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

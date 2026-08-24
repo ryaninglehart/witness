@@ -1,0 +1,5 @@
+{
+  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":23,\"why\":\"Patient reported coughing yesterday.\"},\n    {\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of fever, chills, or positional symptoms in the transcript.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":53,\"why\":\"Patient explicitly stated no chest pain and no pain on inspiration.\"},\n    {\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of blood thinners in the transcript.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":64,\"why\":\"Patient explicitly stated no other medical problems.\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"Patient mentioned being allergic to Ibuprofen.\"},\n    {\"i\":6,\"v\":\"SUPPORTED\",\"u\":91,\"why\":\"Doctor explicitly stated the plan for further examination and investigation in the acute setting.\"}\n]",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

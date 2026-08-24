@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported an appetite loss worse than normal.\"},{\"i\":13,\"v\":\"CONTRADICTED\",\"u\":31,\"why\":\"The patient reported vomiting once.\"},{\"i\":14,\"v\":\"CONTRADICTED\",\"u\":55,\"why\":\"The patient mentioned having asthma and a father with hypertension.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"The patient explicitly stated that his father had hypertension and died of bowel cancer ten years ago.\"},{\"i\":16,\"v\":\"UNSUPPORTED\",\"u\":75,\"why\":\"The patient mentioned using Lexapro, not Salbutamol.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

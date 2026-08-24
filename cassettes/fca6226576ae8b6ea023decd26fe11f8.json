@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"patient explicitly states 'no, no, nothing sore. I mean, depends what, like, normal stuff like cold, flu.'\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"patient states 'amoxycillin' as an allergy\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"patient states 'with my parents'\"},{\"i\":15,\"v\":\"INFERRED\",\"u\":85,\"why\":\"patient states 'Four times per week' which is regular\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

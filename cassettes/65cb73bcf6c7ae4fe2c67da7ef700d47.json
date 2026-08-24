@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No specific advice to start regular ibuprofen was given.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":96,\"why\":\"Doctor suggested taking anti-inflammatories, which could include ibuprofen, and a review if the headache persists.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

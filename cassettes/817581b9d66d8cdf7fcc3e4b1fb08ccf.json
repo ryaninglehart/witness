@@ -1,0 +1,5 @@
+{
+  "text": "```json\n{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not mention any neck stiffness, fever, or rash during the consultation.\"},{\"i\":13,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not mention any neck stiffness, fever, or rash during the consultation.\"}]}\n```",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "```json\n{\n  \"verdicts\": [\n    {\"claim\": 0, \"verdict\": \"true\"},\n    {\"claim\": 1, \"verdict\": \"true\"},\n    {\"claim\": 2, \"verdict\": \"true\"},\n    {\"claim\": 3, \"verdict\": \"true\"},\n    {\"claim\": 4, \"verdict\": \"true\"},\n    {\"claim\": 5, \"verdict\": \"true\"},\n    {\"claim\": 6, \"verdict\": \"true\"},\n    {\"claim\": 7, \"verdict\": \"true\"},\n    {\"claim\": 8, \"verdict\": \"true\"},\n    {\"claim\": 9, \"verdict\": \"true\"},\n    {\"claim\": 10, \"verdict\": \"true\"},\n    {\"claim\": 11, \"verdict\": \"true\"}\n  ]\n}\n```",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}
