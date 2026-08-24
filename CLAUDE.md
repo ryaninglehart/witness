@@ -122,6 +122,12 @@ the evaluation twice and diffs it. **WIT-011**
 **Never claim something works without having run it.** Not "this should pass" —
 run it, paste the output.
 
+**A cache key must cover every input that changes the output**, settings
+included. A replayed answer to a different question is silent, fast, and
+agrees with what you expected. When an experiment changes a request, check the
+cache can tell the difference before trusting a run that finishes early.
+**WIT-020**
+
 **Never skip a test file wholesale for an optional dependency.**
 `pytest.importorskip` at module scope makes every test in the file conditional
 on something only a few of them need. The WIT-012 injection guards were skipped

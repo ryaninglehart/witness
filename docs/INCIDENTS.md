@@ -873,3 +873,46 @@ reachable without the optional dependency, so this cannot silently regress.
 the *whole file* conditional on a dependency that usually only a few tests need.
 Put it in the fixture. And when a test count changes, find the commit that
 changed it before believing the story you told yourself about why.
+
+---
+
+## WIT-020 — The cache ignored the setting the experiment was about
+
+**Not a defect that shipped.** Found while making the change it would have
+silently defeated, and recorded because the near-miss is the instructive part.
+
+**The situation.** 29% of batches failed because the model abandoned the
+requested output format and wrote prose. The fix is server-side constrained
+decoding: Ollama's `format: "json"` restricts generation to syntactically valid
+JSON, so the failure becomes impossible rather than merely discouraged.
+
+**What would have happened.** `_cassette_key` hashed provider, model, system
+prompt and user prompt. Constrained decoding changes none of those — same
+model, same prompts, different request. So every call would have hit a cassette
+recorded *before* the change, replayed an unconstrained response, and the run
+would have reported an unchanged 29% failure rate in a few seconds.
+
+The conclusion available from that run — "constrained decoding makes no
+difference" — is both false and exactly what a tired person expects a
+too-fast run to be telling them. Replay is the feature that makes this project
+reproducible; here it was one commit away from making it confidently wrong.
+
+**What changed.** The key covers a `request_fingerprint()` from the provider —
+the request parameters that change the answer, which for Ollama is whether
+output was constrained. Turning it on now invalidates the old recordings, which
+is correct: they are answers to a different question.
+
+`test_the_cassette_key_covers_the_request_not_just_the_prompt` pins it.
+
+**Also added, because constrained decoding is not sufficient.** `format: "json"`
+constrains syntax, not shape: a model can emit valid JSON that contains no
+verdicts. So a batch yielding nothing is retried once with a blunter
+instruction, and both the retry rate and the rescue count are reported. A retry
+that never succeeds is a slower failure and must not be smoothed out of the
+unreadable rate — the tests pin that too.
+
+**The generalisation.** A cache key must cover every input that changes the
+output, and "input" includes the settings, not just the payload. The failure
+mode is silent, fast, and agrees with whatever you were expecting — which makes
+it worse than a crash. Whenever an experiment changes a request, check that the
+cache can tell the difference before trusting a run that finishes early.

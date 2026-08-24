@@ -335,3 +335,72 @@ def test_unreadable_output_is_counted_not_just_absorbed():
     assert g.batches == 2
     assert g.unparsed_batches == 1
     assert g.unparsed_rate == 0.5
+
+
+# -- constrained decoding and retries (WIT-020) ----------------------------
+
+
+class _Recording(ScriptedProvider):
+    name = "ollama"
+    model = "qwen2.5:7b-instruct"
+
+    def request_fingerprint(self) -> str:
+        return "json"
+
+
+def test_a_retry_rescues_an_unreadable_first_attempt():
+    provider = _Recording("Based on the dialogue, the claims are as follows...",
+                          _verdicts({"i": 0, "v": "SUPPORTED", "u": 1}))
+    g = SemanticGrader(provider)
+    out = g.ground_note("c1", "m", [_assertion(0, "cough")], UTTERANCES)
+    assert out.assertions[0].verdict is Verdict.SUPPORTED
+    assert (g.retried_batches, g.rescued_batches, g.unparsed_batches) == (1, 1, 0)
+
+
+def test_the_retry_says_something_different():
+    # Restating the same format spec politely is not a retry strategy; the
+    # first attempt already carried it and the model ignored it.
+    provider = _Recording("prose", _verdicts({"i": 0, "v": "SUPPORTED", "u": 1}))
+    SemanticGrader(provider).ground_note("c1", "m", [_assertion(0, "x")], UTTERANCES)
+    assert len(provider.calls) == 2
+    assert provider.calls[1] != provider.calls[0]
+    assert "Begin with [" in provider.calls[1]
+
+
+def test_a_hopeless_batch_is_still_counted_as_unreadable():
+    # A retry that never succeeds is a slower failure, and must not be
+    # smoothed out of the reported rate.
+    provider = _Recording("prose", "more prose")
+    g = SemanticGrader(provider)
+    g.ground_note("c1", "m", [_assertion(0, "x")], UTTERANCES)
+    assert g.unparsed_batches == 1
+    assert g.retry_rate == 1.0
+    assert g.rescued_batches == 0
+
+
+def test_retries_can_be_disabled():
+    provider = _Recording("prose", _verdicts({"i": 0, "v": "SUPPORTED", "u": 1}))
+    g = SemanticGrader(provider, retries=0)
+    g.ground_note("c1", "m", [_assertion(0, "x")], UTTERANCES)
+    assert len(provider.calls) == 1
+    assert g.unparsed_batches == 1
+
+
+def test_the_cassette_key_covers_the_request_not_just_the_prompt():
+    """WIT-020. Turning constrained decoding on must not replay the
+    unconstrained recordings and report that nothing changed."""
+    from witness.providers import OllamaProvider, _cassette_key
+
+    on, off = OllamaProvider(), OllamaProvider(constrain_json=False)
+    assert on.request_fingerprint() != off.request_fingerprint()
+    same_prompt = ("ollama", "m", "sys", "user")
+    assert _cassette_key(*same_prompt, on.request_fingerprint()) != _cassette_key(
+        *same_prompt, off.request_fingerprint()
+    )
+
+
+def test_constrained_decoding_is_on_by_default_and_can_be_turned_off():
+    from witness.providers import OllamaProvider
+
+    assert OllamaProvider().constrain_json is True
+    assert OllamaProvider(constrain_json=False).constrain_json is False

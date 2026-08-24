@@ -83,8 +83,23 @@ GRADER_VERSION = "semantic/1.0"
 class SemanticGrader:
     """Ground assertions with a language model, span required."""
 
-    def __init__(self, provider: Provider, batch_size: int = 12):
+    #: Appended to the prompt on a retry. Deliberately blunt: the first
+    #: attempt already carried a full format specification and the model
+    #: ignored it, so restating the same thing politely is not a retry
+    #: strategy.
+    RETRY_NUDGE = (
+        "\n\nYour previous reply could not be read. Reply with the JSON array "
+        "only. No preamble, no explanation, no prose. Begin with [ and end "
+        "with ]."
+    )
+
+    def __init__(self, provider: Provider, batch_size: int = 12, retries: int = 1):
         self.provider = provider
+        #: Extra attempts when a response yields no verdict at all. One is
+        #: enough to be worth having and few enough not to hide a provider
+        #: that is simply broken -- and every attempt is still counted, so a
+        #: high retry rate stays visible instead of being smoothed away.
+        self.retries = retries
         #: Batches sent, and batches whose response yielded no verdict at all.
         #: Counted because the alternative is what happened in WIT-016: 74% of
         #: responses were discarded by the parser, every claim in them became
@@ -94,6 +109,11 @@ class SemanticGrader:
         #: blocked.
         self.batches = 0
         self.unparsed_batches = 0
+        #: Batches that needed a retry, and batches the retry rescued. Both
+        #: printed, because "we retry on failure" is a claim about how often
+        #: it works, and a retry that never succeeds is just a slower failure.
+        self.retried_batches = 0
+        self.rescued_batches = 0
         #: Notes with at least one unparsed batch, as (consultation_id,
         #: model_id). A note is contaminated by a single failed batch: every
         #: claim in it was refused, which drags the note's grounding down and
@@ -111,8 +131,13 @@ class SemanticGrader:
 
     @property
     def unparsed_rate(self) -> float:
-        """Share of batches the parser could make nothing of."""
+        """Share of batches unreadable after every retry."""
         return self.unparsed_batches / self.batches if self.batches else 0.0
+
+    @property
+    def retry_rate(self) -> float:
+        """Share of batches whose first attempt was unreadable."""
+        return self.retried_batches / self.batches if self.batches else 0.0
 
     def ground_note(
         self,
@@ -140,6 +165,18 @@ class SemanticGrader:
         user = f"TRANSCRIPT\n{transcript}\n\nCLAIMS\n{claims}"
         try:
             out = self.provider.complete(SYSTEM, user, max_tokens=2048)
+            parsed = self._parse(out.text)
+            attempt = 0
+            while not parsed and attempt < self.retries:
+                attempt += 1
+                if attempt == 1:
+                    self.retried_batches += 1
+                out = self.provider.complete(
+                    SYSTEM, user + self.RETRY_NUDGE, max_tokens=2048
+                )
+                parsed = self._parse(out.text)
+                if parsed:
+                    self.rescued_batches += 1
         except ProviderError as exc:
             # A provider failure must not silently become a clean bill of
             # health. Every claim in the batch is returned UNSUPPORTED with the
@@ -151,7 +188,6 @@ class SemanticGrader:
                 for a in batch
             ]
 
-        parsed = self._parse(out.text)
         self.batches += 1
         if not parsed:
             self.unparsed_batches += 1

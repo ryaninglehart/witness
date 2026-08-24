@@ -71,6 +71,11 @@ class GraderResult:
     clean_median_grounded: float = 0.0
     clean_recall: float = 0.0
     clean_precision: float = 0.0
+    #: Batches whose first attempt was unreadable, and the share of those the
+    #: retry rescued. Printed because "we retry on failure" is a claim about
+    #: how often it works.
+    retry_rate: float = 0.0
+    rescued_batches: int = 0
 
 
 @dataclass
@@ -146,6 +151,12 @@ class SemanticReport:
                     f"  {r.name}: {r.live_calls} live call(s), "
                     f"{r.replayed_calls} replayed, {r.seconds:.0f}s",
                 ]
+                if r.retry_rate:
+                    lines.append(
+                        f"  first attempt unreadable on {r.retry_rate:.0%} of batches; "
+                        f"the retry rescued {r.rescued_batches}, leaving "
+                        f"{r.unparsed_rate:.0%} unreadable."
+                    )
         lines += [
             "",
             "  'grounded' is the median share of a clinician-written note the",
@@ -376,6 +387,16 @@ def evaluate(
                     if isinstance(grader_obj, SemanticGrader)
                     else 0.0
                 ),
+                retry_rate=(
+                    grader_obj.retry_rate
+                    if isinstance(grader_obj, SemanticGrader)
+                    else 0.0
+                ),
+                rescued_batches=(
+                    grader_obj.rescued_batches
+                    if isinstance(grader_obj, SemanticGrader)
+                    else 0
+                ),
                 clean_notes=len(clean_ids),
                 clean_median_grounded=clean_g,
                 clean_recall=cm.recall,
@@ -405,19 +426,13 @@ def write_report(report: SemanticReport, path: Path) -> Path:
 #: `make crossval`. Replay makes this free: the 148 recorded responses ship
 #: with the repository, so a reviewer re-derives every number here without a
 #: model, a key or a network.
-#: Re-measured on the fixed segmentation (WIT-018), 137 fresh calls. The
-#: withdrawn figures were 38 notes / 82.1% grounded / 69.2% recall; grounding
-#: landed close, recall came in **12 points lower**. The dropped claims had
-#: been inflating it, which is worth remembering the next time a defect looks
-#: like it can only push one way.
-PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {
-    "clean_notes": (37.0, 0.0),
-    "semantic_clean_grounded": (0.833, 0.02),
-    "semantic_clean_recall": (0.571, 0.03),
-    "lexical_clean_grounded": (0.429, 0.02),
-    "lexical_clean_recall": (0.397, 0.03),
-    "semantic_unparsed_rate": (0.293, 0.03),
-}
+#: Empty pending the constrained-decoding run. The previous figures -- 37
+#: notes, 83.3% grounded, 57.1% recall, 29% unreadable -- were measured with
+#: unconstrained decoding. Constraining it changes the request, which changes
+#: the cassette key (WIT-020), so those recordings no longer apply and the
+#: figures cannot be replayed. Refill from the live run and restore the README
+#: section in the same commit.
+PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {}
 
 
 def check_published(report: SemanticReport) -> list[str]:

@@ -58,10 +58,25 @@ class Provider(Protocol):
 
     def available(self) -> bool: ...
 
+    def request_fingerprint(self) -> str:
+        """Request settings, other than the prompt, that change the response."""
+        ...
 
-def _cassette_key(provider: str, model: str, system: str, user: str) -> str:
-    h = hashlib.sha256(f"{provider}\x00{model}\x00{system}\x00{user}".encode()).hexdigest()
-    return h[:32]
+
+def _cassette_key(
+    provider: str, model: str, system: str, user: str, fingerprint: str = ""
+) -> str:
+    """Identify a recorded response by the whole request, not just the prompt.
+
+    ``fingerprint`` carries the request parameters that change the answer --
+    for Ollama, whether output was constrained to JSON. Without it the key was
+    the prompt alone, so turning constrained decoding *on* would have replayed
+    the unconstrained responses recorded before it and reported that the
+    change made no difference. A cache that ignores an input is not a cache,
+    it is a way to measure the wrong thing quickly. See WIT-020.
+    """
+    parts = f"{provider}\x00{model}\x00{system}\x00{user}\x00{fingerprint}"
+    return hashlib.sha256(parts.encode()).hexdigest()[:32]
 
 
 class Cassette:
@@ -103,8 +118,21 @@ class OllamaProvider:
     #: already have pulled instead of downloading another several gigabytes.
     DEFAULT_MODEL = "qwen2.5:7b-instruct"
 
-    def __init__(self, model: str | None = None, host: str | None = None):
+    def __init__(
+        self,
+        model: str | None = None,
+        host: str | None = None,
+        constrain_json: bool | None = None,
+    ):
         self.model = model or os.environ.get("OLLAMA_MODEL") or self.DEFAULT_MODEL
+        #: Ask the server to constrain decoding to valid JSON. Left on by
+        #: default because the alternative is measured: unconstrained, this
+        #: model abandoned the requested format on 29% of batches and wrote
+        #: prose instead, and every claim in those batches was refused.
+        #: Set WITNESS_CONSTRAIN_JSON=0 to reproduce the unconstrained runs.
+        if constrain_json is None:
+            constrain_json = os.environ.get("WITNESS_CONSTRAIN_JSON", "1") != "0"
+        self.constrain_json = constrain_json
         self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
 
     def available(self) -> bool:
@@ -134,9 +162,11 @@ class OllamaProvider:
         except (urllib.error.URLError, OSError, TimeoutError, json.JSONDecodeError):
             return []
 
+    def request_fingerprint(self) -> str:
+        return "json" if self.constrain_json else "free"
+
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
-        payload = json.dumps(
-            {
+        body: dict[str, object] = {
                 "model": self.model,
                 "system": system,
                 "prompt": user,
@@ -145,8 +175,15 @@ class OllamaProvider:
                 # zero makes the same note score differently on reruns, which
                 # would make a release gate non-deterministic.
                 "options": {"temperature": 0.0, "num_predict": max_tokens},
-            }
-        ).encode()
+        }
+        if self.constrain_json:
+            # Server-side grammar-constrained decoding. The model can only
+            # emit syntactically valid JSON, which removes the failure that
+            # cost 29% of batches: abandoning the format and narrating.
+            # It constrains syntax, not shape -- the tolerant parser and the
+            # retry below still carry the rest.
+            body["format"] = "json"
+        payload = json.dumps(body).encode()
         req = urllib.request.Request(
             f"{self.host}/api/generate", data=payload, headers={"Content-Type": "application/json"}
         )
@@ -159,6 +196,9 @@ class OllamaProvider:
 
 class AnthropicProvider:
     name = "anthropic"
+
+    def request_fingerprint(self) -> str:
+        return "free"
 
     def __init__(self, model: str = "claude-sonnet-4-5", api_key: str | None = None):
         self.model = model
@@ -198,6 +238,9 @@ class AnthropicProvider:
 
 class OpenAIProvider:
     name = "openai"
+
+    def request_fingerprint(self) -> str:
+        return "free"
 
     def __init__(self, model: str = "gpt-4o-mini", api_key: str | None = None):
         self.model = model
@@ -248,8 +291,17 @@ class CachedProvider:
     def available(self) -> bool:
         return True  # replay works with no live provider at all
 
+    def request_fingerprint(self) -> str:
+        return self.inner.request_fingerprint()
+
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
-        key = _cassette_key(self.inner.name, self.inner.model, system, user)
+        key = _cassette_key(
+            self.inner.name,
+            self.inner.model,
+            system,
+            user,
+            self.inner.request_fingerprint(),
+        )
         hit = self.cassette.get(key)
         if hit is not None:
             return hit
