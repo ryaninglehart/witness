@@ -122,6 +122,16 @@ the evaluation twice and diffs it. **WIT-011**
 **Never claim something works without having run it.** Not "this should pass" —
 run it, paste the output.
 
+**When a constraint removes a failure mode, find where the failure went.**
+It rarely leaves. Forbidding prose produced valid JSON containing no answer,
+and the unreadable rate went up, not down. The replacement failure is normally
+quieter than the one removed, which is exactly why the constraint feels like it
+worked. **WIT-021**
+
+**Read a long run while it runs.** The intermediate state is on disk and costs
+nothing to sample. WIT-021 was visible in 120 stored responses 45 minutes
+before the summary would have shown it. **WIT-021**
+
 **A cache key must cover every input that changes the output**, settings
 included. A replayed answer to a different question is silent, fast, and
 agrees with what you expected. When an experiment changes a request, check the

@@ -916,3 +916,55 @@ output, and "input" includes the settings, not just the payload. The failure
 mode is silent, fast, and agrees with whatever you were expecting — which makes
 it worse than a crash. Whenever an experiment changes a request, check that the
 cache can tell the difference before trusting a run that finishes early.
+
+---
+
+## WIT-021 — Constraining the syntax made the failure worse
+
+**What happened.** The model abandoned the required output format on 29% of
+batches and wrote prose. The fix looked obvious: Ollama's `format: "json"`
+constrains decoding so only syntactically valid JSON can be generated. Prose
+becomes impossible.
+
+It worked, and the result got worse.
+
+Sampling 120 responses from the live run while it was still going: **120 of 120
+parsed as valid JSON.** The prose failure was eliminated completely. And **48%
+of them contained no verdict** — up from 29%. The dominant shape was:
+
+```
+{"claims":[0,1,2,3,4,5,6,7,8,9,10,11]}
+{  }
+```
+
+Valid JSON. Correct syntax. It lists the claim numbers it was asked to grade
+and grades none of them.
+
+**What that means.** Removing the model's ability to ramble did not give it the
+ability to comply. When a 7B model cannot do the task, prose is how the failure
+used to surface; under a syntax constraint the same failure surfaces as
+well-formed emptiness. The constraint moved the failure somewhere harder to
+notice — a response that *looks* like a valid answer to anything that only
+checks it parses.
+
+`format: "json"` constrains syntax. The requirement was structure. Those are
+not the same thing and the difference was worth 19 points.
+
+**What changed.** The provider now sends a JSON schema rather than the string
+`"json"` — the verdict array, with `i` and `v` required and `v` restricted to
+the four verdict names. The server constrains generation to that shape, so
+`{"claims":[...]}` is not reachable. The schema hashes into the request
+fingerprint (WIT-020), so a schema run cannot replay a syntax-only run.
+
+Tests pin the schema's required fields and assert that the exact shapes
+recorded from the failed run still parse to nothing.
+
+**How it was caught.** By sampling the recordings mid-run rather than waiting
+for the summary. The run was projected at 80 minutes; the failure was visible
+in the first 35 from 120 stored responses. A long run is not opaque while it
+executes — the intermediate state is on disk, and reading it costs nothing.
+
+**The generalisation.** When a constraint eliminates a failure mode, check
+where the failure went. It rarely leaves. It usually reappears in whatever form
+the constraint still permits, and the new form is generally quieter than the
+one you removed — that is the whole reason the constraint felt like it worked.

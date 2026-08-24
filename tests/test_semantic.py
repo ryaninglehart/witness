@@ -404,3 +404,37 @@ def test_constrained_decoding_is_on_by_default_and_can_be_turned_off():
 
     assert OllamaProvider().constrain_json is True
     assert OllamaProvider(constrain_json=False).constrain_json is False
+
+
+def test_the_schema_pins_the_shape_not_just_the_syntax():
+    """WIT-021. Constraining to valid JSON alone made things worse: the model
+    stopped writing prose and started writing valid documents containing no
+    answer. The schema removes that option."""
+    from witness.graders.semantic import VERDICT_SCHEMA
+
+    props = VERDICT_SCHEMA["properties"]["verdicts"]["items"]["properties"]
+    assert set(VERDICT_SCHEMA["required"]) == {"verdicts"}
+    assert set(VERDICT_SCHEMA["properties"]["verdicts"]["items"]["required"]) == {"i", "v"}
+    assert set(props["v"]["enum"]) == {
+        "SUPPORTED", "INFERRED", "UNSUPPORTED", "CONTRADICTED",
+    }
+    # The shapes the model actually produced under syntax-only constraint must
+    # not satisfy this schema.
+    assert "claims" not in VERDICT_SCHEMA["properties"]
+
+
+def test_a_schema_run_does_not_replay_a_syntax_only_run():
+    from witness.graders.semantic import VERDICT_SCHEMA
+    from witness.providers import OllamaProvider, _cassette_key
+
+    plain, schema = OllamaProvider(), OllamaProvider(schema=VERDICT_SCHEMA)
+    prompt = ("ollama", "m", "sys", "user")
+    assert _cassette_key(*prompt, plain.request_fingerprint()) != _cassette_key(
+        *prompt, schema.request_fingerprint()
+    )
+
+
+def test_the_shapes_that_defeated_syntax_only_constraint_still_yield_nothing():
+    # Recorded verbatim from the live constrained run.
+    for junk in ('{"claims":[0,1,2,3,4,5,6,7,8,9,10,11]}', "{  }", '{"claims":[12,13]}'):
+        assert SemanticGrader._parse(junk) == [], junk

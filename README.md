@@ -457,7 +457,7 @@ numbers printed as command output that no command produced.
 
 ## Incidents
 
-`docs/INCIDENTS.md` records twenty defects found while building this. Five are
+`docs/INCIDENTS.md` records twenty-one defects found while building this. Five are
 worth reading:
 
 **WIT-001** — a join dropped 19% of the corpus and the run still printed a

@@ -78,6 +78,45 @@ Reply with JSON only, no prose:
 
 GRADER_VERSION = "semantic/1.0"
 
+#: The shape a verdict batch must take, as a JSON schema. Handed to the
+#: provider so the server can constrain generation to this structure rather
+#: than merely to valid JSON.
+#:
+#: Constraining syntax alone was measured and made things worse. Told only to
+#: emit JSON, qwen2.5 stopped writing prose -- 120 of 120 responses parsed as
+#: JSON -- and started emitting valid documents of the wrong shape:
+#: ``{"claims":[0,1,2,3]}``, listing the claim numbers and grading none of
+#: them, or ``{ }``. Unreadable batches went from 29% to 48%. Removing the
+#: model's ability to ramble did not give it the ability to comply. See
+#: WIT-021.
+VERDICT_SCHEMA: dict = {
+    "type": "object",
+    "properties": {
+        "verdicts": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "i": {"type": "integer"},
+                    "v": {
+                        "type": "string",
+                        "enum": [
+                            "SUPPORTED",
+                            "INFERRED",
+                            "UNSUPPORTED",
+                            "CONTRADICTED",
+                        ],
+                    },
+                    "u": {"type": ["integer", "null"]},
+                    "why": {"type": "string"},
+                },
+                "required": ["i", "v"],
+            },
+        }
+    },
+    "required": ["verdicts"],
+}
+
 
 
 class SemanticGrader:

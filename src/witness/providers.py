@@ -123,6 +123,7 @@ class OllamaProvider:
         model: str | None = None,
         host: str | None = None,
         constrain_json: bool | None = None,
+        schema: dict | None = None,
     ):
         self.model = model or os.environ.get("OLLAMA_MODEL") or self.DEFAULT_MODEL
         #: Ask the server to constrain decoding to valid JSON. Left on by
@@ -133,6 +134,11 @@ class OllamaProvider:
         if constrain_json is None:
             constrain_json = os.environ.get("WITNESS_CONSTRAIN_JSON", "1") != "0"
         self.constrain_json = constrain_json
+        #: A JSON schema to constrain the *shape* of the output, not just its
+        #: syntax. Passing ``"json"`` alone was measured and made things worse:
+        #: the model stopped writing prose and started writing valid JSON that
+        #: contained no answer. A schema removes that option too. See WIT-021.
+        self.schema = schema
         self.host = (host or os.environ.get("OLLAMA_HOST") or "http://127.0.0.1:11434").rstrip("/")
 
     def available(self) -> bool:
@@ -163,6 +169,14 @@ class OllamaProvider:
             return []
 
     def request_fingerprint(self) -> str:
+        if self.schema is not None:
+            # Distinct from plain "json": a run under a schema answers a
+            # different question than one merely constrained to valid JSON,
+            # and must not replay its recordings.
+            digest = hashlib.sha256(
+                json.dumps(self.schema, sort_keys=True).encode()
+            ).hexdigest()[:12]
+            return f"schema:{digest}"
         return "json" if self.constrain_json else "free"
 
     def complete(self, system: str, user: str, max_tokens: int = 1024) -> Completion:
@@ -176,7 +190,9 @@ class OllamaProvider:
                 # would make a release gate non-deterministic.
                 "options": {"temperature": 0.0, "num_predict": max_tokens},
         }
-        if self.constrain_json:
+        if self.schema is not None:
+            body["format"] = self.schema
+        elif self.constrain_json:
             # Server-side grammar-constrained decoding. The model can only
             # emit syntactically valid JSON, which removes the failure that
             # cost 29% of batches: abandoning the format and narrating.
@@ -322,7 +338,13 @@ def default_provider(prefer: str | None = None) -> Provider | None:
     can fall back to the lexical grader and say so, instead of the whole run
     dying because a laptop is offline.
     """
-    candidates: list[Provider] = [OllamaProvider(), AnthropicProvider(), OpenAIProvider()]
+    from witness.graders.semantic import VERDICT_SCHEMA
+
+    candidates: list[Provider] = [
+        OllamaProvider(schema=VERDICT_SCHEMA),
+        AnthropicProvider(),
+        OpenAIProvider(),
+    ]
     if prefer:
         candidates.sort(key=lambda p: p.name != prefer)
     for p in candidates:
@@ -330,5 +352,5 @@ def default_provider(prefer: str | None = None) -> Provider | None:
             return CachedProvider(p)
     # Replay-only: if cassettes exist the harness still reproduces its numbers.
     if CASSETTE_DIR.exists() and any(CASSETTE_DIR.glob("*.json")):
-        return CachedProvider(OllamaProvider())
+        return CachedProvider(OllamaProvider(schema=VERDICT_SCHEMA))
     return None
