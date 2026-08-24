@@ -122,6 +122,14 @@ the evaluation twice and diffs it. **WIT-011**
 **Never claim something works without having run it.** Not "this should pass" —
 run it, paste the output.
 
+**Never skip a test file wholesale for an optional dependency.**
+`pytest.importorskip` at module scope makes every test in the file conditional
+on something only a few of them need. The WIT-012 injection guards were skipped
+in CI for two weeks that way. Put the import in the fixture. **WIT-019**
+
+**A test count that moves without a cause is the signal.** Find the commit that
+changed it before accepting the explanation you invented for it. **WIT-019**
+
 **Confirm CI actually ran, not that it exists.** The first push landed on
 `master` while `ci.yml` triggered on `main`, so no job fired and GitHub never
 registered the workflow. The repository looked published and healthy while

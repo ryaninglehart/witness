@@ -825,3 +825,51 @@ times without anyone checking that `weak` matches "weakness". And the filter
 protecting a measurement is part of the measurement: WIT-002 added this one to
 stop the harness grading noise, and nothing ever asked what else it was
 stopping. A silent exclusion is a silent result.
+
+---
+
+## WIT-019 — The injection regression tests had never run in CI
+
+**What happened.** A reviewer questioned a commit message claiming "155 tests"
+when the suite reported 145 passed, 1 skipped. The commit touched no test files,
+so the number should not have moved at all.
+
+The count was container-specific. `tests/test_viewer.py` opened with
+
+```python
+playwright = pytest.importorskip("playwright.sync_api")
+```
+
+at module scope. On a machine with Playwright installed, 10 tests run. On one
+without — which includes CI, which never installs it — `importorskip` skips the
+**entire module**, reported as a single skip.
+
+Seven of those ten need no browser. They are the byte-level regression guard for
+**WIT-012**, the script-injection vulnerability: that a `</script>` in a
+transcript cannot escape the payload, that the escaping round-trips, that the
+page reaches no external host. Those tests had never executed in CI. The
+security fix had no active protection anywhere except one laptop, and every
+gate stayed green the whole time.
+
+**Why it survived.** The skip is silent by design and reports as one line. And I
+read the "155 tests" figure as confirmation rather than as an anomaly, because
+it was a bigger number than last time. A count that moves without a cause is
+exactly the signal worth chasing; I supplied the cause myself — "must be the new
+tests" — without checking that the commit contained any.
+
+The same shape as WIT-006 and as the `master`/`main` branch trap during
+publication: **a check that does not run is indistinguishable from one that
+passes.** Third time in this project, third location, each found by someone
+else.
+
+**What changed.** The import moved inside the `browser` fixture, so it skips
+those three tests and nothing else. On a machine without Playwright the suite
+now reports 153 passed, 3 skipped, against 145 passed and 1 skipped before —
+eight tests recovered, including every WIT-012 guard.
+`test_the_injection_guards_run_without_a_browser` asserts the byte-level path is
+reachable without the optional dependency, so this cannot silently regress.
+
+**The generalisation.** `importorskip` at module scope is a loaded gun: it makes
+the *whole file* conditional on a dependency that usually only a few tests need.
+Put it in the fixture. And when a test count changes, find the commit that
+changed it before believing the story you told yourself about why.

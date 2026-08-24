@@ -105,20 +105,42 @@ def test_assertion_slots_render_without_a_grounding_span():
 
 import pytest  # noqa: E402
 
-playwright = pytest.importorskip("playwright.sync_api", reason="browser check is optional")
-
 
 @pytest.fixture(scope="module")
 def browser():
+    """A real browser, or a skip -- of these three tests only.
+
+    The import used to sit at module scope via ``importorskip``, which skipped
+    the *entire file* on any machine without Playwright. That included the
+    seven byte-level tests above, which need no browser and are the regression
+    guard for WIT-012 -- the injection vulnerability. CI does not install
+    Playwright, so those tests had never run there: the security fix had no
+    active protection anywhere, and every gate stayed green. A check that does
+    not run is indistinguishable from one that passes. See WIT-019.
+    """
     import os
 
+    sync_api = pytest.importorskip("playwright.sync_api", reason="browser check is optional")
     exe = os.environ.get("CHROMIUM_PATH", "/opt/pw-browsers/chromium")
     if not os.path.exists(exe):
         pytest.skip("no chromium available")
-    with playwright.sync_playwright() as p:
+    with sync_api.sync_playwright() as p:
         b = p.chromium.launch(executable_path=exe)
         yield b
         b.close()
+
+
+def test_the_injection_guards_run_without_a_browser():
+    """The byte-level tests in this file must never be optional.
+
+    Their whole purpose is to fail if WIT-012 is reintroduced, and for two
+    weeks they were being skipped wholesale on every machine that lacked an
+    optional dependency, including CI.
+    """
+    import importlib
+
+    assert importlib.util.find_spec("witness.viewer") is not None
+    assert "</script>" not in _embed({"t": HOSTILE})
 
 
 def _render(tmp_path: Path, text: str) -> Path:

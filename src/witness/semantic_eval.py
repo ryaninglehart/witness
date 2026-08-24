@@ -405,17 +405,19 @@ def write_report(report: SemanticReport, path: Path) -> Path:
 #: `make crossval`. Replay makes this free: the 148 recorded responses ship
 #: with the repository, so a reviewer re-derives every number here without a
 #: model, a key or a network.
-#: WITHDRAWN pending re-measurement. The figures that were here -- 38 clean
-#: notes, 82.1% grounded, 69.2% recall -- were produced under a segmentation
-#: defect that silently dropped 143 clinical claims before grading (WIT-018).
-#: Fixing it changes the claims put to the model, which changes the prompts,
-#: which invalidates 137 of the 164 recorded responses. They cannot be
-#: re-derived by replay and are not restated here.
-#:
-#: An empty dict means `make semantic` enforces nothing. That is correct for
-#: now and must not become permanent: refill it from a live run on the fixed
-#: segmentation, and restore the README section at the same time.
-PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {}
+#: Re-measured on the fixed segmentation (WIT-018), 137 fresh calls. The
+#: withdrawn figures were 38 notes / 82.1% grounded / 69.2% recall; grounding
+#: landed close, recall came in **12 points lower**. The dropped claims had
+#: been inflating it, which is worth remembering the next time a defect looks
+#: like it can only push one way.
+PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {
+    "clean_notes": (37.0, 0.0),
+    "semantic_clean_grounded": (0.833, 0.02),
+    "semantic_clean_recall": (0.571, 0.03),
+    "lexical_clean_grounded": (0.429, 0.02),
+    "lexical_clean_recall": (0.397, 0.03),
+    "semantic_unparsed_rate": (0.293, 0.03),
+}
 
 
 def check_published(report: SemanticReport) -> list[str]:

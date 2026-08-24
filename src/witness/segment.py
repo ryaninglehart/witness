@@ -132,9 +132,14 @@ def classify_slot(text: str) -> Slot:
 #: Stems, not words. The trailing ``\b`` this pattern used to carry made every
 #: entry an exact match, so ``weak`` did not match "weakness", ``swell`` did not
 #: match "swelling", and ``abdo`` did not match "abdominal" -- nine of the
-#: thirteen stems never fired on their own inflected forms. Claims carrying
-#: them were dropped before grading, and a dropped claim cannot be ungrounded,
-#: so the omission inflated every grounding figure. See WIT-018.
+#: thirteen stems never fired on their own inflected forms. 143 clinical claims
+#: were dropped before grading, most of them pertinent negatives.
+#:
+#: Restoring them moved lexical grounding *up*, 40.0% to 45.0%. That is the
+#: opposite of what I predicted when I found this -- I reasoned that a dropped
+#: claim cannot be ungrounded, so the defect must have inflated grounding. The
+#: discarded claims turned out to be easier to ground than average, because the
+#: stems identifying them are content words patients say out loud. See WIT-018.
 _CLINICAL_HINT = re.compile(
     r"\b(pain|ache|fever|cough|nausea|vomit|diarrh|blood|stool|urine|rash|"
     r"swell|breath|chest|abdo|head|dizz|weak|tired|lethargic|appetite|sleep|"

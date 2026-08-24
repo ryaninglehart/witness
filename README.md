@@ -15,7 +15,7 @@ cd witness
 python3 -m venv .venv && source .venv/bin/activate   # needs Python 3.11+
 pip install -r requirements.txt
 make corpus      # PriMock57, text only — audio is git-lfs and optional
-make check       # lint, 144 tests, and the eight enforced figures
+make check       # lint, 156 tests, and the enforced figures
 ```
 
 About a minute. No API key, no network egress, no GPU.
@@ -29,12 +29,12 @@ output, because a number can be stable inside one run and drift between two.
 ## The result, in one line
 
 Term matching cannot gate clinical notes — measured twice, two different
-graders, no operating point. A 7B model reading for meaning appeared to break
-that trade by a wide margin, and **that measurement is currently withdrawn**: a
-segmentation defect was found afterwards which dropped 143 clinical claims
-before grading, and fixing it invalidates the recorded model responses the
-figures came from (WIT-018). The offline results below are re-derived on the
-fixed code; the semantic comparison is being re-run.
+graders, no operating point, and coverage always paid for in recall. A 7B model
+reading for meaning escapes that: **+40 points of grounding without the recall
+penalty** the trade charges term matching for a gain that size. It does not
+demonstrably catch *more* errors — that interval touches zero on 37 notes — and
+it abandons its output format on 29% of batches. A result about a grader, not
+yet a shippable component.
 
 The rest of this document is how each of those was established, in the order it
 happened.
@@ -225,37 +225,80 @@ better", but: the failure is a *judgement* about whether two differently-worded
 statements assert the same clinical fact, and no amount of distributional
 similarity makes that judgement. Something has to read them.
 
-## What does work — withdrawn, being re-measured
+## What does work — and what it costs
 
 `make semantic` runs `graders/semantic.py` against `qwen2.5:7b-instruct` over
-Ollama. The first full run — 57 consultations, 148 batches, 47 minutes on a
-laptop — indicated that the semantic grader breaks the trade by a wide margin,
-grounding roughly twice as much of a clinician's note while also catching
-substantially more of what clinicians flagged, with paired bootstrap intervals
-clear of zero.
+Ollama. 57 consultations, 164 batches, 49 minutes on a laptop. The recorded
+responses ship with this repository, so every figure below re-derives in
+seconds with no model, no key and no network:
 
-**Those figures are withdrawn and are not restated here.** A segmentation
-defect found afterwards (WIT-018) dropped 143 clinical claims — many of them
-pertinent negatives, the category this project argues matters most — before
-anything was graded. Fixing it changes the claims put to the model, which
-changes the prompts, which invalidates 137 of the 164 recorded responses. The
-result cannot be re-derived by replay, so it is not published.
+```
+make semantic-replay
+```
 
-It is being re-run on the fixed segmentation. The measurement stands or falls
-on that run; quoting the old number while the code that produced it is known to
-be wrong is the thing this repository exists to object to.
+Scored on the 37 notes where the model held its output format — **all three
+graders rescored on those same 37**, because a clean subset compared against a
+full corpus is a different corpus:
 
-What the first run did establish, and what does not depend on the segmentation:
+| grader | note grounded | recall | precision |
+|---|---|---|---|
+| lexical/1.0 | 42.9% [35.3, 50.0] | 39.7% [25.0, 53.4] | 15.4% |
+| statistical/1.0 | 62.5% | 27.0% | 15.4% |
+| **semantic/1.0 + qwen2.5:7b** | **83.3%** [76.9, 88.9] | 57.1% [42.6, 70.0] | 32.7% |
 
-- The model abandons the required output format on **29% of batches** — 43 of
-  148 responses contain no verdict anywhere, narrating instead of classifying.
-  Not a parsing problem; there is nothing in them to recover.
-- Unreadable batches bias the two headline figures in *opposite* directions —
-  grounding down, detection up — so a contaminated run cannot be corrected by
-  argument. `make semantic` prints it under `NOT A MEASUREMENT` and exits
-  non-zero.
-- Constrained decoding (Ollama's `format: json`) is the obvious untried fix and
-  should land before the re-run is treated as final.
+Paired bootstrap over the same resamples:
+
+```
+grounding, semantic - lexical   +40.5%  [+30.0%, +52.2%]   distinguishable
+recall,    semantic - lexical   +17.5%  [ +0.0%, +36.5%]   NOT distinguishable
+```
+
+**Read those two lines carefully, because they do not say the same thing.**
+
+The grounding gain is large and solid. The recall gain is positive at every
+point estimate and its interval touches zero: on 37 notes this corpus cannot
+establish that the semantic grader catches more errors than term matching.
+
+What it *does* establish is the more interesting claim. Every term-matching
+grader here pays for coverage in recall, monotonically — the radius sweep above
+prices it at roughly a point of recall per point of grounding. The semantic
+grader takes **+40 points of grounding without paying that bill**: recall is
+flat to better, not the ~25-point loss the trade predicts for a gain that size.
+Precision more than doubles.
+
+So: the trade-off that binds term matching does not bind a model reading for
+meaning. That is the finding. "It also catches more errors" is the additional
+claim this corpus is too small to support, and it is not made here.
+
+These figures replace an earlier set that was withdrawn. Under the segmentation
+defect in WIT-018 the same comparison read 82.1% grounding at 69.2% recall.
+Grounding landed close on re-measurement; **recall was 12 points too high**,
+because the dropped claims had been inflating it — and correcting it is what
+moved the recall difference from distinguishable to not.
+
+### The part that is not ready
+
+**The model abandoned its output format on 29% of batches** — unchanged by the
+segmentation fix. Those responses contain no verdict anywhere: it stops
+classifying and starts narrating. The parser handles every recoverable shape;
+there is nothing in these to recover.
+
+That is why the full-corpus row is refused rather than published. An unreadable
+batch refuses every claim in it, pushing grounding **down** and detection
+**up** — the biases point opposite ways, so the contaminated row cannot be
+corrected by argument, only by dropping those notes. `make semantic` prints it
+under `NOT A MEASUREMENT` and exits non-zero.
+
+Three limits on the 37-note result:
+
+- **The subset is not random.** These are the encounters the model stayed on
+  format for. If it drops format on harder consultations, the figures are
+  optimistic.
+- **n=37.** The grounding gain survives it comfortably; the recall gain does
+  not, which is why it is reported as unestablished rather than as a win.
+- **One model, one corpus, one setting.** Constrained decoding (Ollama's
+  `format: json`) is the obvious fix for the 29% and has not been tried. Until
+  it is, this is a result about a grader, not a shippable component.
 
 ## What the lexical grader does achieve
 
@@ -414,7 +457,7 @@ numbers printed as command output that no command produced.
 
 ## Incidents
 
-`docs/INCIDENTS.md` records eighteen defects found while building this. Five are
+`docs/INCIDENTS.md` records nineteen defects found while building this. Five are
 worth reading:
 
 **WIT-001** — a join dropped 19% of the corpus and the run still printed a

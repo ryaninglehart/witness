@@ -125,19 +125,28 @@ stronger argument than the one it replaced.
 
 **"So did the model fix it?"**
 
-It looked that way, and I have withdrawn the number rather than quote it.
+Half of it, decisively — and I want to be precise about which half.
 
-The first run said yes by a wide margin — roughly double the grounding and a
-large recall gain, paired intervals clear of zero. Then I found a segmentation
-defect that had been dropping 143 clinical claims before anything reached the
-grader, most of them pertinent negatives. Fixing it changes the claims put to
-the model, which changes the prompts, which invalidates 137 of the 164 recorded
-responses. The result cannot be reproduced from what I have, so it is not a
-result.
+On the 37 notes where the model held its output format, all three graders
+rescored on those same 37: grounding goes 42.9% → 83.3%, recall 39.7% → 57.1%,
+precision 15.4% → 32.7%. Paired bootstrap: **+40.5% [+30.0, +52.2]** on
+grounding, **+17.5% [+0.0, +36.5]** on recall.
 
-It is being re-run on the fixed code. If you ask me what a semantic grader buys,
-the honest answer today is: the first measurement was encouraging and I do not
-yet stand behind the number.
+The recall interval touches zero. On 37 notes this corpus cannot establish that
+the semantic grader catches more errors, and I do not claim it does.
+
+What it does establish is the more useful thing. Every term-matching grader here
+pays for coverage in recall, monotonically — the radius sweep prices it at about
+a point of recall per point of grounding. The semantic grader takes forty points
+of grounding and does *not* pay that bill. The trade-off that binds term
+matching does not bind a model reading for meaning. That is the finding.
+
+Worth knowing how I got here: the first version of this answer said 82.1% and
+69.2%, and I withdrew it. A segmentation defect had been dropping 143 clinical
+claims — mostly pertinent negatives — before anything was graded, which
+invalidated the recorded responses those figures came from. Re-measured, the
+grounding held and recall came in twelve points lower. Correcting it is exactly
+what moved the recall claim from "distinguishable" to "not".
 
 Both term-matching graders sit on the trade-off curve. The semantic one steps
 off it. That is exactly what the negative result predicted, and the prediction
@@ -263,7 +272,7 @@ Yes, daily, under a maintained `CLAUDE.md` that defines conventions, protects
 test fixtures from modification, and sets release rules. I wrote those rules
 after three releases broke in ways I should have caught.
 
-The verification layer is the engineering contribution. Eighteen incidents in
+The verification layer is the engineering contribution. Nineteen incidents in
 `docs/INCIDENTS.md` are defects that got past me and were caught by a test, a
 gate, or a number that stopped making sense — several of them in code an
 assistant wrote and I approved. WIT-001 is a join that silently dropped 19% of
@@ -296,4 +305,4 @@ printed in the README as command output that no command produced.
 - That the semantic grader beats the baseline. The measurement is withdrawn
   pending a re-run (WIT-018), and it drops its output format on 29% of batches
   regardless.
-- That AI-assisted code needs no review. Eighteen incidents say otherwise.
+- That AI-assisted code needs no review. Nineteen incidents say otherwise.
