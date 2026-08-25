@@ -27,7 +27,8 @@ practising clinicians and catches more than a small minority of injected
 defects. Best usable balance: 39% acceptance at **11%** detection, over 506
 note-level defects spanning eleven types drawn from the error taxonomy the
 corpus evaluators wrote for themselves. At the percentiles where most clinician
-notes get through, it catches essentially nothing.
+notes get through, it catches essentially nothing. A model reading for meaning
+breaks that trade — see below.
 
 If someone reads that as a failed project, the answer is that a harness which
 reported success here would have been wrong, and I would not have known. The
@@ -125,49 +126,57 @@ stronger argument than the one it replaced.
 
 **"So did the model fix it?"**
 
-Half of it, decisively — and I want to be precise about which half.
+Yes, on both counts — and it took three attempts to be able to say that.
 
-On the 37 notes where the model held its output format, all three graders
-rescored on those same 37: grounding goes 42.9% → 83.3%, recall 39.7% → 57.1%,
-precision 15.4% → 32.7%. Paired bootstrap: **+40.5% [+30.0, +52.2]** on
-grounding, **+17.5% [+0.0, +36.5]** on recall.
+On 56 of 57 notes, all three graders scored on the same 56: grounding goes
+44.7% → 79.3%, recall 39.8% → 65.6%. Paired bootstrap: **+34.6% [+21.4, +46.1]**
+on grounding, **+25.8% [+9.3, +41.7]** on recall. Both clear of zero.
 
-The recall interval touches zero. On 37 notes this corpus cannot establish that
-the semantic grader catches more errors, and I do not claim it does.
+Every term-matching grader in the project pays for coverage in recall,
+monotonically — about a point of recall per point of grounding. The semantic
+grader gains thirty-five points of grounding and twenty-six points of recall
+simultaneously. The trade-off that binds term matching does not bind a model
+reading for meaning.
 
-What it does establish is the more useful thing. Every term-matching grader here
-pays for coverage in recall, monotonically — the radius sweep prices it at about
-a point of recall per point of grounding. The semantic grader takes forty points
-of grounding and does *not* pay that bill. The trade-off that binds term
-matching does not bind a model reading for meaning. That is the finding.
-
-Worth knowing how I got here: the first version of this answer said 82.1% and
-69.2%, and I withdrew it. A segmentation defect had been dropping 143 clinical
-claims — mostly pertinent negatives — before anything was graded, which
-invalidated the recorded responses those figures came from. Re-measured, the
-grounding held and recall came in twelve points lower. Correcting it is exactly
-what moved the recall claim from "distinguishable" to "not".
+I want to be clear that I could not say this two days ago, and that the reason
+is interesting. An earlier run gave 83.3% grounding at 57.1% recall on only 37
+notes, and the recall interval touched zero — positive, but not establishable.
+The 20 excluded notes were ones where the model abandoned the output format.
+Fixing that is what took the sample from 37 to 56 and moved recall from
+unproven to proven. The claim did not change because I argued for it; it
+changed because the measurement got better.
 
 Both term-matching graders sit on the trade-off curve. The semantic one steps
 off it. That is exactly what the negative result predicted, and the prediction
 was published before the test was run.
 
-**"Then why isn't it in production?"**
+**"Tell me about the output-format problem."**
 
-Because it dropped the output format on 29% of batches — 43 of 148 responses
-stopped classifying and started narrating, with no verdict anywhere in them.
-Not a parsing problem; there is nothing in those to recover.
+This is the part I would most want to be asked about.
 
-I refuse the full-corpus row rather than publishing it, because an unreadable
-batch refuses every claim in it, which pushes grounding down and detection up.
-The two biases point opposite ways, so that row cannot be corrected by
-argument — only by dropping those notes. The harness prints it under NOT A
-MEASUREMENT and exits non-zero.
+The model kept abandoning the required format and narrating instead — 29% of
+batches, and every claim in those was refused. The obvious fix is Ollama's
+`format: "json"`, which constrains decoding so only valid JSON can be
+generated. Prose becomes impossible.
 
-And the 38-note subset is not random: it is the encounters the model stayed on
-format for. If it drops format on harder consultations, my figures are
-optimistic. I would fix the format compliance with constrained decoding and
-re-run before claiming anything about deployment.
+It worked, and the result got worse. 120 of 120 sampled responses parsed as
+JSON, and unreadable batches went from 29% to **48%**. The model had stopped
+writing prose and started writing `{"claims":[0,1,2,3]}` — valid, well-formed,
+listing the claims it was asked to grade and grading none of them.
+
+Removing its ability to ramble did not give it the ability to comply. It moved
+the failure into a shape that looks like an answer to anything checking only
+that it parses. `format: "json"` constrains syntax; the requirement was
+structure.
+
+Sending an actual JSON schema — verdict array, required fields, verdict names
+as an enum — took it to 6% on first attempt and 1% after one retry.
+
+Two things I would carry to any similar problem. When a constraint removes a
+failure mode, go and find where the failure went; it rarely leaves, and the
+replacement is usually quieter than what you removed. And I caught this by
+sampling the stored responses 35 minutes into an 80-minute run rather than
+waiting for the summary — a long run is not opaque while it executes.
 
 **"You withdrew your headline result. Why should I trust the rest?"**
 
@@ -272,7 +281,7 @@ Yes, daily, under a maintained `CLAUDE.md` that defines conventions, protects
 test fixtures from modification, and sets release rules. I wrote those rules
 after three releases broke in ways I should have caught.
 
-The verification layer is the engineering contribution. Nineteen incidents in
+The verification layer is the engineering contribution. Twenty-one incidents in
 `docs/INCIDENTS.md` are defects that got past me and were caught by a test, a
 gate, or a number that stopped making sense — several of them in code an
 assistant wrote and I approved. WIT-001 is a join that silently dropped 19% of
@@ -283,18 +292,15 @@ printed in the README as command output that no command produced.
 
 ## What I would do next, in order
 
-1. **Fix format compliance and re-run.** Ollama's constrained JSON mode, or
-   retry-on-unparsed. That takes the 38-note result to a 57-note one and is the
-   difference between a finding and a component.
-2. **Calibrate the gate against the semantic grader.** Every operating point
+1. **Calibrate the gate against the semantic grader.** Every operating point
    and sabotage figure in this project comes from the offline graders. What a
    release gate does with a grader this much better is unmeasured, and it is
    the question the whole harness was built to answer.
-3. **An ASR layer.** Grounding is currently measured against perfect human
+2. **An ASR layer.** Grounding is currently measured against perfect human
    transcripts. Whisper's documented tendency to fabricate on disfluent speech
    (Koenecke et al., FAccT 2024) matters most for the sickest patients and is a
    second failure surface entirely.
-4. **More annotators, or a second corpus.** The inter-rater ceiling is doing a
+3. **More annotators, or a second corpus.** The inter-rater ceiling is doing a
    lot of work in the precision story and it deserves to be tested rather than
    relied on.
 
@@ -302,7 +308,7 @@ printed in the README as command output that no command produced.
 
 - That this is production-ready. It is a measurement harness.
 - That the numbers transfer beyond UK primary care.
-- That the semantic grader beats the baseline. The measurement is withdrawn
-  pending a re-run (WIT-018), and it drops its output format on 29% of batches
-  regardless.
-- That AI-assisted code needs no review. Nineteen incidents say otherwise.
+- That the semantic grader is deployable. It beats the baseline on 56 of 57
+  notes with both intervals clear of zero, and that is a result on one corpus
+  with one model — not a shippable safety gate.
+- That AI-assisted code needs no review. Twenty-one incidents say otherwise.

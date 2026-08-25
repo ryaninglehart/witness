@@ -964,7 +964,23 @@ for the summary. The run was projected at 80 minutes; the failure was visible
 in the first 35 from 120 stored responses. A long run is not opaque while it
 executes — the intermediate state is on disk, and reading it costs nothing.
 
+**What the schema did.** First-attempt failures fell from 48% to 6%, and to 1%
+after one retry. Excluded notes fell from 20 of 57 to **1 of 57**, which is what
+finally made the headline comparison answerable: with 56 notes instead of 37,
+the recall difference between the semantic and lexical graders moved from
++17.5% [+0.0, +36.5] — an interval touching zero, and reported as unestablished
+— to +25.8% [+9.3, +41.7]. The claim changed because the measurement improved,
+not because it was argued for.
+
+**And the failure moved a third time, exactly as predicted below.** What
+survives is `{"verdicts": []}` — the schema's own key, correctly typed, holding
+nothing. It satisfies every constraint and grades no claims. At 1% after retry
+it is not worth a fourth constraint; a `minItems` on the array would close it
+and cost another full re-run to measure. It is recorded rather than fixed.
+
 **The generalisation.** When a constraint eliminates a failure mode, check
 where the failure went. It rarely leaves. It usually reappears in whatever form
 the constraint still permits, and the new form is generally quieter than the
 one you removed — that is the whole reason the constraint felt like it worked.
+Three constraints here, three surviving failure shapes, each quieter than the
+last: prose, then well-formed nonsense, then well-formed emptiness.

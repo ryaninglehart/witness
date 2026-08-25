@@ -426,13 +426,17 @@ def write_report(report: SemanticReport, path: Path) -> Path:
 #: `make crossval`. Replay makes this free: the 148 recorded responses ship
 #: with the repository, so a reviewer re-derives every number here without a
 #: model, a key or a network.
-#: Empty pending the constrained-decoding run. The previous figures -- 37
-#: notes, 83.3% grounded, 57.1% recall, 29% unreadable -- were measured with
-#: unconstrained decoding. Constraining it changes the request, which changes
-#: the cassette key (WIT-020), so those recordings no longer apply and the
-#: figures cannot be replayed. Refill from the live run and restore the README
-#: section in the same commit.
-PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {}
+#: Measured under schema-constrained decoding (WIT-021), 174 live calls, 61
+#: minutes. Only one note of 57 is excluded, against 20 under unconstrained
+#: decoding, so the clean subset is now very nearly the whole corpus.
+PUBLISHED_SEMANTIC: dict[str, tuple[float, float]] = {
+    "clean_notes": (56.0, 0.0),
+    "semantic_clean_grounded": (0.793, 0.02),
+    "semantic_clean_recall": (0.656, 0.03),
+    "lexical_clean_grounded": (0.447, 0.02),
+    "lexical_clean_recall": (0.398, 0.03),
+    "semantic_unparsed_rate": (0.011, 0.02),
+}
 
 
 def check_published(report: SemanticReport) -> list[str]:

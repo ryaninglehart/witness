@@ -30,11 +30,11 @@ output, because a number can be stable inside one run and drift between two.
 
 Term matching cannot gate clinical notes — measured twice, two different
 graders, no operating point, and coverage always paid for in recall. A 7B model
-reading for meaning escapes that: **+40 points of grounding without the recall
-penalty** the trade charges term matching for a gain that size. It does not
-demonstrably catch *more* errors — that interval touches zero on 37 notes — and
-it abandons its output format on 29% of batches. A result about a grader, not
-yet a shippable component.
+reading for meaning escapes that entirely: **+34.6 points of grounding and
++25.8 points of recall at the same time**, both intervals clear of zero, on 56
+of 57 notes. Getting there needed the model's output constrained to a schema —
+constraining it merely to valid JSON made things measurably worse. It is a
+result about a grader on one corpus, not a shippable component.
 
 The rest of this document is how each of those was established, in the order it
 happened.
@@ -225,80 +225,76 @@ better", but: the failure is a *judgement* about whether two differently-worded
 statements assert the same clinical fact, and no amount of distributional
 similarity makes that judgement. Something has to read them.
 
-## What does work — and what it costs
+## What does work
 
 `make semantic` runs `graders/semantic.py` against `qwen2.5:7b-instruct` over
-Ollama. 57 consultations, 164 batches, 49 minutes on a laptop. The recorded
-responses ship with this repository, so every figure below re-derives in
-seconds with no model, no key and no network:
+Ollama, with generation constrained to a verdict schema. 57 consultations, 174
+calls, 61 minutes on a laptop. Every response ships with this repository, so
+the figures below re-derive in seconds with no model, no key and no network:
 
 ```
 make semantic-replay
 ```
 
-Scored on the 37 notes where the model held its output format — **all three
-graders rescored on those same 37**, because a clean subset compared against a
-full corpus is a different corpus:
+**56 of the 57 notes survive**, and all three graders are scored on those same
+56:
 
 | grader | note grounded | recall | precision |
 |---|---|---|---|
-| lexical/1.0 | 42.9% [35.3, 50.0] | 39.7% [25.0, 53.4] | 15.4% |
-| statistical/1.0 | 62.5% | 27.0% | 15.4% |
-| **semantic/1.0 + qwen2.5:7b** | **83.3%** [76.9, 88.9] | 57.1% [42.6, 70.0] | 32.7% |
+| lexical/1.0 | 44.7% [37.5, 50.0] | 39.8% [28.9, 50.0] | 16.5% |
+| statistical/1.0 | 66.7% | 23.7% | 14.6% |
+| **semantic/1.0 + qwen2.5:7b** | **79.3%** [69.0, 87.5] | **65.6%** [53.4, 76.4] | 23.5% |
 
 Paired bootstrap over the same resamples:
 
 ```
-grounding, semantic - lexical   +40.5%  [+30.0%, +52.2%]   distinguishable
-recall,    semantic - lexical   +17.5%  [ +0.0%, +36.5%]   NOT distinguishable
+grounding, semantic - lexical   +34.6%  [+21.4%, +46.1%]   distinguishable
+recall,    semantic - lexical   +25.8%  [ +9.3%, +41.7%]   distinguishable
 ```
 
-**Read those two lines carefully, because they do not say the same thing.**
+**Both clear of zero.** The semantic grader verifies nearly twice as much of a
+clinician's note *and* catches substantially more of what the clinicians
+flagged. Every term-matching grader in this project pays for coverage in recall,
+monotonically — the radius sweep prices it at about a point of recall per point
+of grounding. The semantic grader takes thirty-five points of grounding and
+gains twenty-six points of recall at the same time.
 
-The grounding gain is large and solid. The recall gain is positive at every
-point estimate and its interval touches zero: on 37 notes this corpus cannot
-establish that the semantic grader catches more errors than term matching.
+The trade-off that binds term matching does not bind a model reading for
+meaning. That is the question the whole harness was built to ask, and this is
+the answer.
 
-What it *does* establish is the more interesting claim. Every term-matching
-grader here pays for coverage in recall, monotonically — the radius sweep above
-prices it at roughly a point of recall per point of grounding. The semantic
-grader takes **+40 points of grounding without paying that bill**: recall is
-flat to better, not the ~25-point loss the trade predicts for a gain that size.
-Precision more than doubles.
+### Getting here took three attempts at one problem
 
-So: the trade-off that binds term matching does not bind a model reading for
-meaning. That is the finding. "It also catches more errors" is the additional
-claim this corpus is too small to support, and it is not made here.
+The model kept abandoning the required output format and narrating instead,
+which refused every claim in the affected batches. Each fix moved the failure
+rather than removing it, and the sequence is the useful part:
 
-These figures replace an earlier set that was withdrawn. Under the segmentation
-defect in WIT-018 the same comparison read 82.1% grounding at 69.2% recall.
-Grounding landed close on re-measurement; **recall was 12 points too high**,
-because the dropped claims had been inflating it — and correcting it is what
-moved the recall difference from distinguishable to not.
+| constraint | responses unreadable |
+|---|---|
+| none — prompt asks for JSON | 29% |
+| `format: "json"` — syntax constrained | **48%** |
+| verdict schema — structure constrained | 6% first attempt, **1%** after one retry |
 
-### The part that is not ready
+Constraining syntax made it *worse*. Told only to emit JSON, the model stopped
+writing prose and started writing `{"claims":[0,1,2,3]}` — valid, correctly
+formed, listing the claims it was asked to grade and grading none of them.
+Removing its ability to ramble did not give it the ability to comply; it moved
+the failure into a shape that looks like an answer. Only constraining the
+*structure* fixed it. See WIT-021.
 
-**The model abandoned its output format on 29% of batches** — unchanged by the
-segmentation fix. Those responses contain no verdict anywhere: it stops
-classifying and starts narrating. The parser handles every recoverable shape;
-there is nothing in these to recover.
+### What is still true
 
-That is why the full-corpus row is refused rather than published. An unreadable
-batch refuses every claim in it, pushing grounding **down** and detection
-**up** — the biases point opposite ways, so the contaminated row cannot be
-corrected by argument, only by dropping those notes. `make semantic` prints it
-under `NOT A MEASUREMENT` and exits non-zero.
-
-Three limits on the 37-note result:
-
-- **The subset is not random.** These are the encounters the model stayed on
-  format for. If it drops format on harder consultations, the figures are
-  optimistic.
-- **n=37.** The grounding gain survives it comfortably; the recall gain does
-  not, which is why it is reported as unestablished rather than as a win.
-- **One model, one corpus, one setting.** Constrained decoding (Ollama's
-  `format: json`) is the obvious fix for the 29% and has not been tried. Until
-  it is, this is a result about a grader, not a shippable component.
+- **The 56 are not a random sample.** They are the notes the model stayed on
+  format for. One note is still excluded, so the effect is now small, but the
+  direction of any bias is unknown.
+- **One model, one corpus, one care setting.** 57 UK primary-care encounters
+  and a single 7B model. Nothing here establishes transfer.
+- **The residual failure moved again rather than vanishing.** What survives is
+  `{"verdicts": []}` — schema-valid and empty. At 1% after retry it is not
+  worth another constraint, and it is recorded rather than fixed.
+- **Precision is 23.5%**, below the 32.7% measured when 20 notes were excluded.
+  The notes that came back are harder. That is the honest direction for a
+  figure to move when a sample stops being filtered.
 
 ## What the lexical grader does achieve
 
