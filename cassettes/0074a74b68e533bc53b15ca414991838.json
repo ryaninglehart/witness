@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not mention smoking or alcohol consumption in the conversation.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":79,\"why\":\"The doctor suggested empirically treating the patient for a possible UTI, which is a common cause of lower abdominal pain.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":98,\"why\":\"The patient suggested this as an alternative to tests, and the doctor agreed to prescribe antibiotics instead.\"},\n    {\"i\":15,\"v\":\"INFERRED\",\"u\":103,\"why\":\"The doctor advised the patient to try regular painkillers, specifically Paracetamol, for the pain.\"},\n    {\"i\":16,\"v\":\"INFERRED\",\"u\":96,\"why\":\"The doctor suggested the patient come back in a few days if her symptoms were not improving or if they worsened, indicating a follow-up in 24-48 hours if symptoms were not improving or if they were worsening.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

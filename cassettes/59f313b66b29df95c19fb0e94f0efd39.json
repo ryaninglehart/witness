@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The transcript does not mention malaria, Dengue, or meningitis as conditions to rule out.\"}]};",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

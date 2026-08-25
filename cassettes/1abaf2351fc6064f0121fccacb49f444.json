@@ -1,5 +1,0 @@
-{
-  "text": "The doctor's claim 12 is directly supported by the patient's statement in line 127 of the transcript:\n\n[127] patient: <UNSURE>OK. Great</UNSURE>.\n\nThe patient's response \"OK. Great\" indicates agreement with the doctor's advice, which is consistent with the doctor's claim to send a referral if the patient experiences persistent swelling, heat, redness, or if the knee locks up and they can't bend and stretch it. The patient's \"OK\" and \"Great\" suggest they understand and agree with the doctor's instructions, thereby supporting the doctor's claim.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

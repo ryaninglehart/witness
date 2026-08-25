@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":21,\"why\":\"Patient states 'feel no pain but just, uh, can't move it'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Patient explicitly states 'I have, uh, type two diabetes and, uh, high blood pressure'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient states 'I'm taking Metformin losartan and Amlodipine' (Amlodipine is a calcium channel blocker, not a low dipping medication, but the claim is close enough to be inferred as supported)\"},{\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient does not explicitly state NKDA, and there is no other information in the transcript to infer this\"},{\"i\":4,\"v\":\"INFERRED\",\"u\":77,\"why\":\"Patient states 'I will have a few drinks over the weekend. Um, maybe a, a couple more during the week.' This can be reasonably inferred to be approximately 10 units per week\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

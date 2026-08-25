@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 122, \"v\": \"INFERRED\", \"why\": \"The patient mentions having a beer during the weekdays and drinking more on Fridays, which is consistent with the claim of 10 units a month.\" }, { \"i\": 125, \"v\": \"SUPPORTED\", \"why\": \"The patient explicitly states that they drink alcohol once or twice a month, which aligns with the claim of 10 units a month.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

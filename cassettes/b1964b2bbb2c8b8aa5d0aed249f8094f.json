@@ -1,5 +1,0 @@
-{
-  "text": "0. The patient described a \"really horrible ache\" in their abdomen, which suggests an ache is present.\n1. The patient did not mention drinking lots of water, but they did mention being constipated, which could be related to dehydration.\n2. The pain was described as a \"really horrible ache\" by the patient, indicating the pain is described as an ache.\n3. The patient mentioned lower abdominal pain, describing it as an \"ache.\"\n4. The patient stated they are not on any medications at the moment, so the claim \"Nil Meds\" is correct.\n5. The doctor suggested that the symptoms could be due to simple constipation, PID (Pelvic Inflammatory Disease), STI (Sexually Transmitted Infection), or UTI (Urinary Tract Infection), so the claim \"Imp- Simple constipation, PID, STI, UTI\" is accurate based on the doctor's assessment.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 12, \"v\": \"SUPPORTED\" }, { \"i\": 13, \"v\": \"SUPPORTED\" }, { \"i\": 14, \"v\": \"SUPPORTED\" }, { \"i\": 15, \"v\": \"SUPPORTED\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

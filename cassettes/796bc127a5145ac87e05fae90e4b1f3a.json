@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":13,\"why\":\"Patient described breathing difficulties after being stung by a wasp\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of blotching rash in the transcript\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":25,\"why\":\"Patient stated 'no, not really' to significant past medical or surgical history\"},{\"i\":3,\"v\":\"INFERRED\",\"u\":28,\"why\":\"Patient mentioned eczema and penicillin allergy, which are part of the past medical history\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"Patient explicitly stated 'I'm allergic to penicillin'\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient was advised to call the ambulance, not to start antihistamines immediately\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":46,\"why\":\"Doctor suggested it might be a particularly severe reaction and to call the ambulance to rule out anaphylaxis\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":72,\"why\":\"Patient states she lives in a flat with friends and is a student of Biology. She also mentions not smoking and drinking alcohol socially on weekends.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Doctor infers UTI/cystitis based on patient's symptoms of burning pain on passing urine and crampy tummy pain lower down.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":98,\"why\":\"Doctor advises patient to call back or come back if not better by the end of the week or if symptoms worsen.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

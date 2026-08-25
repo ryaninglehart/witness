@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"Patient explicitly states 'No, nothing.'\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":45,\"why\":\"Patient states 'I don't think so, um.'\"},\n    {\"i\":2,\"SUPPORTED\",\"u\":49,\"why\":\"Patient states 'No. No weakness of my arms and legs.'\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Patient states 'No, but now I'm feeling very sick.'\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient mentions 'premature ovarian failure'\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"Patient states 'No.'\"},\n    {\"i\":6,\"v\":\"SUPPORTED\",\"u\":null,\"why\":\"Abbreviation NKDA stands for 'No Known Drug Allergies'\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

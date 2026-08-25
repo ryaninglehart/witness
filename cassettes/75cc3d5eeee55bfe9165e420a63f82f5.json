@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Patient stated 'One glass of wine a week'.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":96,\"why\":\"Doctor stated 'It would be helpful if you could get a thermometer from the pharmacy and, do check your temperature, just to make sure that it isn't, going up and down.' and 'Um, the other thing is that if it becomes a, common, thing or a recurrent problem. Then we need to talk to you again about it.'\"}],\"verdicts\":[{\"i\":14,\"v\":\"SUPPORTED\",\"u\":92,\"why\":\"Doctor stated 'Um, normally we can treat this infection without having to test your urine. Uh, with, with a course of antibiotics.'\"}],\"verdicts\":[{\"i\":15,\"v\":\"SUPPORTED\",\"u\":110,\"why\":\"Doctor stated 'If you feel like your symptoms get worse at any point, or they're not resolving with the treatment. Or you keep getting a similar, um, you keep getting a similar, problem, reccurently. Then it's important for us to talk, talk to you in more detail about that.'\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

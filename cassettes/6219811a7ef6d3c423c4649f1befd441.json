@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported having some discharge and pain, which contradicts the claim of no discharge. Additionally, the patient mentioned blood in stool, which directly contradicts the claim of no blood in stool.\"},\n    {\"i\":13,\"v\":\"CONTRADICTED\",\"u\":123,\"why\":\"The patient reported having some discharge, which directly contradicts the claim of no discharge.\"},\n    {\"i\":14,\"v\":\"UNSUPPORTED\",\"u\":108,\"why\":\"The patient's response was unclear, but given the context, it is not supported that the patient is a non-smoker and non-drinker of alcohol.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

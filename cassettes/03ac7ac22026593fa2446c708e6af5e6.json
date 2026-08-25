@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":109,\"why\":\"Doctor advised patient to continue lemsip and not to take any other paracetamol containing products.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":111,\"why\":\"Doctor advised against daytime use of cough syrup but allowed use if unable to sleep at night, inferring cough syrup can be used at night if needed.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":102,\"why\":\"Doctor stated that the cough can persist longer than a week and that they should contact if the temperature is ongoing or the cough is getting worse.\"},\n    {\"i\":15,\"v\":\"SUPPORTED\",\"u\":101,\"why\":\"Doctor advised to check temperature and to contact if coughing up lots of nasty phlegm or blood or if getting blood coming out the nose or shortness of breath, chest pain.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

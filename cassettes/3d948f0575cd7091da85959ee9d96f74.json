@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":24,\"v\":\"SUPPORTED\",\"u\":39,\"why\":\"Patient denied having a fever.\"},{\"i\":25,\"v\":\"SUPPORTED\",\"u\":44,\"why\":\"Patient mentioned having a sore throat which he attributed to a possible fever, but stated it was not a significant fever.\"},{\"i\":26,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of ibuprofen in the transcript.\"},{\"i\":27,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of headaches or associated symptoms in the transcript.\"},{\"i\":28,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient stated 'Asthma and hay fever if they can help', indicating no other significant medical problems.\"},{\"i\":29,\"v\":\"INFERRED\",\"u\":90,\"why\":\"Patient mentioned taking an antihistamine, which is likely Mercilon, a common brand for antihistamines.\"},{\"i\":30,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of migraine or neurological symptoms in the transcript.\"},{\"i\":31,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No prescription or advice for regular paracetamol and naproxen was given in the transcript.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

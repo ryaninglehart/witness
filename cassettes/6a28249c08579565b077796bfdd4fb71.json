@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"INFERRED\",\"why\":\"The patient mentions feeling more breathless even walking to the shop, and the doctor suggests further tests to check heart function. There is no mention of chest pain or fever, and the patient confirms no acid reflux symptoms.\"},{\"i\":1,\"v\":\"INFERRED\",\"why\":\"The patient mentions taking Furosemide and Fybogel, and the doctor prescribes aspirin and simvastatin. The patient confirms no allergies.\"},{\"i\":2,\"v\":\"INFERRED\",\"why\":\"The patient's father died of a heart attack and had osteoporosis, as mentioned in the conversation.\"},{\"i\":3,\"v\":\"INFERRED\",\"why\":\"The patient explicitly states they do not drink alcohol.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

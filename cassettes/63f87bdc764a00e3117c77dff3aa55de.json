@@ -1,5 +1,0 @@
-{
-  "text": "Based on the dialogue, the doctor's claims for the patient's next steps are:\n\n12. **Blood tests, including U+Es, FBC, BNP**\n   - The doctor mentions checking the patient's full blood count (FBC), kidney function (U+Es), and BNP (B-type natriuretic peptide) levels.\n\n13. **Arrange echo**\n   - The doctor suggests doing an echocardiogram (echo) to assess how well the patient's heart is pumping.\n\n14. **Review in 7 days, or earlier if worsening symptoms (chest pain, SOB, dizziness, etc.)**\n   - The doctor advises the patient to come back in about a week to review their condition and to contact the doctor sooner if they experience any worsening symptoms such as chest pain, shortness of breath (SOB), or dizziness.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

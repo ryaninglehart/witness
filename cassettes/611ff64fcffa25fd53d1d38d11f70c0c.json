@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"INFERRED\"},{\"i\":13,\"v\":\"SUPPORTED\"},{\"i\":14,\"v\":\"SUPPORTED\"},{\"i\":15,\"v\":\"SUPPORTED\"},{\"i\":16,\"v\":\"SUPPORTED\"},{\"i\":17,\"v\":\"SUPPORTED\"},{\"i\":18,\"v\":\"SUPPORTED\"},{\"i\":19,\"v\":\"SUPPORTED\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":27,\"why\":\"Patient states 'Yes, but I've had spotted, uh, blood in my urine.'\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient did not mention any new vaginal discharge.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":16,\"why\":\"Patient states 'No, I've got.'\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":34,\"why\":\"Patient states 'No, not at all.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"Patient states 'No medical, no.'\"},{\"i\":5,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions spotting in urine but does not mention any change in bowel habit or blood in stool.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":52,\"why\":\"Patient states 'I had IBS before.'\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"Patient states 'No.'\"},{\"i\":8,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"Patient mentions taking Mebeverine.\"},{\"i\":9,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient states 'I live with friends.'\"},{\"i\":10,\"v\":\"SUPPORTED\",\"u\":79,\"why\":\"Patient states 'I'm a support worker.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

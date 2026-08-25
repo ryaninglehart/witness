@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":9,\"why\":\"The patient described a swelling on the left elbow, which is warm to the touch, but not painful. There was no erythema or redness mentioned.\"},\n    {\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentioned thinking he has osteoarthritis, but it was not confirmed by a doctor. The claim is not supported by the transcript.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":35,\"why\":\"The patient explicitly stated he is allergic to peanuts.\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":42,\"why\":\"The patient stated he is not on any medication and is fit and well, running regularly.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":36,\"why\":\"The patient stated he does not have any other illnesses or allergies to report, which aligns with NKDA (No Known Drug Allergies).\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

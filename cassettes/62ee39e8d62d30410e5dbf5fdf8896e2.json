@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":45,\"why\":\"Patient mentions feeling like their chest is tight.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":61,\"why\":\"Patient states 'I generally have asthma'.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"Patient mentions 'Salbutamol inhalers'.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"Patient mentions having a peanut allergy.\"},{\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient does not mention a sore throat or difficulty breathing the next morning. The context is about swelling and breathing difficulties after eating prawn soup.\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

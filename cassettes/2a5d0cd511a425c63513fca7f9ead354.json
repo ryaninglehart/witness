@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":9,\"why\":\"Patient stated 'It's not painful at all, or like, I feel fine.'\"},{\"i\":1,\"v\":\"INFERRED\",\"u\":16,\"why\":\"Patient stated 'It's the, the left elbow.' and 'I can actually like move it normally.'\"},{\"i\":2,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient said 'I think I have something like uh, osteoarthritis.' which is a different condition from osteoarthritis.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":35,\"why\":\"Patient stated 'I'm, I'm allergic to, to peanuts.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":42,\"why\":\"Patient stated 'Uh, no. Not that I know of.'\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":36,\"why\":\"Patient stated 'Not really, no. Um, <INAUDIBLE_SPEECH/> I'm, I'm allergic to, to peanuts.' and 'do you suffer from eczema at all?' and 'No.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

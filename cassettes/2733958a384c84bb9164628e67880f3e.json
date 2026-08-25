@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions hyperthyroidism, not hypothyroidism.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":126,\"why\":\"The patient explicitly states 'Thyroxine' which is the medication for hypothyroidism.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

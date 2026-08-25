@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient's mother has migraines and patient has not been diagnosed but has similar symptoms.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":89,\"why\":\"Patient mentions taking Microgynon for contraception.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"Patient explicitly states 'No, nothing' when asked about any other medical history.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

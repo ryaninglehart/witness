@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"Doctor explicitly advised to drink plenty and to have a soft diet.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Doctor stated that if diarrhea doesn't go away in a week's time or if you're passing blood, a stool sample is needed.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":102,\"why\":\"Doctor mentioned that if diarrhea is going about six to eight times a day, there's a high chance of dehydration and the patient might need to go into hospital.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":100,\"why\":\"Doctor advised a 3-day course of antibiotics.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":99,\"why\":\"Doctor suggested to contact if pain worsens or new symptoms develop, indicating a plan for follow-up if symptoms persist or worsen.\"}]};",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"Patient explicitly states 'No, nothing.'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":45,\"why\":\"Patient states 'I don't think so, um.'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":49,\"why\":\"Patient states 'No. No.'\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Patient states 'No, but now I'm feeling very sick.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient mentions 'premature ovarian failure'\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"Patient states 'No.'\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":null,\"why\":\"Abbreviation NKDA (No Known Drug Allergy) is supported by patient's response\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient lives with her husband and his family, not her parents.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":88,\"why\":\"Patient explicitly states 'I don't know' to smoking, drinking alcohol, and taking other drugs.\"},\n    {\"i\":14,\"v\":\"INFERRED\",\"u\":26,\"why\":\"Patient describes lower abdominal pain that is getting worse, which is a common reason for an examination.\"},\n    {\"i\":15,\"v\":\"SUPPORTED\",\"u\":133,\"why\":\"Doctor advises to call if the pain gets worse or if the patient is not holding any fluids down.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

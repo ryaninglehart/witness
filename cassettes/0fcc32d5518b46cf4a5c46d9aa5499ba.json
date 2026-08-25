@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":23,\"why\":\"Patient reported coughing yesterday\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of fever, chills, or positional symptoms in the transcript\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":52,\"why\":\"Patient explicitly stated no chest pain and no pain on inspiration\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":58,\"why\":\"Patient mentioned taking Codeine, which is a blood thinner\"},{\"i\":4,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient denied having any other medical problems\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"Patient stated allergy to Ibuprofen\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":96,\"why\":\"Doctor explicitly stated the plan\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

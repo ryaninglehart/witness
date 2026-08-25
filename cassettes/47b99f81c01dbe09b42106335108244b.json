@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [  ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

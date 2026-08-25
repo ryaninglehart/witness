@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":64,\"why\":\"Utterance 64 states 'My brother had, Neurofibromatosis, I think it is.'\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":70,\"why\":\"Utterance 70 states 'Yeah, yeah. Um, I, uh, live with my partner.' and Utterance 73 states 'No, no pets.' which implies living alone.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

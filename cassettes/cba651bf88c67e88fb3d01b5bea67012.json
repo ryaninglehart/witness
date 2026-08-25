@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions having a similar headache a few weeks ago, indicating she does get headaches.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":47,\"why\":\"Patient states 'I did, I did have a similar headache a few weeks ago.'\"},{\"i\":2,\"v\":\"INFERRED\",\"u\":33,\"why\":\"Patient mentions having a similar headache a few weeks ago, which is a common symptom of migraines.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":89,\"why\":\"Patient explicitly states 'Um I take the pill, Microgynon.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"Patient explicitly states 'No, nothing.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

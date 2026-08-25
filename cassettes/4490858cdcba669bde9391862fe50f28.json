@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":91,\"why\":\"Patient explicitly states her job as a graphics designer.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":111,\"why\":\"Doctor infers gastroenteritis from patient's symptoms and mention of brother having similar symptoms.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":114,\"why\":\"Doctor explicitly states the plan to send off a stool sample.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":120,\"why\":\"Doctor advises patient to continue taking ORS with small sips.\"},{\"i\":16,\"v\":\"SUPPORTED\",\"u\":125,\"why\":\"Doctor advises patient to contact them if symptoms worsen.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":61,\"why\":\"Utterance 61: 'my father has, high uh, well used to have high blood pressure. He actually, so he actually died, of, bowel cancer, like ten years ago.'\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":70,\"why\":\"Utterance 70: 'Ohh I, I live alone.'\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":72,\"why\":\"Utterance 72: 'I haven't been able to work in the past few days, but yes, like given, uh, my uh.' Utterance 73: 'What's your employment? What do you do for work?' Utterance 74: 'I'm a software engineer.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

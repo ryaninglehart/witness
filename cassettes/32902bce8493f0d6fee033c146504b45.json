@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":27,\"why\":\"patient explicitly states 'no cough'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":31,\"why\":\"patient states 'it, it seems to be OK. It, it's fine.'\"},{\"i\":2,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"patient mentions a rash, which contradicts the claim\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":40,\"why\":\"patient states 'general medical history is fine'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":48,\"why\":\"patient states 'Yep.' and 'Uh, no.'\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"patient states 'Uh, no.'\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

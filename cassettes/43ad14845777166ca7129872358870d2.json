@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"Patient explicitly states 'No.'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":50,\"why\":\"Patient explicitly states 'No.'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":59,\"why\":\"Patient states 'Diabetes'\"},{\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions diabetes in family history but does not specify no other conditions\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":95,\"why\":\"Patient states 'a couple of pints a week'\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

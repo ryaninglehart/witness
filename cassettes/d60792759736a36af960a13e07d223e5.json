@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":11,\"why\":\"Patient described difficulty hearing in left ear for 6 weeks, tinnitus, and slight nausea/dizziness.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":11,\"why\":\"Patient described difficulty hearing in left ear for 6 weeks, tinnitus, and slight nausea/dizziness.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":30,\"why\":\"Patient denied discharge, fever, itchiness, and pain.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"Doctor stated the need to exclude impacted wax in ear canal first.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":44,\"why\":\"Patient confirmed understanding of the plan.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"Doctor explicitly advised to drink plenty and to have a soft diet.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":100,\"why\":\"Doctor advised to seek a stool sample if diarrhea doesn't go away in a week or if there is blood.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":102,\"why\":\"Doctor advised to book an appointment if diarrhea is more than 6 to 8 times a day, indicating potential dehydration.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":99,\"why\":\"Utterance 109 indicates the patient understands the advice to contact if pain worsens.\"}]}`ihn\nuser\nCLAIMS\n12. If develops temperature/persistent/worsening pain to call back or if recurrent similar sx\n13. Patient has a history of breast cancer in the family.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

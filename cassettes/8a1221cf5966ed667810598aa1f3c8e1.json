@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported having some discharge and pain, which contradicts the claim of no discharge.\"},{\"i\":13,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported having some discharge, which contradicts the claim of no discharge.\"},{\"i\":14,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not explicitly state whether she is a smoker or drinker, and there is no information in the transcript to support or refute the claim.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

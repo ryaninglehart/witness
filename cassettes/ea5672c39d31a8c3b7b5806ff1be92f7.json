@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":53,\"why\":\"patient explicitly states 'no, no, no'\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":58,\"why\":\"patient states 'nothing sore. I mean, depends what, like, normal stuff like cold, flu'\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"patient mentions 'internal contraceptive implant, but like, for one year, now, no more'\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":null,\"why\":\"patient does not mention any known drug allergies\"},{\"i\":16,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"patient states 'with my parents'\"},{\"i\":17,\"v\":\"SUPPORTED\",\"u\":93,\"why\":\"patient states 'let's say a beer' and 'Four times a week on average, yeah'\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

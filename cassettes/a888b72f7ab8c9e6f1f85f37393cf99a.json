@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 7, \"v\": \"INFERRED\" }, { \"i\": 8, \"v\": \"INFERRED\" }, { \"i\": 0, \"v\": \"INFERRED\" }, { \"i\": 1, \"v\": \"INFERRED\" }, { \"i\": 3, \"v\": \"INFERRED\" }, { \"i\": 4, \"v\": \"INFERRED\" }, { \"i\": 5, \"v\": \"INFERRED\" }, { \"i\": 9, \"v\": \"INFERRED\" }, { \"i\": 10, \"v\": \"INFERRED\" }, { \"i\": 11, \"v\": \"INFERRED\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 2, \"v\": \"INFERRED\", \"why\": \"The patient mentions numbness in the left arm and tingling in the fingertips, which aligns with the claim of numbness in the left arm, tingling fingertips.\" }, { \"i\": 3, \"v\": \"INFERRED\", \"why\": \"The patient mentions taking ibuprofen for knuckles on the right hand, which aligns with the claim of taking ibuprofen for the knuckles on the right hand.\" }, { \"i\": 7, \"v\": \"INFERRED\", \"why\": \"The patient mentions no neck pain, which aligns with the claim of no neck pain.\" }, { \"i\": 8, \"v\": \"INFERRED\", \"why\": \"The patient mentions no headaches, which aligns with the claim of no headaches.\" }, { \"i\": 9, \"v\": \"INFERRED\", \"why\": \"The patient mentions mild weakness in the left arm, which aligns with the claim of mild weakness.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

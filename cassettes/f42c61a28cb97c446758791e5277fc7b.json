@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions having had IBS in the past, but no other specific medical problems.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"The patient states she did not take any regular medications.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"The patient explicitly states she is allergic to Clindamycin.\"},{\"i\":15,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions a family history of kidney, bladder, and bowel issues, but does not provide specific details.\"},{\"i\":16,\"v\":\"SUPPORTED\",\"u\":32,\"why\":\"The patient states she thinks she has no real serious medical problems.\"},{\"i\":17,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions drinking alcohol socially, but does not provide a detailed history of alcohol consumption.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

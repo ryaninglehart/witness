@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[\n    {\"i\":0,\"v\":\"SUPPORTED\"},\n    {\"i\":1,\"v\":\"SUPPORTED\"},\n    {\"i\":2,\"v\":\"SUPPORTED\"},\n    {\"i\":3,\"v\":\"UNSUPPORTED\"},\n    {\"i\":4,\"v\":\"SUPPORTED\"},\n    {\"i\":5,\"v\":\"SUPPORTED\"},\n    {\"i\":6,\"v\":\"SUPPORTED\"},\n    {\"i\":7,\"v\":\"SUPPORTED\"},\n    {\"i\":8,\"v\":\"SUPPORTED\"},\n    {\"i\":9,\"v\":\"UNSUPPORTED\"},\n    {\"i\":10,\"v\":\"UNSUPPORTED\"}\n]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

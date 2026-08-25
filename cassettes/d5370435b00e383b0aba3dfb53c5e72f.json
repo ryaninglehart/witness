@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 92, \"v\": \"SUPPORTED\", \"why\": \"Patient mentions living in student halls, which aligns with SH's claim.\" }, { \"i\": 102, \"v\": \"SUPPORTED\", \"why\": \"Patient mentions not smoking and drinking occasionally, which aligns with SH's claim.\" }, { \"i\": 111, \"v\": \"SUPPORTED\", \"why\": \"Doctor's diagnosis of UTI aligns with SH's claim of possible UTI.\" }, { \"i\": 119, \"v\": \"SUPPORTED\", \"why\": \"Doctor's recommendation for a urine sample aligns with SH's claim of urine dip and MSU.\" }, { \"i\": 124, \"v\": \"SUPPORTED\", \"why\": \"Doctor's recommendation for simple analgesia aligns with SH's claim.\" }, { \"i\": 128, \"v\": \"SUPPORTED\", \"why\": \"Doctor's advice to review in 1/52 or earlier if symptoms worsen aligns with SH's claim.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

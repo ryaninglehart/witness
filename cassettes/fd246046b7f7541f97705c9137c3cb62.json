@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not mention taking any medications during the consultation.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":78,\"why\":\"The patient explicitly stated 'No, no.' when asked about weakness in arms or legs.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

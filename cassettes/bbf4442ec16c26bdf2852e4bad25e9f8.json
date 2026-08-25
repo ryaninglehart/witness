@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"Patient explicitly states 'my partner and my dog'.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":97,\"why\":\"Patient described symptoms of a chest infection and a high temperature, which are consistent with viral bronchitis.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":109,\"why\":\"Doctor explicitly advises to continue lemsips and not to take any other paracetamol containing products.\"},{\"i\":15,\"v\":\"INFERRED\",\"u\":111,\"why\":\"Doctor advises against daytime use of cough syrup but allows it for nighttime use if unable to sleep.\"},{\"i\":16,\"v\":\"INFERRED\",\"u\":99,\"why\":\"Doctor states that the infection can take a week or two to settle and that the cough can persist longer than that.\"},{\"i\":17,\"v\":\"INFERRED\",\"u\":101,\"why\":\"Doctor advises to contact if the temperature is ongoing, getting worse, or if the cough is getting worse, coughing up lots of nasty phlegm, or coughing up blood, or having nose bleeds.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

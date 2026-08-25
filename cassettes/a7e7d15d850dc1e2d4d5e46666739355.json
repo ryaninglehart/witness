@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Patient states he works as an accountant.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"Patient states he lives with his wife and two children.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":68,\"why\":\"Patient explicitly states he does not smoke and does not drink alcohol.\"},{\"i\":15,\"v\":\"INFERRED\",\"u\":75,\"why\":\"Doctor infers gastroenteritis based on patient's symptoms and recent Chinese takeaway.\"},{\"i\":16,\"v\":\"SUPPORTED\",\"u\":80,\"why\":\"Doctor explicitly states conservative management.\"},{\"i\":17,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Doctor recommends rest, fluids, and paracetamol if feverish.\"},{\"i\":18,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Doctor mentions recommending OTC diarolyte.\"},{\"i\":19,\"v\":\"SUPPORTED\",\"u\":92,\"why\":\"Doctor advises to review in 3-4 days if symptoms not improving.\"},{\"i\":20,\"v\":\"SUPPORTED\",\"u\":94,\"why\":\"Doctor advises to see earlier if feeling more unwell.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

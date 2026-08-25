@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":16,\"why\":\"Patient described wheezing starting two days ago after cleaning a dusty environment.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":35,\"why\":\"Patient explicitly stated no chest pain.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":41,\"why\":\"Patient reported drinking 4-5 glasses of water daily.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":44,\"why\":\"Patient mentioned a history of asthma as a child and hay fever in the summer.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":59,\"why\":\"Patient denied being allergic to anything and had no regular medications.\"},{\"i\":5,\"v\":\"INFERRED\",\"u\":75,\"why\":\"Given the patient's history of asthma and hay fever, the doctor inferred the differential diagnoses.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Doctor advised the patient to take an antihistamine and to visit a clinic for further tests.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

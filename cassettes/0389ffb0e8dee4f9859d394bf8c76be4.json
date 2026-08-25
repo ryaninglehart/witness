@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"Patient explicitly states 'amoxycillin' as an allergy.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Patient states 'with my parents' when asked who lives with them at home.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":85,\"why\":\"Patient states 'yes' to the question about smoking or drinking alcohol regularly, and provides a frequency of 'Four times per week on average'.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

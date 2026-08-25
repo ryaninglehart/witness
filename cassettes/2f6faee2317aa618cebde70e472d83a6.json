@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":62,\"why\":\"Patient stated 'No medical, no' in response to question about regular medications.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":72,\"why\":\"Patient stated 'Clindamycin' as an allergy.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient stated 'I live with friends'.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":83,\"why\":\"Patient stated 'One glass of wine a week'.\"},{\"i\":16,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Patient explicitly stated 'No fever at all'.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

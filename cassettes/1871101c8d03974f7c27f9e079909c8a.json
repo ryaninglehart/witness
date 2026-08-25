@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":9,\"why\":\"Patient reported headache since this morning.\"},\n    {\"i\":1,\"v\":\"INFERRED\",\"u\":21,\"why\":\"Patient's description of one-sided headache suggests a frontal component.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":57,\"why\":\"Patient explicitly stated that paracetamol did not help.\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":59,\"why\":\"Patient confirmed taking paracetamol.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":61,\"why\":\"Patient explicitly stated 'none' for other illnesses.\"},\n    {\"i\":5,\"v\":\"SUPPORTED\",\"u\":73,\"why\":\"Patient stated living with partner, indicating not living alone.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

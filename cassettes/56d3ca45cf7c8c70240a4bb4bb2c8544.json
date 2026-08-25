@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"patient states 'not really, no' to nausea\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":55,\"why\":\"patient states 'I've taken some Paracetamol'\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":61,\"why\":\"patient states 'none' to other illnesses\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":73,\"why\":\"patient states 'I live with my partner'\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

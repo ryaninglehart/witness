@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":96,\"why\":\"The doctor states it would just be for three days, supporting a 3/7 course.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":96,\"why\":\"The doctor prescribes antibiotics for the patient.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":106,\"why\":\"The doctor advises the patient to contact if symptoms worsen or become recurrent.\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

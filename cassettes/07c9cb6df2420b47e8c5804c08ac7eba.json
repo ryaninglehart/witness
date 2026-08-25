@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient reported feeling short of breath while watching TV 'just over the last hour', not last night.\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient's shortness of breath is described as 'coming on quite recently and quite quickly', which does not support it is not getting worse.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":53,\"why\":\"The patient explicitly states 'No. I mean, I don't know. I feel like I'm getting really stressed out because, like, my heart, it's really going.' This implies no chest pain.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":28,\"why\":\"The patient mentions 'I had a C-section a few weeks ago.' This supports a PMH of C-section.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"The patient states 'they gave me some, uh, Codeine.' This supports the claim.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":71,\"why\":\"The patient says 'I don't know. Sorry.' This supports the claim that the patient is unsure about the reaction to Ibuprofen.\"}]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,0 +1,5 @@
+{
+  "text": "{\n  \"verdicts\": [\n    {\"i\": 12, \"v\": \"UNSUPPORTED\", \"u\": null, \"why\": \"Patient denied having any other medical history besides the headache.\"},\n    {\"i\": 13, \"v\": \"SUPPORTED\", \"u\": 56, \"why\": \"Patient explicitly stated 'It's just the headache.'\"},\n    {\"i\": 14, \"v\": \"SUPPORTED\", \"u\": 71, \"why\": \"Patient stated 'I live with housemates. So, three of them. So we're four.'\"},\n    {\"i\": 15, \"v\": \"SUPPORTED\", \"u\": 82, \"why\": \"Patient stated 'I socially smoke. And I drink only socially.'\"},\n    {\"i\": 16, \"v\": \"INFERRED\", \"u\": 96, \"why\": \"Patient's family history of migraines and her own symptoms suggest migraines.\"},\n    {\"i\": 17, \"v\": \"UNSUPPORTED\", \"u\": null, \"why\": \"No mention of regular use of Paracetamol or NSAIDs in the conversation.\"},\n    {\"i\": 18, \"v\": \"SUPPORTED\", \"u\": 118, \"why\": \"Doctor suggested keeping a headache diary as a future step.\"},\n    {\"i\": 19, \"v\": \"SUPPORTED\", \"u\": 111, \"why\": \"Doctor mentioned a follow-up in about a week to two weeks.\"}\n  ]\n}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

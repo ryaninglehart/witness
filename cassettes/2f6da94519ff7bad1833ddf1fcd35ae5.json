@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":100,\"why\":\"Utterance 100 states 'if your diarrhoea doesn't go away in a week's time, or if you're passing blood, we need a stool sample'.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":102,\"why\":\"Utterance 102 states 'if you're going about six to eight times a day, that means there's a high chance that, uh, you are, having dehydration and you might need to go into hospital at that point in time'.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

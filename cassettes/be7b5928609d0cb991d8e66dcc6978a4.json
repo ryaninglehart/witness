@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":97,\"why\":\"Patient reported drinking 'a couple of pints a week'.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":107,\"why\":\"Doctor diagnosed contact dermatitis based on patient's symptoms and work environment.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":114,\"why\":\"Doctor explicitly stated 'three four times a day, for the next couple of weeks'.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":117,\"why\":\"Doctor stated 'if it still hasn't got better in about a week, two weeks time, I really need you to come back and see me again'.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

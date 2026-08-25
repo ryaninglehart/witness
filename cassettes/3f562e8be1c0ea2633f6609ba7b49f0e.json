@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not explicitly state she does not smoke or drink socially.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":79,\"why\":\"The patient's symptoms, including lower abdominal pain and pink urine, suggest a possible urinary tract infection (UTI).\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":98,\"why\":\"The patient suggested empirically treating for a urine infection instead of tests.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":103,\"why\":\"The doctor advised the patient to try regular painkillers, specifically Paracetamol.\"},{\"i\":16,\"v\":\"INFERRED\",\"u\":96,\"why\":\"The doctor suggested follow-up if symptoms worsen or do not improve, indicating a review in 24-48 hours.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

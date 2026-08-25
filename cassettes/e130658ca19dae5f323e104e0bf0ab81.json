@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":16,\"why\":\"Patient mentions that the wheezing started after cleaning the house and she thinks it might be due to an allergy to dust.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"Patient explicitly states that she does not experience any pain.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":44,\"why\":\"Patient mentions having had asthma as a child and sometimes getting hay fever in the summer.\"},\n    {\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"There is no mention of NKDA in the transcript. The patient does mention having a history of asthma and hay fever, which contradicts NKDA.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

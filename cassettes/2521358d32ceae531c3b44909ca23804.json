@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentioned drinking infrequently but did not report smoking.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":81,\"why\":\"The doctor diagnosed the patient with gastroenteritis.\"},{\"i\":14,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient did not mention taking paracetamol regularly.\"},{\"i\":15,\"v\":\"INFERRED\",\"u\":94,\"why\":\"The doctor advised the patient to return if not better in a week, which implies a review in 3-5 days if symptoms improve.\"}]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":16,\"why\":\"Patient mentions that the wheezing started after cleaning the house and thinks it might be due to an allergy to dust.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":30,\"why\":\"Patient reports feeling short of breath and finding it hard to talk.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"Patient explicitly states there is no pain.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":39,\"why\":\"Patient explicitly states there is no dizziness.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":44,\"why\":\"Patient mentions having had asthma as a child and sometimes getting hay fever in the summer.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":null,\"why\":\"Patient does not report any other medical problems or allergies, which aligns with NKDA (No Known Drug Allergies)\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "Here are the claims extracted from the dialogue, along with their corresponding numbers:\n\n0. 3/7 history of diarrhea\n1. Watery stools, opening bowels every hour\n2. No blood in stools\n3. Associated crampy abdominal pain\n4. Feels nauseous, has vomited occasionally\n5. Feeling feverish, hot/cold\n6. No urinary symptoms\n7. Passing less urine\n8. No weight loss\n9. Past medical history: nil\n10. Family history: nil, no regular issues\n11. No significant past or present disease/ailments (NKDA)",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

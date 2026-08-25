@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient only mentions a past history of IBS, no other past medical history is discussed.\"},\n    {\"i\":13,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"The patient states 'no, I did uh, I did uh, a little bit ago, or a couple of days ago, try some uh, over the counter bicarbonate, to try and help with the pain but it wasn't, it wasn't really helping.'\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":65,\"why\":\"The patient explicitly states 'Uh, yeah, I'm allergic to, Clindamycin.'\"},\n    {\"i\":15,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The patient mentions a family history of 'Yeah. Uh, no I don't think so, not that I, not anything I, know about.'\"},\n    {\"i\":16,\"v\":\"SUPPORTED\",\"u\":32,\"why\":\"The patient states 'But, other than that I think no like uh, real serious medical problems that seem, yeah.'\"},\n    {\"i\":17,\"v\":\"INFERRED\",\"u\":84,\"why\":\"The patient mentions 'I don't, I don't smoke, uh, I do drink, like on the weekends, yeah.' which infers that she does not drink alcohol regularly.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

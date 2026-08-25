@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of a review of a photo or any visual evidence of a headache.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":15,\"why\":\"Patient stated 'mainly on the left side'.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":25,\"why\":\"Patient explicitly stated 'no, no, been feeling fine actually'.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":40,\"why\":\"Patient stated 'I haven't really checked, but I don't feel like I'm feverish'.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":50,\"why\":\"Patient stated 'No, but I haven't really got a cough or anything'.\"},{\"i\":5,\"v\":\"INFERRED\",\"u\":62,\"why\":\"Patient mentioned 'my mum had, uh, high blood pressure'.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":73,\"why\":\"Patient stated 'I'd say a normal amount, probably, you know, a few drinks at the weekend'.\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":81,\"why\":\"Patient stated 'I'm allergic to Aspirin, so I haven't been taking that'.\"}]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

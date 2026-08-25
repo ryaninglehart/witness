@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":79,\"why\":\"The patient mentions they have been struggling with back pain for a while.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":10,\"why\":\"The patient states the fever started about 7 days ago, which aligns with the Sunday timeframe.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"The patient explicitly states they have not had any diarrhoea.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":34,\"why\":\"The patient mentions having headaches, which are a form of head pain.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":37,\"why\":\"The patient describes the headache as centralized over the head.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":43,\"why\":\"The patient explicitly states they have no rash.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"The patient mentions they have been struggling with back pain for a while.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

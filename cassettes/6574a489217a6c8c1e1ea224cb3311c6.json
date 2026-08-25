@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of fever, dysuria, or nausea/vomiting.\"},{\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No mention of dysuria or 3 days of symptoms.\"},{\"i\":2,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions asthma and allergies, but no mention of being fit and well.\"},{\"i\":3,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient states the diarrhoea is not getting better or worse.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":46,\"why\":\"Patient denies blood in the vomit.\"},{\"i\":5,\"v\":\"INFERRED\",\"u\":50,\"why\":\"Abdominal pain under the umbilicus, patient mentions hearing stomach noises.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":64,\"why\":\"Patient states last vomited this morning.\"},{\"i\":7,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"Patient denies blood in the vomit.\"},{\"i\":8,\"v\":\"SUPPORTED\",\"u\":78,\"why\":\"Patient denies any chest pain.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

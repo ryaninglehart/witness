@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":16,\"why\":\"Patient states that the pain is a bit better with Ibuprofen but still present.\"},\n    {\"i\":1,\"v\":\"INFERRED\",\"u\":18,\"why\":\"Patient describes pain as 'all over but, I feel like over my right eye, it's um bit, stronger.'\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":24,\"why\":\"Patient explicitly states 'No, no, no. But I can wake up with it in the morning.'\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":92,\"why\":\"Patient states 'Yeah, probably like, three, once a week.'\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

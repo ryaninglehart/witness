@@ -1,5 +1,0 @@
-{
-  "text": "Based on the dialogue, the claims can be verified as follows:\n\n12. **Increase furosemide BD**: \n   - The doctor suggests increasing the dose of Furosemide from one tablet a day to two tablets a day for the first few days.\n   - **Verification**: True.\n\n13. **Blood tests, inc U+Es, FBC, BNP**:\n   - The doctor mentions getting a blood test done, which includes checking the full blood count (FBC), kidney function (U+Es), and BNP (Brain Natriuretic Peptide).\n   - **Verification**: True.\n\n14. **Arrange echo**:\n   - The doctor suggests arranging an echocardiogram (echo) to see how well the heart is pumping.\n   - **Verification**: True.\n\n15. **Review in 7d, or earlier if worsening sx (chest pain, SOB, dizziness, etc)**:\n   - The doctor recommends the patient come back in about a week to see how they are getting on.\n   - The doctor also advises the patient to call if they are getting more unwell, specifically mentioning symptoms like chest pain, shortness of breath (SOB), dizziness, or palpitations.\n   - **Verification**: True.\n\nAll the claims are supported by the dialogue.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

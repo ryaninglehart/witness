@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":78,\"why\":\"Patient stated 'socially I drink, but uh, I don't think more, more than normal.'\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Patient stated 'Not that it, no.'\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

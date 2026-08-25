@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient mentions not being prone to headaches, but does not explicitly state that she does not normally get headaches.\"},\n    {\"i\":1,\"v\":\"SUPPORTED\",\"u\":47,\"why\":\"Patient states 'I'm not really prone to them, no. But I did, I did have a similar headache a few weeks ago.'\"},\n    {\"i\":2,\"v\":\"INFERRED\",\"u\":18,\"why\":\"Patient describes the headache as 'throbbing' and 'worse when I move', which is consistent with a migraine diagnosis.\"},\n    {\"i\":3,\"v\":\"SUPPORTED\",\"u\":89,\"why\":\"Patient explicitly states 'Um I take the pill, Microgynon.'\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"Patient explicitly states 'No, nothing.'\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

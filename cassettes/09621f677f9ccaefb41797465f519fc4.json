@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 98, \"v\": \"SUPPORTED\", \"why\": \"Patient explicitly states he lives with his sister and mother.\" }, { \"i\": 114, \"v\": \"SUPPORTED\", \"why\": \"Patient mentions smoking socially, but not regularly.\" }, { \"i\": 119, \"v\": \"SUPPORTED\", \"why\": \"Patient mentions drinking alcohol, but not regularly, usually on Fridays.\" }, { \"i\": 126, \"v\": \"SUPPORTED\", \"why\": \"Doctor concludes the patient's symptoms are suggestive of gastroenteritis.\" }, { \"i\": 138, \"v\": \"SUPPORTED\", \"why\": \"Doctor advises patient to try regular paracetamol if feeling feverish.\" }, { \"i\": 140, \"v\": \"SUPPORTED\", \"why\": \"Doctor advises patient to review in 48 hours or sooner if symptoms worsen.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

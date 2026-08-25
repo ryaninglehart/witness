@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":19,\"why\":\"Patient mentioned trying a steroid cream from the pharmacy.\"},{\"i\":13,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No specific brand name was mentioned, and 'Betnovate BD' is not referenced in the transcript.\"},{\"i\":14,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"The transcript does not specify the frequency or quantity of the steroid cream.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":108,\"why\":\"Doctor advised the patient to come back if things don't get better in the next week to ten days.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

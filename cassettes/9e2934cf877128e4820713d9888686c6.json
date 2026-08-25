@@ -1,5 +1,0 @@
-{
-  "text": "Based on the dialogue, the key claims that can be extracted are:\n\n1. **Imp- depression**: The patient reports symptoms of depression, including difficulty focusing, being easily distracted, a slightly lower mood, and a decreased sex drive. The patient also mentions that their father committed suicide about fifteen years ago, which could be a risk factor for depression.\n\n2. **GP review**: The doctor suggests that the patient should book an appointment with their GP for a physical examination and blood tests to further investigate the symptoms. The doctor believes that a physical examination and tests are necessary to determine the cause of the patient's symptoms.\n\nThese claims summarize the main points of the conversation between the patient and the doctor.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

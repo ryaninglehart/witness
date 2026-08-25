@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":97,\"why\":\"Patient reported drinking 'a couple of pints a week'.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":37,\"why\":\"Patient's symptoms of soreness, cracked skin, and itching in the context of her work as a housekeeper suggest contact dermatitis.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":114,\"why\":\"Doctor explicitly stated 'we can try some steroid creams to help with the inflammation.'\"},\n    {\"i\":15,\"v\":\"SUPPORTED\",\"u\":117,\"why\":\"Doctor stated 'if it still hasn't got better in about a week, two weeks time, I really need you to come back and see me again.'\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

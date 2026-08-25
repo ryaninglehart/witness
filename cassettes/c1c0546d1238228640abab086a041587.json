@@ -1,5 +1,0 @@
-{
-  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":29,\"why\":\"Patient explicitly states 'No, no fever, no'\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":51,\"why\":\"Patient states 'No, it hasn't made any difference, the time of day.'\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":42,\"why\":\"Patient states 'Not really.'\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":63,\"why\":\"Patient states 'My partner.'\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":10,\"why\":\"Patient describes a new symptom - headache.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"Doctor explicitly states the plan.\"},{\"i\":6,\"v\":\"SUPPORTED\",\"u\":87,\"why\":\"Doctor advises to contact if pain is worsening or new symptoms appear.\"}]}",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 0, \"v\": \"SUPPORTED\", \"why\": \"Patient mentions knee pain and is currently taking ibuprofen 400mg bd for it.\" }, { \"i\": 1, \"v\": \"SUPPORTED\", \"why\": \"Patient confirms they are taking ibuprofen 400mg bd for knee pain.\" }, { \"i\": 2, \"v\": \"SUPPORTED\", \"why\": \"Patient explicitly states 'No, no, no problems' when asked about back pain.\" }, { \"i\": 3, \"v\": \"SUPPORTED\", \"why\": \"Patient explicitly states 'No' when asked about swelling in hands, feet, elbows, or wrists.\" }, { \"i\": 4, \"v\": \"SUPPORTED\", \"why\": \"Patient explicitly states 'No' when asked about calf pain.\" }, { \"i\": 5, \"v\": \"SUPPORTED\", \"why\": \"Patient explicitly states 'No' when asked about pain in the joints of their foot.\" }, { \"i\": 6, \"v\": \"UNSUPPORTED\", \"why\": \"Patient mentions they are far-sighted, which is not asthma, and denies having asthma.\" }, { \"i\": 7, \"v\": \"SUPPORTED\", \"why\": \"Patient lists the medications they are taking, including vitamin D, melatonin, ibuprofen, and Xanax as needed.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

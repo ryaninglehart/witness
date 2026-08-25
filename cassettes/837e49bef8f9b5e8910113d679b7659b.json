@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient lives with her husband and his family, not her parents.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":88,\"why\":\"Patient explicitly states 'I don't know' when asked about smoking, drinking alcohol, or taking other drugs.\"},{\"i\":14,\"v\":\"INFERRED\",\"u\":26,\"why\":\"Patient describes lower abdominal pain that is getting worse, which is a common presentation for a gynecological issue, hence the inference of abdominal pain possibly being a cause of concern.\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":133,\"why\":\"Doctor advises the patient to contact the support line if the pain gets worse or if new symptoms appear.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "Based on the dialogue, the claims that can be extracted are:\n\n0. Difficulty sleeping\n2. Impaired depression\n3. GP review\n\nExplanation:\n- The patient mentions difficulty focusing and being easily distracted, which could be related to difficulty sleeping.\n- The patient describes having a lower mood and decreased sex drive, which aligns with impaired depression.\n- The doctor suggests a follow-up with the patient's GP for an examination and blood tests, indicating a need for a GP review.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

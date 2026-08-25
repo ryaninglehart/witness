@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":60,\"why\":\"Patient stated 'Yeah, definitely sort of tired and, um, yeah, less energy, sort of probably less than I, I would normally be.'\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":73,\"why\":\"Patient stated 'No, <UNIN/>. '\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":74,\"why\":\"Patient stated 'No, <UNIN/>. '\"},{\"i\":15,\"v\":\"SUPPORTED\",\"u\":75,\"why\":\"Patient stated 'No. '\"},{\"i\":16,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient did not mention anything about night sweats.\"},{\"i\":17,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient did not mention alcohol consumption.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

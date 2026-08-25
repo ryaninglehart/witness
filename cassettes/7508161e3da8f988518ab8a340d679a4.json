@@ -1,5 +1,0 @@
-{
-  "text": "```json\n{\n  \"verdicts\": [\n    {\"i\": 0, \"v\": \"SUPPORTED\", \"u\": 16, \"why\": \"Patient mentioned wheezing started two days ago after cleaning the house.\"},\n    {\"i\": 1, \"v\": \"SUPPORTED\", \"u\": 35, \"why\": \"Patient did not mention any chest pain.\"},\n    {\"i\": 2, \"v\": \"SUPPORTED\", \"u\": 41, \"why\": \"Patient reported having 4-5 glasses of water a day, indicating no problems with eating and drinking.\"},\n    {\"i\": 3, \"v\": \"SUPPORTED\", \"u\": 44, \"why\": \"Patient mentioned having asthma as a child and hay fever in the summer.\"},\n    {\"i\": 4, \"v\": \"SUPPORTED\", \"u\": 59, \"why\": \"Patient did not mention any allergies or regular medications.\"},\n    {\"i\": 5, \"v\": \"INFERRED\", \"u\": 75, \"why\": \"Given the patient's history of asthma and hay fever, the doctor inferred the differential diagnoses of acute exacerbation of asthma or allergy.\"},\n    {\"i\": 6, \"v\": \"SUPPORTED\", \"u\": 83, \"why\": \"Doctor advised the patient to take an antihistamine and to visit a clinic for further tests and examination.\"}\n  ]\n}\n```",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

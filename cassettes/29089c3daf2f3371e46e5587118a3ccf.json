@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 0, \"v\": \"SUPPORTED\" }, { \"i\": 1, \"v\": \"SUPPORTED\" }, { \"i\": 2, \"v\": \"SUPPORTED\" }, { \"i\": 3, \"v\": \"SUPPORTED\" }, { \"i\": 4, \"v\": \"SUPPORTED\" }, { \"i\": 5, \"v\": \"SUPPORTED\" }, { \"i\": 6, \"v\": \"SUPPORTED\" }, { \"i\": 7, \"v\": \"SUPPORTED\" }, { \"i\": 8, \"v\": \"SUPPORTED\" }, { \"i\": 9, \"v\": \"SUPPORTED\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

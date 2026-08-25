@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"SUPPORTED\",\"u\":23,\"why\":\"Patient explicitly stated 'It's very itchy and dry, all over my body'.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":66,\"why\":\"Patient explicitly stated 'No fever?' and 'There's no temperature, no joint pains'.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":25,\"why\":\"Patient mentioned 'I have asthma, and, uh, in my family, uh, there's hypothyroidism and migraine. My mother has migraine'.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":82,\"why\":\"Patient mentioned 'probably neither. Uh' and 'Yeah. Yeah. It's only when I have a flare'.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient explicitly stated 'I, I have asthma, and, uh, in my family, uh, there's hypothyroidism and migraine. My mother has migraine'.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "```json\n{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No specific management decisions are mentioned in the transcript.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":28,\"why\":\"Patient explicitly states 'no my left ear'.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":32,\"why\":\"Patient explicitly states 'No, OK'.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":30,\"why\":\"Patient explicitly states 'not specifically apart from the dizziness so much'.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":49,\"why\":\"Patient explicitly states 'No'.\"}]}\n```",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

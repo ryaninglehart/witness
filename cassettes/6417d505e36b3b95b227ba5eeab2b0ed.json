@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":115,\"why\":\"Doctor explicitly states to prescribe a peak flow meter.\"},{\"i\":13,\"v\":\"SUPPORTED\",\"u\":121,\"why\":\"Doctor states the pharmacist can show the patient how to use the inhaler.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":123,\"why\":\"Doctor suggests increasing the salbutamol to 2-4 puffs every four hours and arranging a review in a week.\"},{\"i\":15,\"v\":\"INFERRED\",\"u\":125,\"why\":\"Doctor suggests arranging a review in a week to see how the patient's asthma is, implying the possibility of needing to start other medication.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

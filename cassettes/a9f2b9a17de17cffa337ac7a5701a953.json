@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":36,\"why\":\"Patient mentioned that the swelling developed in half an hour and is getting bigger.\"},\n    {\"i\":1,\"UNSUPPORTED\":\"Patient did not mention chest tightness or difficulty breathing at the moment.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":59,\"why\":\"Patient mentioned having asthma and using Salbutamol inhalers.\"},\n    {\"i\":3,\"UNSUPPORTED\":\"Patient only mentioned having a peanut allergy as a child and not receiving an injection.\"},\n    {\"i\":4,\"v\":\"SUPPORTED\",\"u\":61,\"why\":\"Patient confirmed using Salbutamol inhalers regularly.\"},\n    {\"i\":5,\"v\":\"INFERRED\",\"u\":83,\"why\":\"Doctor advised calling the ambulance and taking antihistamines, which implies the use of an antihistamine.\"},\n    {\"i\":6,\"v\":\"SUPPORTED\",\"u\":86,\"why\":\"Doctor explicitly advised calling 999 due to suspected anaphylaxis.\"},\n    {\"i\":7,\"v\":\"INFERRED\",\"u\":95,\"why\":\"Doctor advised a follow-up with the doctor after discharge to consider prescribing an epipen for future anaphylactic reactions.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

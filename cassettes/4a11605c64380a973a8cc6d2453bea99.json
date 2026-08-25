@@ -1,5 +1,0 @@
-{
-  "text": "Here are the claims extracted from the dialogue, along with their corresponding numbers:\n\n1. 3/7 hx of diarrhea - The patient mentions having had diarrhea for 3-7 days.\n2. No blood in stools - The patient states there is no blood in his stools.\n3. Assoc crampy abdo pain - The patient reports associated crampy abdominal pain.\n4. Passing less urine - The patient mentions passing less urine, indicating possible dehydration.\n5. No weight loss - The patient states there has been no weight loss.\n6. PMH: nil - The patient has no significant past medical history.\n7. DH: nil regular - The patient has no significant drug history.\n8. NKDA - The patient denies any known drug allergies.\n9. SH: lives with sister and mum - The patient lives with his sister and mother.\n10. Smokes socially, EtOH - The patient smokes socially and consumes alcohol, typically on Fridays.\n11. Imp: gastroenteritis - The doctor's impression is that the patient has gastroenteritis, a basic infection of the stomach.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

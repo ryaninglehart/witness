@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":12,\"v\":\"SUPPORTED\",\"u\":72,\"why\":\"Patient states she lives in a flat with friends and is a student studying Biology. She also mentions not smoking and drinking alcohol socially on weekends.\"},{\"i\":13,\"v\":\"INFERRED\",\"u\":87,\"why\":\"Doctor infers UTI/cystitis based on patient's symptoms of burning pain on passing urine and crampy tummy pain.\"},{\"i\":14,\"v\":\"SUPPORTED\",\"u\":102,\"why\":\"Doctor explicitly states to review in 3 days if no better or earlier if symptoms worsen.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":12,\"v\":\"SUPPORTED\",\"u\":91,\"why\":\"Patient explicitly states her job as a graphics designer.\"},\n    {\"i\":13,\"v\":\"INFERRED\",\"u\":111,\"why\":\"Doctor infers gastroenteritis from patient's symptoms and mention of brother having similar symptoms.\"},\n    {\"i\":14,\"v\":\"SUPPORTED\",\"u\":114,\"why\":\"Doctor explicitly states the need for a stool sample to check for bacterial infection.\"},\n    {\"i\":15,\"v\":\"SUPPORTED\",\"u\":119,\"why\":\"Doctor advises patient to continue taking ORS (oral rehydration salts) in small amounts.\"},\n    {\"i\":16,\"v\":\"SUPPORTED\",\"u\":125,\"why\":\"Doctor advises patient to contact them if symptoms worsen and suggests urgent A&E assessment if needed.\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

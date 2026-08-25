@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 12, \"v\": \"SUPPORTED\", \"why\": \"The doctor explicitly states, 'If you have any chest pains, or change in bowel habits, do get in touch with us.' and 'And when you get the result, you will receive a text message through your phone to tell you to book an appointment.' This directly supports the claim that the patient will need to book in for another appointment after receiving a text message from Babylon.\" }, { \"i\": 13, \"v\": \"SUPPORTED\", \"why\": \"The doctor clearly states, 'If you have any chest pains, or change in bowel habits, do get in touch with us.' This is a direct safety netting statement, supporting the claim that the patient should contact the doctor urgently if they develop chest pain with palpitations or changes in bowel habits.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

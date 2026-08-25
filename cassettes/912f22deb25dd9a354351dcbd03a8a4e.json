@@ -1,0 +1,5 @@
+{
+  "text": "{ \"verdicts\": [ { \"i\": 12, \"v\": \"INFERRED\", \"why\": \"The patient mentions taking Lisinopril, but there is no explicit mention of Metformin. However, the doctor does not ask about Metformin, which might suggest it is not part of the patient's current medications.\" }, { \"i\": 13, \"v\": \"INFERRED\", \"why\": \"The patient explicitly states, 'Uh, not that I'm, not that I'm aware of. You know, I mean, what, what are the, what are the allergies you get? Just, you know, nah, not.' This indicates that the patient does not have any known allergies, which is often abbreviated as NKDA (No Known Drug Allergies) in medical records.\" } ] }",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

@@ -1,0 +1,5 @@
+{
+  "text": "{\"verdicts\":[{\"i\":0,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"No specific mention of management decisions or NHS advice in the transcript.\"},{\"i\":1,\"v\":\"SUPPORTED\",\"u\":28,\"why\":\"Patient explicitly states 'no my left ear' regarding pain.\"},{\"i\":2,\"v\":\"SUPPORTED\",\"u\":32,\"why\":\"Patient does not mention any discharge.\"},{\"i\":3,\"v\":\"SUPPORTED\",\"u\":30,\"why\":\"Patient does not mention any fever.\"},{\"i\":4,\"v\":\"SUPPORTED\",\"u\":34,\"why\":\"Patient explicitly states 'nah I'll do it' regarding cleaning ears, implying not itchy.\"},{\"i\":5,\"v\":\"SUPPORTED\",\"u\":49,\"why\":\"Patient explicitly states 'No' to chest pain.\"}]}",
+  "provider": "ollama",
+  "model": "qwen2.5:7b-instruct"
+}

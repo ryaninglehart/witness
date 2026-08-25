@@ -1,5 +1,0 @@
-{
-  "text": "[\n    {\"i\":0,\"v\":\"SUPPORTED\",\"u\":77,\"why\":\"Patient mentioned having asthma and provided a family history including hypothyroidism and migraine, which includes a past medical history of eczema.\"},\n    {\"i\":1,\"v\":\"UNSUPPORTED\",\"u\":null,\"why\":\"Patient did not mention using inhalers, only that they are used 'on and off' during a flare-up.\"},\n    {\"i\":2,\"v\":\"SUPPORTED\",\"u\":76,\"why\":\"Patient explicitly stated 'I, I have asthma, and, uh, in my family, uh, there's hypothyroidism and migraine. My mother has migraine.'\"}\n]",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}

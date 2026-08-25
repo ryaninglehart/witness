@@ -1,5 +1,0 @@
-{
-  "text": "Based on the conversation, here are the claims with their corresponding verifications:\n\n0. **Knee pain**: \n   - Verified: The patient mentions knee pain and discusses it with the doctor.\n\n1. **You have been taking ibuprofen 400mg bd for knee pain**:\n   - Verified: The patient mentions taking ibuprofen 400mg daily for knee pain.\n\n2. **No back pain**:\n   - Verified: The patient explicitly states, \"No back pains?\"\n\n3. **No swelling of hands/feet/elbows/wrist**:\n   - Verified: The patient mentions noticing swelling in their feet but not in hands, elbows, or wrists.\n\n4. **No calf pain**:\n   - Verified: The patient does not mention any calf pain.\n\n5. **No pain in joints of foot**:\n   - Verified: The patient explicitly states, \"No, no, no problems.\"\n\n6. **PMH: Asthma**:\n   - Not Verified: The patient mentions having a far-sighted condition and a UTI, but does not mention asthma.\n\n7. **DH: Vitamin D, melatonin, ibuprofren, xanax prn**:\n   - Verified: The patient mentions taking vitamin D, melatonin, ibuprofen, and occasionally Xanax.",
-  "provider": "ollama",
-  "model": "qwen2.5:7b-instruct"
-}
