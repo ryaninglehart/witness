@@ -6,3 +6,6 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 semantic*.log
+
+# macOS noise (added before syncing to GitHub)
+.DS_Store
